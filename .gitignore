@@ -1,3 +1,9 @@
+# Nuxt.js build / generate output
+shelter
+
+# created by macOs
+.DS_Store
+
 # Logs
 logs
 *.log
