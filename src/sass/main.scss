@@ -1,8 +1,50 @@
+$body-max-width: 1280px;
 $base-color: #cccccc;
 $font-fam-arial: 'arial';
 $font-fam-georgia: 'georgia';
 
 body {
+    max-width: $body-max-width;
     background-color: #ffffff;
     font-family: $font-fam-georgia;
+}
+
+h1 {
+    font-family: 'Georgia';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 44px;
+    line-height: 130%;
+    width: 310px;
+}
+
+.start.screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    height: 908px;
+    padding: 0 40px;
+    background: url(../assets/images/start-screen-background.jpg);
+    background: radial-gradient(100% 215.42% at 0% 0%, #5B483A 0%, #262425 100%), #211F20;
+
+    .screen-content {
+        // height: 908px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        align-items: center;
+
+        // align-items: flex-end;
+        .not-only {
+            color: #ffffff;
+            width: 460px;
+            height: 322px;
+        }
+
+        .start-screen-puppy {
+            height: 728px;
+        }
+    }
 }
