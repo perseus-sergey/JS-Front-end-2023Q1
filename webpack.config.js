@@ -1,4 +1,5 @@
 const path = require('path');
+const imgDir = path.resolve(__dirname, 'src/assets/images');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -56,6 +57,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, 'src', 'template.html'),
             filename: 'index.html',
+            favicon: `${imgDir}/favicon.ico`,
             minify: {
                 collapseWhitespace: true,
             }
