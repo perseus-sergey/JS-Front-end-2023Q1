@@ -53,6 +53,16 @@ h1 {
     margin: 0 auto;
     // width: 40vw;
     width: 75%;
+    // padding-top: 3%;
+
+    @media (max-width: $ipad-max-width) {
+        padding-top: 5%;
+    }
+
+    @media (max-width: $iphone-max-width) {
+        padding: 0;
+        width: 100%;
+    }
 }
 
 h2,
@@ -238,6 +248,7 @@ button {
 }
 
 .header.pets {
+    padding-bottom: 30px;
 
     .logo {
         cursor: pointer;
@@ -478,18 +489,32 @@ button {
 
     .pets-content {
         text-align: center;
-        padding-top: 6.1%;
+        padding-top: 6.2%;
         padding-bottom: 7.9%;
 
         @media (max-width: $ipad-max-width) {
             // padding-top: 10.3%;
             // padding-bottom: 13%;
+            // padding: 7.5% 12% 13%;
             padding: 10.3% 4% 13%;
+
         }
 
         @media (max-width: $iphone-max-width) {
             // padding: 42px 10px;
             padding: 13% 3%;
+        }
+
+        &.pts-cont {
+            padding-bottom: 6%;
+
+            @media (max-width: $ipad-max-width) {
+                padding: 7% 12% 9.2%;
+            }
+
+            @media (max-width: $iphone-max-width) {
+                padding: 13% 4% 13.4%;
+            }
         }
 
         .slider-wrapper {
@@ -513,6 +538,14 @@ button {
                     padding: 14px 15px;
                     order: -1;
                 }
+                
+                &.cw-pets {
+                    width: 100%;
+                    
+                    @media (max-width: $iphone-max-width) {
+                        padding: 10% 4.2% 5%;
+                    }
+                }
             }
 
             .arrow {
@@ -533,36 +566,108 @@ button {
             }
 
             .slider {
-                width: 2820px;
+                // width: 2820px;
+                width: 290%;
                 margin: 5.8% auto;
-                display: flex;
-                justify-content: space-between;
+                // display: flex;
+                // justify-content: space-between;
                 // row-gap: 45px;
+                display: grid;
+                grid-template-columns: repeat(8, 1fr);
+                grid-template-rows: 1fr;
+                // grid-column-gap: 3.3%;
 
                 @media (max-width: $ipad-max-width) {
                     // margin: 8vw auto;
                     margin: 10.3% auto;
-                    width: 2440px;
+                    // width: 2440px;
+                    width: 430%;
                 }
 
                 @media (max-width: $iphone-max-width) {
                     margin-bottom: 2%;
+                    // width: 900%;
+                }
+
+                @media (max-width: 700px) {
+                    width: 900%;
                 }
             }
 
             .slider-pets {
                 width: 100%;
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+                margin: 5% auto;
+                grid-column-gap: 3.3%;
+                grid-row-gap: 2.5%;
+
+                @media (max-width: $ipad-max-width) {
+                    padding-bottom: 12%;
+                    grid-column-gap: 7%;
+                    grid-row-gap: 2.5%;
+                    grid-template-columns: repeat(3, 1fr);
+                    grid-template-rows: repeat(3, 1fr);
+                    // grid-auto-rows: 0;
+                    grid-template-areas:
+                        "katr jenn scarl"
+                        "wood soph fred"
+                        "timm charl .";
+
+                    .katr {
+                        grid-area: katr;
+                    }
+
+                    .jenn {
+                        grid-area: jenn;
+                    }
+
+                    .wood {
+                        grid-area: wood;
+                    }
+
+                    .soph {
+                        grid-area: soph;
+                    }
+
+                    .timm {
+                        grid-area: timm;
+                    }
+
+                    .charl {
+                        grid-area: charl;
+                    }
+
+                    .scarl {
+                        grid-area: scarl;
+                    }
+
+                    .fred {
+                        grid-area: fred;
+                    }
+                }
+                @media (max-width: $iphone-max-width) {
+                    grid-template-columns: 1fr;
+                    row-gap: 2.2%;
+                    grid-template-areas:
+                        "katr soph scarl"
+                        "jenn timm fred"
+                        "wood charl .";
+                }
+
             }
         }
 
         .card {
-            padding-bottom: 1.7rem;
+            width: 270px;
+            padding-bottom: 1.8rem;
             display: flex;
             flex-direction: column-reverse;
             background-color: $color-light-s;
             border-radius: 0.56rem;
-            overflow: hidden;
-            gap: 1.9rem;
+            // overflow: hidden;
+            // gap: 1.9rem;
+            gap: 30px;
 
             @media (max-width: $ipad-max-width) {
                 gap: 1.7rem;
@@ -570,6 +675,10 @@ button {
 
             @media (max-width: $iphone-max-width) {
                 gap: 1.8rem;
+            }
+
+            @media (max-width: $nokia-max-width - 10px) {
+                width: auto;
             }
 
             &:hover {
@@ -621,9 +730,18 @@ button {
         // }
 
         .pagination {
-            padding: 15px 430px 0 430px;
+            // padding: 2% 0 0;
+            padding: 2% 36%;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
+
+            @media (max-width: $ipad-max-width) {
+                padding: 1% 21%;
+            }
+            @media (max-width: $iphone-max-width) {
+                padding: 0;
+            }
 
             .btn {
                 color: $color-dark-3xl;
@@ -745,7 +863,7 @@ button {
 
     .donation-content {
         // padding: 80px 183px 100px 183px;
-        padding: 6% 14.5% 7.9%;
+        padding: 6% 14.5% 7.7%;
         display: flex;
         column-gap: 3%;
         align-items: center;
@@ -786,13 +904,13 @@ button {
                 width: 100%;
                 align-items: center;
             }
-            
+
             .heading {
                 @media (max-width: $iphone-max-width) {
                     text-align: center;
                 }
             }
-            
+
             .subheading {
                 @media (max-width: $iphone-max-width) {
                     letter-spacing: normal;
