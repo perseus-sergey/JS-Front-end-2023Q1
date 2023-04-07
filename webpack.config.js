@@ -53,6 +53,9 @@ module.exports = {
             },
         ],
     },
+
+    devtool: 'eval',
+
     plugins: [
         new HtmlWebpackPlugin({
             template: path.join(__dirname, 'src', 'template.html'),
