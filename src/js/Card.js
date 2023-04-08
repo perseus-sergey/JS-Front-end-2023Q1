@@ -17,7 +17,8 @@ export class Card {
         let img = this.generateDomElement('img');
         img.alt = this.name;
         // img.src = this.imgPath;
-        img.src = `./assets/images/${this.name.toLowerCase()}.png`;
+        let dot = this.petsPage ? '.' : '';
+        img.src = dot + `./assets/images/${this.name.toLowerCase()}.png`;
         btnPrim.append(btn);
         btnSec.append(btnPrim);
         card.append(btnSec);

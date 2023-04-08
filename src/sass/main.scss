@@ -548,6 +548,10 @@ button {
                 width: 83%;
                 overflow: hidden;
 
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
                 @media (max-width: $iphone-max-width) {
                     width: 100%;
                     padding: 14px 15px;
@@ -581,11 +585,18 @@ button {
             }
 
             .slider {
-                width: 290%;
+                position: relative;
+                // width: 290%;
                 margin: 5.8% auto;
-                display: grid;
-                grid-template-columns: repeat(8, 1fr);
-                grid-template-rows: 1fr;
+                // display: grid;
+                // grid-template-columns: repeat(8, 1fr);
+                // grid-template-rows: 1fr;
+
+                display: flex;
+                width: 300%;
+                justify-content: space-between;
+
+                align-items: center;
 
                 @media (max-width: $ipad-max-width) {
                     margin: 10.3% auto;
@@ -599,10 +610,19 @@ button {
                 @media (max-width: 700px) {
                     width: 900%;
                 }
+
+                .slider__item {
+                    display: flex;
+                    column-gap: 7%;
+                    // width: 83%;
+                    width: 1000px;
+                    height: 100%;
+                }
             }
 
             .slider-pets {
                 width: 100%;
+                display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 grid-template-rows: repeat(2, 1fr);
                 margin: 5% auto;
@@ -779,6 +799,34 @@ button {
             }
         }
     }
+}
+
+@keyframes move-left {
+    from {
+        left: 0
+    }
+
+    to {
+        left: +100%
+    }
+}
+
+.transition-left {
+    animation: move-left 2s;
+}
+
+@keyframes move-right {
+    from {
+        left: 0
+    }
+
+    to {
+        left: -100%
+    }
+}
+
+.transition-right {
+    animation: move-right 2s;
 }
 
 #help {

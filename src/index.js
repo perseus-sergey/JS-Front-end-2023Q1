@@ -48,6 +48,7 @@ import './assets/images/svg/modal_close_btn.svg';
 
 const pets = [
     {
+        "id": "0",
         "name": "Katrine",
         "img": "./assets/images/modal_katrine.png",
         "type": "Cat",
@@ -59,6 +60,7 @@ const pets = [
         "parasites": ["none"]
     },
     {
+        "id": "1",
         "name": "Jennifer",
         "img": "./assets/images/modal_jennifer.png",
         "type": "Dog",
@@ -70,6 +72,7 @@ const pets = [
         "parasites": ["none"]
     },
     {
+        "id": "2",
         "name": "Woody",
         "img": "./assets/images/modal_woody.png",
         "type": "Dog",
@@ -81,6 +84,7 @@ const pets = [
         "parasites": ["none"]
     },
     {
+        "id": "3",
         "name": "Sophia",
         "img": "./assets/images/modal_sophia.png",
         "type": "Dog",
@@ -92,6 +96,7 @@ const pets = [
         "parasites": ["none"]
     },
     {
+        "id": "4",
         "name": "Timmy",
         "img": "./assets/images/modal_timmy.png",
         "type": "Cat",
@@ -103,6 +108,7 @@ const pets = [
         "parasites": ["none"]
     },
     {
+        "id": "5",
         "name": "Charly",
         "img": "./assets/images/modal_charly.png",
         "type": "Dog",
@@ -114,6 +120,7 @@ const pets = [
         "parasites": ["lice", "fleas"]
     },
     {
+        "id": "6",
         "name": "Scarlett",
         "img": "./assets/images/modal_scarlett.png",
         "type": "Dog",
@@ -125,6 +132,7 @@ const pets = [
         "parasites": ["none"]
     },
     {
+        "id": "7",
         "name": "Freddie",
         "img": "./assets/images/modal_freddie.png",
         "type": "Cat",
@@ -146,6 +154,7 @@ import { Modal } from './js/Modal';
 
 window.onload = function () {
     if (pets) {
+        // debugger;
         renderSliderToDom();
         addCardClickHandler();
         menuBtnHandler();
@@ -153,13 +162,13 @@ window.onload = function () {
 }
 // ============== SLIDER card ======== start ====
 
-const renderSliderToDom = () => {
-    const slider = document.querySelector('.slider');
-    let petsPage = false;
-    if (slider.classList.contains('slider-pets')) petsPage = true;
-    slider.innerHTML = '';
-    pets.forEach(dog => slider.append(new Card(dog.name, dog.img, petsPage).generateCard()));
-}
+// const renderSliderToDom = () => {
+//     const slider = document.querySelector('.slider');
+//     let petsPage = false;
+//     if (slider.classList.contains('slider-pets')) petsPage = true;
+//     slider.innerHTML = '';
+//     pets.forEach(dog => slider.append(new Card(dog.name, dog.img, petsPage).generateCard()));
+// }
 
 
 const addCardClickHandler = () => {
@@ -228,3 +237,105 @@ const menuClicked = (e) => {
     }
 }
 // ______________ Burger Menu ______ end _______
+
+// ============== CARUSEL ======== start ====
+let centerItem, leftItem, rightItem;
+const slider = document.querySelector('.slider');
+const btnLeft = document.querySelector('.arrow.l');
+const btnRight = document.querySelector('.arrow.r');
+
+let arrPets = [...pets].sort(() => Math.random() - 0.5);
+let arrId = [];
+let arrIdRight = [];
+let arrIdLeft = [];
+
+const renderSliderToDom = () => {
+    if (slider.classList.contains('slider-pets')) {
+        // slider.innerHTML = '';
+        pets.forEach(dog => slider.append(new Card(dog.name, dog.img, true).generateCard()));
+        return;
+    }
+
+    leftItem = slider.appendChild(Modal.generateDomElement('div', '', 'slider__item', 'slider-item-left'));
+    centerItem = slider.appendChild(Modal.generateDomElement('div', '', 'slider__item', 'slider-item-center'));
+    rightItem = slider.appendChild(Modal.generateDomElement('div', '', 'slider__item', 'slider-item-right'));
+
+    fillCenterSlideBlock();
+    addBtnListners();
+}
+
+const pushCardsToBlock = (dog, block) => {
+    let petsPage = false;
+    if (slider.classList.contains('slider-pets')) petsPage = true;
+    block.appendChild(new Card(dog.name, dog.img, petsPage).generateCard());
+}
+
+const fillCenterSlideBlock = () => {
+    for (let i = 0; i < 3; i++) {
+        pushCardsToBlock(arrPets[i], centerItem);
+        arrId.push(arrPets[i].id);
+    }
+    fillSideSlideBlocks();
+    fillSideSlideBlocks(false);
+}
+
+const fillSideSlideBlocks = (left = true) => {
+    arrPets = [...pets].sort(() => Math.random() - 0.5);
+    let arr = [];
+    let block = left ? leftItem : rightItem;
+
+    left ? arrIdLeft = [] : arrIdRight = [];
+
+    arrPets.forEach(el => !arrId.includes(el.id) && arr.push(el))
+
+    arr.splice(0, 3).forEach(el => {
+        left ? arrIdLeft.push(el.id) : arrIdRight.push(el.id);
+        pushCardsToBlock(el, block);
+    });
+}
+
+const moveLeft = () => {
+    slider.classList.add('transition-left');
+    removeBtnListners();
+}
+const moveRight = () => {
+    slider.classList.add('transition-right');
+    removeBtnListners();
+}
+
+const removeBtnListners = () => {
+    btnLeft.removeEventListener('click', moveLeft);
+    btnRight.removeEventListener('click', moveRight);
+}
+
+const addBtnListners = () => {
+    btnLeft.addEventListener('click', moveLeft);
+    btnRight.addEventListener('click', moveRight);
+}
+
+slider.addEventListener('animationend', (animationEvent) => {
+    if (animationEvent.animationName === 'move-right') {
+        slider.classList.remove('transition-right');
+        leftItem.innerHTML = centerItem.innerHTML;
+        centerItem.innerHTML = rightItem.innerHTML;
+        rightItem.innerHTML = ''
+        arrIdLeft = arrId.slice();
+        arrId = arrIdRight.slice();
+        arrIdRight = [];
+        fillSideSlideBlocks(false);
+    }
+    else if (animationEvent.animationName === 'move-left') {
+        slider.classList.remove('transition-left');
+        rightItem.innerHTML = centerItem.innerHTML;
+        centerItem.innerHTML = leftItem.innerHTML;
+        leftItem.innerHTML = ''
+        arrIdRight = arrId.slice();
+        arrId = arrIdLeft.slice();
+        arrIdLeft = [];
+        fillSideSlideBlocks();
+    }
+
+    addBtnListners();
+})
+// ______________ CARUSEL ______ end _______
+
