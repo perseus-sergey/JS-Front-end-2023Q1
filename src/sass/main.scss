@@ -233,7 +233,7 @@ button {
             display: flex;
             gap: 2.3rem;
 
-            @media (max-width: calc($iphone-max-width - 1px)) {
+            @media (max-width: calc($iphone-max-width)) {
                 padding: 78% 10%;
                 display: flex;
                 flex-direction: column;
@@ -241,7 +241,7 @@ button {
             }
 
             p {
-                @media (max-width: calc($iphone-max-width - 1px)) {
+                @media (max-width: calc($iphone-max-width)) {
                     font-size: 2rem;
                     line-height: 170%;
                 }
@@ -321,7 +321,7 @@ button {
 
     .menu {
 
-        @media (max-width: calc($iphone-max-width - 1px)) {
+        @media (max-width: calc($iphone-max-width)) {
             background-color: $color-light-l;
         }
 
@@ -545,7 +545,7 @@ button {
             }
 
             .carusel-wrapper {
-                width: 83%;
+                width: 90%;
                 overflow: hidden;
 
                 display: flex;
@@ -553,7 +553,7 @@ button {
                 align-items: center;
 
                 @media (max-width: $iphone-max-width) {
-                    width: 100%;
+                    // width: 100%;
                     padding: 14px 15px;
                     order: -1;
                 }
@@ -600,7 +600,7 @@ button {
 
                 @media (max-width: $ipad-max-width) {
                     margin: 10.3% auto;
-                    width: 430%;
+                    // width: 430%;
                 }
 
                 @media (max-width: $iphone-max-width) {
@@ -613,9 +613,10 @@ button {
 
                 .slider__item {
                     display: flex;
-                    column-gap: 7%;
+                    justify-content: space-around;
+                    // column-gap: 7%;
                     // width: 83%;
-                    width: 1000px;
+                    width: 1100px;
                     height: 100%;
                 }
             }
@@ -628,59 +629,60 @@ button {
                 margin: 5% auto;
                 grid-column-gap: 3.3%;
                 grid-row-gap: 2.5%;
+                justify-items: center;
 
-                @media (max-width: $ipad-max-width) {
+                @media (max-width: 1250px) {
                     padding-bottom: 12%;
                     grid-column-gap: 7%;
                     grid-row-gap: 2.5%;
-                    grid-template-columns: repeat(3, 1fr);
+                    grid-template-columns: repeat(2, 1fr);
                     grid-template-rows: repeat(3, 1fr);
                     // grid-auto-rows: 0;
-                    grid-template-areas:
-                        "katrine jennifer scarlett"
-                        "woody sophia freddie"
-                        "timmy charly .";
+                    // grid-template-areas:
+                    //     "katrine jennifer scarlett"
+                    //     "woody sophia freddie"
+                    //     "timmy charly .";
 
-                    .katrine {}
+                    // .katrine {}
 
-                    grid-area: katrine;
+                    // grid-area: katrine;
 
-                    .jennifer {
-                        grid-area: jennifer;
-                    }
+                    // .jennifer {
+                    //     grid-area: jennifer;
+                    // }
 
-                    .woody {
-                        grid-area: woody;
-                    }
+                    // .woody {
+                    //     grid-area: woody;
+                    // }
 
-                    .sophia {
-                        grid-area: sophia;
-                    }
+                    // .sophia {
+                    //     grid-area: sophia;
+                    // }
 
-                    .timmy {
-                        grid-area: timmy;
-                    }
+                    // .timmy {
+                    //     grid-area: timmy;
+                    // }
 
-                    .charly {
-                        grid-area: charly;
-                    }
+                    // .charly {
+                    //     grid-area: charly;
+                    // }
 
-                    .scarlett {
-                        grid-area: scarlett;
-                    }
+                    // .scarlett {
+                    //     grid-area: scarlett;
+                    // }
 
-                    .freddie {
-                        grid-area: freddie;
-                    }
+                    // .freddie {
+                    //     grid-area: freddie;
+                    // }
                 }
 
                 @media (max-width: $iphone-max-width) {
                     grid-template-columns: 1fr;
                     row-gap: 2.2%;
-                    grid-template-areas:
-                        "katrine sophia scarlett"
-                        "jennifer timmy freddie"
-                        "woody charly .";
+                    // grid-template-areas:
+                    //     "katrine sophia scarlett"
+                    //     "jennifer timmy freddie"
+                    //     "woody charly .";
                 }
 
             }
@@ -812,7 +814,7 @@ button {
 }
 
 .transition-left {
-    animation: move-left 2s;
+    animation: move-left 1s;
 }
 
 @keyframes move-right {
@@ -826,7 +828,7 @@ button {
 }
 
 .transition-right {
-    animation: move-right 2s;
+    animation: move-right 1s;
 }
 
 #help {

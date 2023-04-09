@@ -1,6 +1,6 @@
 export class Modal {
 
-    constructor(oPet) {
+    constructor(oPet, petsPage = false) {
         this.name = oPet.name;
         this.imgPath = oPet.img;
         this.type = oPet.type;
@@ -10,7 +10,7 @@ export class Modal {
         this.inoculations = oPet.inoculations;
         this.diseases = oPet.diseases;
         this.parasites = oPet.parasites;
-        // this.petsPage = oPet.petsPage;
+        this.petsPage = petsPage;
         this.buildModal();
     }
 
@@ -19,6 +19,7 @@ export class Modal {
     buildModal() {
         this.closeBtn = '';
         this.overlay = this.generateOverlay();
+        document.body.classList.toggle('active-menu');
 
         this.closeBtn.addEventListener('click', this.closeModal);
         this.overlay.addEventListener('click', this.closeModal);
@@ -30,8 +31,8 @@ export class Modal {
         let modalWind = Modal.generateDomElement('div', '', 'modal-wind')
         let petImg = Modal.generateDomElement('img', '', 'pet-img');
         petImg.alt = `Pet ${this.type} - ${this.name}`;
-        // petImg.src = this.imgPath;
-        petImg.src = `./assets/images/modal_${this.name.toLowerCase()}.png`;
+        let dot = this.petsPage ? '.' : '';
+        petImg.src = dot + `./assets/images/modal_${this.name.toLowerCase()}.png`;
 
         let content = Modal.generateDomElement('div', '', 'content');
 
@@ -71,6 +72,7 @@ export class Modal {
         if (!document.querySelector('.overlay')) return;
         if (!event.target.closest('.content') && !event.target.closest('.pet-img')) {
             document.querySelector('.overlay').remove();
+            document.body.classList.remove('active-menu');
         }
     }
 

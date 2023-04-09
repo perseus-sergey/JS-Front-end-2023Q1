@@ -145,31 +145,36 @@ const pets = [
     }
 ];
 
-// import './js/imports';
-// import './js/Card';
-// import './js/Modal';
 import { Card } from './js/Card';
 import { Modal } from './js/Modal';
-// import { MenuBurger } from './js/MenuBurger';
 
 window.onload = function () {
     if (pets) {
-        // debugger;
-        renderSliderToDom();
+        setMediaQueryListeners();
         addCardClickHandler();
         menuBtnHandler();
     }
 }
+
+// ============== MEDIAQUERY ======== start ====
+
+const medQryIpad = window.matchMedia('(max-width: 1250px)')
+const medQryIphone = window.matchMedia('(max-width: 767px)')
+
+function mediaQueryHandler() {
+    renderSliderToDom();
+}
+
+const setMediaQueryListeners = () => {
+    medQryIpad.addListener(mediaQueryHandler);
+    medQryIphone.addListener(mediaQueryHandler);
+
+    mediaQueryHandler();
+}
+// ______________ MEDIAQUERY ______ end _______
+
+
 // ============== SLIDER card ======== start ====
-
-// const renderSliderToDom = () => {
-//     const slider = document.querySelector('.slider');
-//     let petsPage = false;
-//     if (slider.classList.contains('slider-pets')) petsPage = true;
-//     slider.innerHTML = '';
-//     pets.forEach(dog => slider.append(new Card(dog.name, dog.img, petsPage).generateCard()));
-// }
-
 
 const addCardClickHandler = () => {
     document.querySelector('.slider').addEventListener('click', (e) => {
@@ -189,7 +194,7 @@ const getArrData = (name) => {
     return pets.find(pet => pet.name === name);
 }
 const renderCardModal = (oPet) => {
-    new Modal(oPet).openModal();
+    new Modal(oPet, petsPage).openModal();
 }
 // ______________ Card MODAL ______ end _______
 
@@ -239,10 +244,13 @@ const menuClicked = (e) => {
 // ______________ Burger Menu ______ end _______
 
 // ============== CARUSEL ======== start ====
+
 let centerItem, leftItem, rightItem;
 const slider = document.querySelector('.slider');
+const petsPage = slider.classList.contains('slider-pets');
 const btnLeft = document.querySelector('.arrow.l');
 const btnRight = document.querySelector('.arrow.r');
+let cardQuant;
 
 let arrPets = [...pets].sort(() => Math.random() - 0.5);
 let arrId = [];
@@ -250,12 +258,11 @@ let arrIdRight = [];
 let arrIdLeft = [];
 
 const renderSliderToDom = () => {
-    if (slider.classList.contains('slider-pets')) {
-        // slider.innerHTML = '';
-        pets.forEach(dog => slider.append(new Card(dog.name, dog.img, true).generateCard()));
+    slider.innerHTML = '';
+    if (petsPage) {
+        makePagin();
         return;
     }
-
     leftItem = slider.appendChild(Modal.generateDomElement('div', '', 'slider__item', 'slider-item-left'));
     centerItem = slider.appendChild(Modal.generateDomElement('div', '', 'slider__item', 'slider-item-center'));
     rightItem = slider.appendChild(Modal.generateDomElement('div', '', 'slider__item', 'slider-item-right'));
@@ -265,13 +272,18 @@ const renderSliderToDom = () => {
 }
 
 const pushCardsToBlock = (dog, block) => {
-    let petsPage = false;
-    if (slider.classList.contains('slider-pets')) petsPage = true;
     block.appendChild(new Card(dog.name, dog.img, petsPage).generateCard());
 }
 
+const setCardQuant = () => {
+    cardQuant = 3;
+    if (medQryIpad.matches) cardQuant = 2;
+    if (medQryIphone.matches) cardQuant = 1;
+}
+
 const fillCenterSlideBlock = () => {
-    for (let i = 0; i < 3; i++) {
+    setCardQuant();
+    for (let i = 0; i < cardQuant; i++) {
         pushCardsToBlock(arrPets[i], centerItem);
         arrId.push(arrPets[i].id);
     }
@@ -280,6 +292,7 @@ const fillCenterSlideBlock = () => {
 }
 
 const fillSideSlideBlocks = (left = true) => {
+    setCardQuant();
     arrPets = [...pets].sort(() => Math.random() - 0.5);
     let arr = [];
     let block = left ? leftItem : rightItem;
@@ -288,7 +301,7 @@ const fillSideSlideBlocks = (left = true) => {
 
     arrPets.forEach(el => !arrId.includes(el.id) && arr.push(el))
 
-    arr.splice(0, 3).forEach(el => {
+    arr.splice(0, cardQuant).forEach(el => {
         left ? arrIdLeft.push(el.id) : arrIdRight.push(el.id);
         pushCardsToBlock(el, block);
     });
@@ -338,4 +351,74 @@ slider.addEventListener('animationend', (animationEvent) => {
     addBtnListners();
 })
 // ______________ CARUSEL ______ end _______
+
+// ============== PAGINATION ======== start ====
+const btnPaginLeft = document.querySelector('.btn.previous');
+const btnPaginRight = document.querySelector('.btn.next');
+const btnPaginLast = document.querySelector('.btn.last');
+const btnPaginFirst = document.querySelector('.btn.first');
+const paginCurrPage = document.querySelector('.btn.current');
+
+let paginArr = [];
+let currPageNum = 1;
+
+let allCard = 48;
+let elPerPage = 8;
+let maxPage = allCard / elPerPage;
+
+const makePagin = () => {
+    paginArr = [];
+    setCardQuantPets();
+    currPageNum = Math.min(currPageNum, maxPage);
+    paginCurrPage.innerHTML = currPageNum;
+
+    for (let i = 1; i <= maxPage; i++) {
+        const a = arrPets.sort(() => Math.random() - 0.5).slice(0, elPerPage);
+        paginArr.push(a);
+    }
+    showPaginList();
+    paginClickListners();
+}
+
+const setCardQuantPets = () => {
+    elPerPage = 8;
+    if (medQryIpad.matches) elPerPage = 6;
+    if (medQryIphone.matches) elPerPage = 3;
+    maxPage = allCard / elPerPage;
+}
+
+const showPaginList = () => {
+    paginCurrPage.innerHTML = currPageNum;
+    btnPaginRight.disabled = btnPaginLast.disabled = currPageNum >= maxPage;
+    btnPaginLeft.disabled = btnPaginFirst.disabled = currPageNum <= 1;
+
+    slider.innerHTML = '';
+    paginArr[currPageNum - 1].forEach(dog => slider.append(new Card(dog.name, dog.img, petsPage).generateCard()));
+}
+
+const paginClickListners = () => {
+    btnPaginLeft.addEventListener('click', paginLeftClickHandler);
+    btnPaginRight.addEventListener('click', paginRightClickHandler);
+    btnPaginLast.addEventListener('click', paginLastClickHandler);
+    btnPaginFirst.addEventListener('click', paginFirsrClickHandler);
+}
+const paginLeftClickHandler = () => {
+    currPageNum--;
+    showPaginList();
+}
+const paginRightClickHandler = () => {
+    currPageNum++;
+    showPaginList();
+}
+const paginLastClickHandler = () => {
+    currPageNum = maxPage;
+    showPaginList();
+}
+const paginFirsrClickHandler = () => {
+    currPageNum = 1;
+    showPaginList();
+}
+
+// ______________ PAGINATION ______ end _______
+
 
