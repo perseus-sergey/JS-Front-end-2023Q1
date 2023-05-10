@@ -1,8 +1,9 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
-const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+// const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
+const PostcssPresentEnv = require('postcss-preset-env');
 
 const imgDir = path.resolve(__dirname, 'src/assets/img');
 const mode = process.env.NODE_ENV || 'development';
@@ -50,23 +51,23 @@ module.exports = {
     watchFiles: path.join(__dirname, 'src'),
     port: 8090,
   },
-  optimization: {
-    minimizer: [
-      new ImageMinimizerPlugin({
-        minimizer: {
-          implementation: ImageMinimizerPlugin.imageminMinify,
-          options: {
-            plugins: [
-              ['gifsicle', { interlaced: true }],
-              ['jpegtran', { progressive: true }],
-              ['optipng', { optimizationLevel: 5 }],
-              ['svgo', { name: 'preset-default' }],
-            ],
-          },
-        },
-      }),
-    ],
-  },
+  // optimization: {
+  //   minimizer: [
+  //     new ImageMinimizerPlugin({
+  //       minimizer: {
+  //         implementation: ImageMinimizerPlugin.imageminMinify,
+  //         options: {
+  //           plugins: [
+  //             ['gifsicle', { interlaced: true }],
+  //             ['jpegtran', { progressive: true }],
+  //             ['optipng', { optimizationLevel: 5 }],
+  //             ['svgo', { name: 'preset-default' }],
+  //           ],
+  //         },
+  //       },
+  //     }),
+  //   ],
+  // },
   module: {
     rules: [
       {
@@ -82,7 +83,7 @@ module.exports = {
             loader: 'postcss-loader',
             options: {
               postcssOptions: {
-                plugins: [require('postcss-preset-env')],
+                plugins: [PostcssPresentEnv],
               },
             },
           },

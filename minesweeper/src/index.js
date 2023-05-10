@@ -1,3 +1,3 @@
 import './template.html';
 import './index.scss';
-import './modules/main'
+import './modules/Playground';
