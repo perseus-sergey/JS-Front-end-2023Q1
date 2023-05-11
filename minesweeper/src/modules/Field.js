@@ -21,6 +21,7 @@ export default class Field {
     OPENED: 'field-opened',
     FLAG: 'field-flag',
     WRONG_FLAG: 'field-flag_wrong',
+    GOOD_FLAG: 'field-flag_good',
     MINE: 'field-mine',
     BOOM: 'field-mine_boom',
     MINES_AROUND: [

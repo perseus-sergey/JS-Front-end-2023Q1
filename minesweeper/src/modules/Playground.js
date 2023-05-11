@@ -6,6 +6,7 @@ class Playground {
     this.COL_NUM = colNumber;
     this.MINE_NUM = mineNum;
     this.fieldClickHandler = this.fieldClickHandler.bind(this);
+    // this.rightClickHandler = this.rightClickHandler.bind(this);
     this.makeMainSection();
     this.startPlay();
     this.addListners();
@@ -15,6 +16,8 @@ class Playground {
   fields = [];
 
   mines = [];
+
+  flags = [];
 
   mainSection = '';
 
@@ -43,6 +46,15 @@ class Playground {
 
   addListners() {
     document.addEventListener('click', this.fieldClickHandler);
+
+    document.oncontextmenu = function () {
+      return false;
+    };
+
+    window.addEventListener('contextmenu', this.fieldClickHandler);
+
+    // TO_DO: add listner for flagged (rightClick)
+
     // document.addEventListener('click', (event) => this.fieldClickHandler(event));
 
     // this.monitor.addEventListener('blur', () => {
@@ -59,14 +71,33 @@ class Playground {
     // });
   }
 
-  fieldClickHandler(event, element = event.target.closest(`.${this.fields[0][0].fieldStyle.FIELD}`)) {
+  fieldClickHandler(
+    event,
+    element = event.target.closest(`.${this.fields[0][0].fieldStyle.FIELD}`),
+  ) {
+    console.log(event.type);
     if (element) {
       // this.moovingCharColor = window.getComputedStyle(element).color;
       // this.addKeyBtnPressedClass(element);
 
       const [x, y] = element.dataset.id.split('-').map((el) => el / 1);
       const oFieldPressed = this.fields[x][y];
-      console.log(oFieldPressed);
+
+      if (oFieldPressed.isOpened) return;
+
+      if (event.type === 'contextmenu') {
+        oFieldPressed.isFlag = !oFieldPressed.isFlag;
+        if (oFieldPressed.isFlag) {
+          element.textContent = '✔';
+          this.flags.push(oFieldPressed.fieldID);
+        } else {
+          element.textContent = '';
+          this.flags.filter((id) => id !== oFieldPressed.fieldID);
+        }
+        return;
+      }
+
+      if (oFieldPressed.isFlag) return;
 
       // to insert mines after first click
       if (this.isFirstClick) {
@@ -82,25 +113,45 @@ class Playground {
       if (oFieldPressed.isMine) {
         element.textContent = '💥';
         this.mines = this.mines.filter((id) => id !== oFieldPressed.fieldID);
-        this.loss();
-      } else { this.openField(x, y); }
+        this.lose();
+      } else {
+        this.openField(x, y);
+      }
       // this.removeKeyBtnPressedClass(element);
     }
   }
 
-  loss() {
+  lose() {
     this.mines.forEach((id) => {
-      document.querySelector(`[data-id="${id}"]`).textContent = '💣';
+      const domF = document.querySelector(`[data-id="${id}"]`);
+      domF.textContent = '💣';
+      if (this.flags.indexOf(id) !== -1) {
+        this.flags = this.flags.filter((el) => el !== id);
+        domF.classList.add(this.fields[0][0].fieldStyle.GOOD_FLAG);
+      }
     });
-    // TO_DO: remove listner
+    this.flags.forEach((id) => {
+      document
+        .querySelector(`[data-id="${id}"]`)
+        .classList.add(this.fields[0][0].fieldStyle.WRONG_FLAG);
+    });
     document.removeEventListener('click', this.fieldClickHandler);
+    document.removeEventListener('contextmenu', this.fieldClickHandler);
   }
 
   makePlayground() {
-    const playgrElem = Field.generateDomElement(this.PLAYGROUND_TAG, '', this.PLAYGROUND_STYLE);
+    const playgrElem = Field.generateDomElement(
+      this.PLAYGROUND_TAG,
+      '',
+      this.PLAYGROUND_STYLE,
+    );
 
     for (let x = 0; x < this.ROW_NUM; x += 1) {
-      const fieldRow = Field.generateDomElement(this.FIELD_ROW_TAG, '', this.FIELD_ROW_STYLE);
+      const fieldRow = Field.generateDomElement(
+        this.FIELD_ROW_TAG,
+        '',
+        this.FIELD_ROW_STYLE,
+      );
       for (let y = 0; y < this.COL_NUM; y += 1) {
         fieldRow.append(this.fields[x][y].generateField());
       }
@@ -138,7 +189,11 @@ class Playground {
   }
 
   makeMainSection() {
-    const mainSection = Field.generateDomElement(this.MAIN_TAG, '', this.MAIN_CLASS);
+    const mainSection = Field.generateDomElement(
+      this.MAIN_TAG,
+      '',
+      this.MAIN_CLASS,
+    );
     document.body.append(mainSection);
     this.mainSection = mainSection;
   }
@@ -181,7 +236,9 @@ class Playground {
       for (let aroundY = -1; aroundY <= 1; aroundY += 1) {
         const calcX = aroundX + x;
         const calcY = aroundY + y;
-        if (!this.outBounds(calcX, calcY)) { counter += this.fields[calcX][calcY].isMine; }
+        if (!this.outBounds(calcX, calcY)) {
+          counter += this.fields[calcX][calcY].isMine;
+        }
       }
     }
     return counter;
@@ -194,8 +251,11 @@ class Playground {
 
     // oField.openField();
     const domField = document.querySelector(`[data-id="${x}-${y}"]`);
-    if (oField.VALUE) domField.textContent = oField.VALUE;
-    domField.classList.add(oField.fieldStyle.OPENED, oField.fieldStyle.MINES_AROUND[oField.VALUE]);
+    domField.textContent = oField.VALUE ? oField.VALUE : '';
+    domField.classList.add(
+      oField.fieldStyle.OPENED,
+      oField.fieldStyle.MINES_AROUND[oField.VALUE],
+    );
 
     oField.isOpened = true;
     if (oField.VALUE !== 0) return;
