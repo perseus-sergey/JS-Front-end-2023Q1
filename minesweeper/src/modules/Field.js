@@ -70,11 +70,11 @@ export default class Field {
     return field;
   }
 
-  openField(htmlElement) {
-    this.isOpened = true;
-    this.styles.push(this.fieldStyle.OPENED);
-    this.styles.push(this.fieldStyle.MINES_AROUND[this.VALUE]);
-  }
+  // openField(htmlElement) {
+  //   this.isOpened = true;
+  //   this.styles.push(this.fieldStyle.OPENED);
+  //   this.styles.push(this.fieldStyle.MINES_AROUND[this.VALUE]);
+  // }
 
   swithFlag(htmlElement) {
     this.isFlag = !this.isFlag;

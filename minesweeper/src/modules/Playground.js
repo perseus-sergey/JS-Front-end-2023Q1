@@ -5,12 +5,16 @@ class Playground {
     this.ROW_NUM = rowNumber;
     this.COL_NUM = colNumber;
     this.MINE_NUM = mineNum;
+    this.fieldClickHandler = this.fieldClickHandler.bind(this);
     this.makeMainSection();
     this.startPlay();
     this.addListners();
+    // this._bindEvents = this._bindEvents.bind(this);
   }
 
   fields = [];
+
+  mines = [];
 
   mainSection = '';
 
@@ -38,7 +42,8 @@ class Playground {
   }
 
   addListners() {
-    document.addEventListener('click', (event) => this.fieldClickHandler(event));
+    document.addEventListener('click', this.fieldClickHandler);
+    // document.addEventListener('click', (event) => this.fieldClickHandler(event));
 
     // this.monitor.addEventListener('blur', () => {
     //   this.monitor.focus();
@@ -69,12 +74,26 @@ class Playground {
         do {
           this.startPlay();
         } while (this.calcMinesAround(x, y) !== 0);
+        this.openField(x, y);
+        return;
       }
 
-      if (oFieldPressed.isMine) alert('BOOOOOM!!!!!');
-      else { this.openField(x, y, element); }
+      // if it's mine:
+      if (oFieldPressed.isMine) {
+        element.textContent = '💥';
+        this.mines = this.mines.filter((id) => id !== oFieldPressed.fieldID);
+        this.loss();
+      } else { this.openField(x, y); }
       // this.removeKeyBtnPressedClass(element);
     }
+  }
+
+  loss() {
+    this.mines.forEach((id) => {
+      document.querySelector(`[data-id="${id}"]`).textContent = '💣';
+    });
+    // TO_DO: remove listner
+    document.removeEventListener('click', this.fieldClickHandler);
   }
 
   makePlayground() {
@@ -106,7 +125,6 @@ class Playground {
       this.fields[x] = [];
       for (let y = 0; y < this.COL_NUM; y += 1) {
         this.fields[x].push(new Field(x, y));
-        // this.fields[x][y] = new Field(x, y);
       }
     }
   }
@@ -133,6 +151,7 @@ class Playground {
 
   insertMines() {
     let counter = 0;
+    this.mines = [];
 
     while (counter < this.MINE_NUM) {
       const randX = Math.floor(Math.random() * this.ROW_NUM);
@@ -140,6 +159,7 @@ class Playground {
 
       if (!this.fields[randX][randY].isMine) {
         this.fields[randX][randY].isMine = 1;
+        this.mines.push(this.fields[randX][randY].fieldID);
         counter += 1;
       }
     }
