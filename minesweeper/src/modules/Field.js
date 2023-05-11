@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 export default class Field {
   // 0 - not mine, 1 - mine
   constructor(coordX, coordY, isMine = 0, isFlag = false, isOpened = false) {
@@ -9,6 +10,8 @@ export default class Field {
   }
 
   VALUE = 0;
+
+  styles = [];
 
   FIELD_TAG = 'div';
 
@@ -30,12 +33,21 @@ export default class Field {
     ],
   };
 
+  getStyles() {
+    return [...this.styles];
+  }
+
+  getValue() {
+    return this.VALUE;
+  }
+
   generateField() {
-    const {
-      fieldStyle, isFlag, isOpened, VALUE,
+    let {
+      fieldStyle, styles, isFlag, isOpened, VALUE, isMine,
     } = this;
-    const styles = [fieldStyle.FIELD];
-    let text = '';
+    styles = [fieldStyle.FIELD];
+    // const styles = [fieldStyle.FIELD];
+    // let text = '';
 
     if (isFlag) {
       styles.push(fieldStyle.FLAG);
@@ -43,16 +55,30 @@ export default class Field {
       styles.push(fieldStyle.OPENED);
     }
 
-    styles.push(fieldStyle.MINES_AROUND[VALUE]);
+    // styles.push(fieldStyle.MINES_AROUND[VALUE]);
 
     // if there's mine near this field and field is isOpened
-    if (VALUE && isOpened) text = VALUE;
+    // if (VALUE) text = VALUE;
+    // if (isMine) text = 'B';
+    // if (VALUE && isOpened) text = VALUE;
 
-    const field = Field.generateDomElement(this.FIELD_TAG, text, styles);
+    const field = Field.generateDomElement(this.FIELD_TAG, '', styles);
 
     field.dataset.id = this.fieldID;
+    // field.dataset.val = VALUE;
 
     return field;
+  }
+
+  openField(htmlElement) {
+    this.isOpened = true;
+    this.styles.push(this.fieldStyle.OPENED);
+    this.styles.push(this.fieldStyle.MINES_AROUND[this.VALUE]);
+  }
+
+  swithFlag(htmlElement) {
+    this.isFlag = !this.isFlag;
+    htmlElement.classList.toggle(this.fieldStyle.FLAG, this.isFlag);
   }
 
   static generateDomElement(tag, text = '', ...classes) {
