@@ -1,12 +1,15 @@
 /* eslint-disable prefer-const */
-export default class Field {
+export default class Field extends HTMLElement {
   // 0 - not mine, 1 - mine
-  constructor(coordX, coordY, isMine = 0, isFlag = false, isOpened = false) {
-    this.fieldID = `${coordX}-${coordY}`;
+  constructor(x, y, isMine = 0, isFlag = false, isOpened = false) {
+    super();
+    this.fieldID = `${x}-${y}`;
+    this.x = x;
+    this.y = y;
     this.isOpened = isOpened;
     this.isMine = isMine;
     this.isFlag = isFlag;
-    this.isOpened = isOpened;
+    this.generateField();
   }
 
   VALUE = 0;
@@ -14,6 +17,13 @@ export default class Field {
   styles = [];
 
   FIELD_TAG = 'div';
+
+  fieldIcon = {
+    EMPTY: '',
+    BOOM: '💥',
+    MINE: '💣',
+    FLAG: '✔',
+  };
 
   fieldStyle = {
     FIELD: 'field',
@@ -34,6 +44,14 @@ export default class Field {
     ],
   };
 
+  static get observedAttributes() {
+    return ['isOpened', 'isMine', 'isFlag'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    this.generateField();
+  }
+
   getStyles() {
     return [...this.styles];
   }
@@ -43,17 +61,12 @@ export default class Field {
   }
 
   generateField() {
-    let {
-      fieldStyle, styles, isFlag, isOpened, VALUE, isMine,
-    } = this;
-    styles = [fieldStyle.FIELD];
-    // const styles = [fieldStyle.FIELD];
-    // let text = '';
+    this.styles = [this.fieldStyle.FIELD];
 
-    if (isFlag) {
-      styles.push(fieldStyle.FLAG);
-    } else if (isOpened) {
-      styles.push(fieldStyle.OPENED);
+    if (this.isFlag) {
+      this.styles.push(this.fieldStyle.FLAG);
+    } else if (this.isOpened) {
+      this.styles.push(this.fieldStyle.OPENED);
     }
 
     // styles.push(fieldStyle.MINES_AROUND[VALUE]);
@@ -63,12 +76,13 @@ export default class Field {
     // if (isMine) text = 'B';
     // if (VALUE && isOpened) text = VALUE;
 
-    const field = Field.generateDomElement(this.FIELD_TAG, '', styles);
+    // const field = Field.generateDomElement(this.FIELD_TAG, '', styles);
 
-    field.dataset.id = this.fieldID;
+    this.dataset.id = this.fieldID;
+    // field.dataset.id = this.fieldID;
     // field.dataset.val = VALUE;
 
-    return field;
+    // return field;
   }
 
   // openField(htmlElement) {
@@ -80,17 +94,5 @@ export default class Field {
   swithFlag(htmlElement) {
     this.isFlag = !this.isFlag;
     htmlElement.classList.toggle(this.fieldStyle.FLAG, this.isFlag);
-  }
-
-  static generateDomElement(tag, text = '', ...classes) {
-    const element = document.createElement(tag);
-    const arrClasses = [];
-    classes.forEach((el) => {
-      if (Array.isArray(el)) el.forEach((i) => arrClasses.push(i));
-      else el.split(' ').forEach((e) => arrClasses.push(e));
-    });
-    if (arrClasses.length) element.classList.add(...arrClasses);
-    element.textContent = text;
-    return element;
   }
 }
