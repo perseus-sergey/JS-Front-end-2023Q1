@@ -1,22 +1,25 @@
-/* eslint-disable prefer-const */
 export default class Field extends HTMLElement {
   // 0 - not mine, 1 - mine
-  constructor(x, y, isMine = 0, isFlag = false, isOpened = false) {
+  constructor(x, y) {
     super();
     this.fieldID = `${x}-${y}`;
+    // this.dataset.id = this.fieldID;
     this.x = x;
     this.y = y;
-    this.isOpened = isOpened;
-    this.isMine = isMine;
-    this.isFlag = isFlag;
     this.generateField();
   }
+
+  isOpened = false;
+
+  isMine = 0;
+
+  isFlag = false;
 
   VALUE = 0;
 
   styles = [];
 
-  FIELD_TAG = 'div';
+  static FIELD_TAG = 'field-div';
 
   fieldIcon = {
     EMPTY: '',
@@ -44,55 +47,28 @@ export default class Field extends HTMLElement {
     ],
   };
 
-  static get observedAttributes() {
-    return ['isOpened', 'isMine', 'isFlag'];
+  openField() {
+    this.isOpened = true;
+    this.textContent = this.VALUE || '';
+    this.classList.add(this.fieldStyle.OPENED, this.fieldStyle.MINES_AROUND[this.VALUE]);
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
-    this.generateField();
+  showMine() {
+    this.textContent = this.fieldIcon.MINE;
   }
 
-  getStyles() {
-    return [...this.styles];
+  isCorrectFlag(isCorrect) {
+    this.classList.add(isCorrect ? this.fieldStyle.GOOD_FLAG : this.fieldStyle.WRONG_FLAG);
   }
 
-  getValue() {
-    return this.VALUE;
+  changeFlag() {
+    this.isFlag = !this.isFlag;
+    this.textContent = this.isFlag ? this.fieldIcon.FLAG : this.fieldIcon.EMPTY;
   }
 
   generateField() {
     this.styles = [this.fieldStyle.FIELD];
 
-    if (this.isFlag) {
-      this.styles.push(this.fieldStyle.FLAG);
-    } else if (this.isOpened) {
-      this.styles.push(this.fieldStyle.OPENED);
-    }
-
-    // styles.push(fieldStyle.MINES_AROUND[VALUE]);
-
-    // if there's mine near this field and field is isOpened
-    // if (VALUE) text = VALUE;
-    // if (isMine) text = 'B';
-    // if (VALUE && isOpened) text = VALUE;
-
-    // const field = Field.generateDomElement(this.FIELD_TAG, '', styles);
-
-    this.dataset.id = this.fieldID;
-    // field.dataset.id = this.fieldID;
-    // field.dataset.val = VALUE;
-
-    // return field;
-  }
-
-  // openField(htmlElement) {
-  //   this.isOpened = true;
-  //   this.styles.push(this.fieldStyle.OPENED);
-  //   this.styles.push(this.fieldStyle.MINES_AROUND[this.VALUE]);
-  // }
-
-  swithFlag(htmlElement) {
-    this.isFlag = !this.isFlag;
-    htmlElement.classList.toggle(this.fieldStyle.FLAG, this.isFlag);
+    this.classList = [...this.styles];
   }
 }

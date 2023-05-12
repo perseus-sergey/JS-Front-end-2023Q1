@@ -71,6 +71,26 @@
     // @include fontColor($keyColorGreen);
     // width: 7vw;
   }
+  &.field_mines-around-1 {
+    // background-image: $keyBgColorGoodFlag;
+    @include fontColor($keyColorGreen);
+  }
+  &.field_mines-around-2 {
+    // background-image: $keyBgColorGoodFlag;
+    @include fontColor($keyColorYellow);
+  }
+  &.field_mines-around-3 {
+    // background-image: $keyBgColorGoodFlag;
+    @include fontColor($keyColorOrange);
+  }
+  &.field_mines-around-4 {
+    // background-image: $keyBgColorGoodFlag;
+    @include fontColor($keyColorPinc);
+  }
+  &.field_mines-around-5 {
+    // background-image: $keyBgColorGoodFlag;
+    @include fontColor($keyColorViolet);
+  }
 
   // &.key-btn_space {
   //   @include fontColor($keyColorYellow);

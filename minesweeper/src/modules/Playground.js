@@ -13,7 +13,8 @@ class Playground {
     this.fieldClickHandler = this.fieldClickHandler.bind(this);
     // this.rightClickHandler = this.rightClickHandler.bind(this);
     this.makeMainSection();
-    this.startPlay();
+    this.appendPlayground();
+    this.makeCountersSection();
     this.startListners();
     // this._bindEvents = this._bindEvents.bind(this);
   }
@@ -40,40 +41,25 @@ class Playground {
 
   PLAYGROUND_STYLE = 'playground';
 
-  FIELD_TAG = 'field-div';
+  FIELD_TAG = Field.FIELD_TAG;
 
   FIELD_ROW_TAG = 'div';
 
   FIELD_ROW_STYLE = 'playground__row';
 
-  startPlay() {
-    // this.initPlayground();
-    // this.setupPlayground();
-    this.appendPlayground();
-    // this.insertMines();
-  }
+  COUNTER_WRAPPER_STYLE = 'counter-wrapper';
+
+  COUNTER_STYLE = 'counter';
+
+  TIMER_STYLE = 'timer';
 
   startListners() {
     document.addEventListener('click', this.fieldClickHandler);
-
-    document.oncontextmenu = function () {
-      return false;
-    };
-
-    window.addEventListener('contextmenu', this.fieldClickHandler);
-
-    // TO_DO: add listner for flagged (rightClick)
-
-    // document.addEventListener('click', (event) => this.fieldClickHandler(event));
-
-    // this.monitor.addEventListener('blur', () => {
-    //   this.monitor.focus();
-    // });
+    document.oncontextmenu = () => false;
 
     // document.addEventListener('keydown', (event) => {
     //   if (!this.isMeta) this.keyDownHandler(event);
     // });
-
     // document.addEventListener('keyup', (event) => {
     //   if (event.key === 'Shift') this.keyDownHandler(event);
     //   this.isMeta = false;
@@ -85,29 +71,26 @@ class Playground {
     document.removeEventListener('contextmenu', this.fieldClickHandler);
   }
 
-  fieldClickHandler(
-    event,
-    domField = event.target.closest(`.${this.fields[0][0].fieldStyle.FIELD}`),
-  ) {
+  fieldClickHandler(event) {
+    const domField = event.target.closest(`.${this.fields[0][0].fieldStyle.FIELD}`);
+
     if (this.isGameFinished) return;
     if (domField) {
       // this.moovingCharColor = window.getComputedStyle(element).color;
       // this.addKeyBtnPressedClass(element);
 
-      // const [x, y] = element.dataset.id.split('-').map((el) => el / 1);
-      // const domField = this.fields[x][y];
-
       if (domField.isOpened) return;
 
+      // if it's right click:
       if (event.type === 'contextmenu') {
-        domField.isFlag = !domField.isFlag;
+        domField.changeFlag();
         if (domField.isFlag) {
-          domField.textContent = domField.fieldIcon.FLAG;
           this.flags.push(domField.fieldID);
         } else {
-          domField.textContent = domField.fieldIcon.EMPTY;
-          this.flags.filter((id) => id !== domField.fieldID);
+          this.removeFlag(domField.fieldID);
+          // this.flags.filter((id) => id !== domField.fieldID);
         }
+        this.flagCount();
         return;
       }
 
@@ -119,8 +102,11 @@ class Playground {
       if (this.isFirstClick) {
         this.isFirstClick = false;
         do {
-          this.startPlay();
+          this.appendPlayground();
         } while (this.calcMinesAround(x, y) !== 0);
+
+        window.addEventListener('contextmenu', this.fieldClickHandler);
+
         this.openField(x, y);
         return;
       }
@@ -132,26 +118,37 @@ class Playground {
         this.finishGame();
       } else {
         this.openField(x, y);
+        this.flagCount();
       }
+      // console.log(this.flags.length);
       // this.removeKeyBtnPressedClass(element);
     }
+  }
+
+  flagCount() {
+    this.counterDiv.textContent = this.MINE_NUM - this.flags.length;
+  }
+
+  removeFlag(flagId) {
+    this.flags = this.flags.filter((el) => el !== flagId);
   }
 
   finishGame() {
     this.isGameFinished = true;
 
     this.mines.forEach((id) => {
-      const domF = document.querySelector(`[data-id="${id}"]`);
-      domF.textContent = domF.fieldIcon.MINE;
+      const [x, y] = id.split('-');
+      const domField = this.fields[x][y];
+      domField.showMine();
       if (this.flags.indexOf(id) !== -1) {
-        this.flags = this.flags.filter((el) => el !== id);
-        domF.classList.add(this.fields[0][0].fieldStyle.GOOD_FLAG);
+        this.removeFlag(id);
+        // this.flags = this.flags.filter((el) => el !== id);
+        domField.isCorrectFlag(true);
       }
     });
     this.flags.forEach((id) => {
-      document
-        .querySelector(`[data-id="${id}"]`)
-        .classList.add(this.fields[0][0].fieldStyle.WRONG_FLAG);
+      const [x, y] = id.split('-');
+      this.fields[x][y].isCorrectFlag(false);
     });
     this.endListners();
   }
@@ -167,12 +164,10 @@ class Playground {
       this.fields[x] = [];
       for (let y = 0; y < this.COL_NUM; y += 1) {
         const field = new Field(x, y);
-        if (field.styles.length) field.classList.add(...field.styles);
 
         this.fields[x].push(field);
 
         fieldRow.append(field);
-        // fieldRow.append(this.fields[x][y].generateField());
       }
       playgrElem.append(fieldRow);
     }
@@ -188,6 +183,20 @@ class Playground {
     return playgrElem;
   }
 
+  makeCountersSection() {
+    const counterWrapper = Playground.generateDomElement('section', '', this.COUNTER_WRAPPER_STYLE);
+    this.counterDiv = Playground.generateDomElement('div', '', this.COUNTER_STYLE);
+    this.counterDiv.textContent = 0;
+    this.timerDiv = Playground.generateDomElement('div', '', this.TIMER_STYLE);
+
+    counterWrapper.append(this.counterDiv);
+    counterWrapper.append(this.timerDiv);
+
+    // this.fields = [];
+    document.body.append(counterWrapper);
+    // return counterWrapper;
+  }
+
   appendPlayground() {
     if (this.domPlayground) this.domPlayground.remove();
 
@@ -195,25 +204,6 @@ class Playground {
 
     this.mainSection.append(this.domPlayground);
   }
-
-  // initPlayground() {
-  //   this.fields = [];
-  //   for (let x = 0; x < this.ROW_NUM; x += 1) {
-  //     this.fields.push(x);
-  //     this.fields[x] = [];
-  //     for (let y = 0; y < this.COL_NUM; y += 1) {
-  //       this.fields[x].push(new Field(x, y));
-  //     }
-  //   }
-  // }
-
-  // setupPlayground() {
-  //   for (let x = 0; x < this.ROW_NUM; x += 1) {
-  //     for (let y = 0; y < this.COL_NUM; y += 1) {
-  //       this.fields[x][y].VALUE = this.calcMinesAround(x, y);
-  //     }
-  //   }
-  // }
 
   makeMainSection() {
     const mainSection = Playground.generateDomElement(
@@ -247,13 +237,13 @@ class Playground {
     }
   }
 
-  removeMines() {
-    for (let x = 0; x < this.ROW_NUM; x += 1) {
-      for (let y = 0; y < this.COL_NUM; y += 1) {
-        this.fields[x][y].isMine = 0;
-      }
-    }
-  }
+  // removeMines() {
+  //   for (let x = 0; x < this.ROW_NUM; x += 1) {
+  //     for (let y = 0; y < this.COL_NUM; y += 1) {
+  //       this.fields[x][y].isMine = 0;
+  //     }
+  //   }
+  // }
 
   calcMinesAround(x, y) {
     if (this.outBounds(x, y)) return 0;
@@ -276,18 +266,9 @@ class Playground {
     const oField = this.fields[x][y];
     if (oField.isOpened) return;
 
-    // oField.openField();
-    const domField = document.querySelector(`[data-id="${x}-${y}"]`);
-    domField.textContent = domField.VALUE ? domField.VALUE : '';
-    // domField.textContent = oField.VALUE ? oField.VALUE : '';
-    domField.classList.add(
-      oField.fieldStyle.OPENED,
-      oField.fieldStyle.MINES_AROUND[oField.VALUE],
-    );
-
-    oField.isOpened = true;
+    oField.openField();
+    this.removeFlag(oField.fieldID);
     if (oField.VALUE !== 0) return;
-    // if (this.calcMinesAround(x, y) !== 0) return;
 
     this.openField(x, y - 1);
     this.openField(x, y + 1);
@@ -316,4 +297,3 @@ class Playground {
   }
 }
 const playground = new Playground();
-// playground.startPlay();
