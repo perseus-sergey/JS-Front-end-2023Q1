@@ -1,6 +1,8 @@
 import Cell from './Cell';
 
 // TO_DO: timer
+// TO_DO: sound
+// TO_DO: start button
 // TO_DO: counter design
 // TO_DO: UI menu
 // TO_DO: try {*} = this
@@ -33,6 +35,10 @@ class Playground {
   isFirstClick = true;
 
   isGameFinished = false;
+
+  timer = 0;
+
+  opened = 0;
 
   MAIN_TAG = 'main';
 
@@ -139,15 +145,38 @@ class Playground {
 
     window.addEventListener('contextmenu', this.cellClickHandler);
 
+    this.startTimer();
     this.flagCount();
     this.openCell(x, y);
   }
 
+  startTimer() {
+    this.stopTimer();
+    this.timerInterval = setInterval(() => {
+      this.timer += 1 / 60;
+      const msVal = Math.floor((this.timer - Math.floor(this.timer)) * 100);
+      const secondVal = Math.floor(this.timer) - Math.floor(this.timer / 60) * 60;
+      const minuteVal = Math.floor(this.timer / 60);
+      this.ms.innerHTML = msVal < 10 ? `0${msVal.toString()}` : msVal;
+      this.second.innerHTML = secondVal < 10 ? `0${secondVal.toString()}` : secondVal;
+      this.minute.innerHTML = minuteVal < 10 ? `0${minuteVal.toString()}` : minuteVal;
+    }, 1000 / 60);
+  }
+
+  stopTimer() {
+    clearInterval(this.timerInterval);
+  }
+
+  winClick(cell) {
+    cell.isWin();
+    this.finishGame(true);
+    // alert('YOU WIN !!!!!!!!');
+  }
+
   mineClick(cell) {
-    // cell.textContent = cell.cellIcon.BOOM;
     cell.isBoom();
     this.mines = this.mines.filter((id) => id !== cell.cellID);
-    this.finishGame();
+    this.finishGame(false);
   }
 
   flagMarkClick(cell) {
@@ -168,7 +197,8 @@ class Playground {
     this.flags = this.flags.filter((el) => el !== flagId);
   }
 
-  finishGame() {
+  finishGame(isWin) {
+    this.stopTimer();
     this.isGameFinished = true;
 
     this.mines.forEach((id) => {
@@ -177,7 +207,6 @@ class Playground {
       domCell.showMine();
       if (this.flags.indexOf(id) !== -1) {
         this.removeFlag(id);
-        // this.flags = this.flags.filter((el) => el !== id);
         domCell.isCorrectFlag(true);
       }
     });
@@ -241,12 +270,18 @@ class Playground {
     this.counterDiv.textContent = 0;
     this.timerDiv = Playground.generateDomElement('div', '', this.TIMER_STYLE);
 
+    this.ms = Playground.generateDomElement('div', '00');
+    this.second = Playground.generateDomElement('div', '00');
+    this.minute = Playground.generateDomElement('div', '00');
+
+    this.timerDiv.append(this.minute);
+    this.timerDiv.append(this.second);
+    this.timerDiv.append(this.ms);
+
     counterWrapper.append(this.counterDiv);
     counterWrapper.append(this.timerDiv);
 
-    // this.cells = [];
     document.body.append(counterWrapper);
-    // return counterWrapper;
   }
 
   appendPlayground() {
@@ -320,6 +355,13 @@ class Playground {
 
     oCell.openCell();
     this.removeFlag(oCell.cellID);
+    this.opened += 1;
+
+    if (this.opened === this.ROW_NUM * this.COL_NUM - this.MINE_NUM) {
+      this.winClick(oCell);
+      return;
+    }
+
     if (oCell.VALUE !== 0) return;
 
     await new Promise((resolve) => {
@@ -352,4 +394,4 @@ class Playground {
     return element;
   }
 }
-const playground = new Playground(5, 27, 22);
+const playground = new Playground(7, 7, 3);

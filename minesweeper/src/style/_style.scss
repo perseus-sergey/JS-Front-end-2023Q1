@@ -38,6 +38,10 @@ body > * {
   .counter-section__timer {
     width: 15vw;
     height: 5vw;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    // font-family: "Sportsworld", cursive;
     color: #fad0fa;
     font-size: 2.5vw;
     text-align: center;

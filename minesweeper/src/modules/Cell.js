@@ -6,7 +6,6 @@ export default class Cell extends HTMLElement {
     // this.dataset.id = this.cellID;
     this.x = x;
     this.y = y;
-    this.generateCell();
   }
 
   isOpened = false;
@@ -32,6 +31,7 @@ export default class Cell extends HTMLElement {
     // FLAG: '⚠',
     // FLAG: '🔒',
     FLAG: '✔',
+    WIN: '🎁',
   };
 
   cellStyle = {
@@ -43,6 +43,7 @@ export default class Cell extends HTMLElement {
     GOOD_FLAG: 'cell-flag_good',
     MINE: 'cell-mine',
     BOOM: 'cell-mine_boom',
+    WIN: 'cell-win',
     MINES_AROUND: [
       'cell_mines-around-0',
       'cell_mines-around-1',
@@ -53,6 +54,10 @@ export default class Cell extends HTMLElement {
       'cell_mines-around-6',
     ],
   };
+
+  connectedCallback() {
+    this.generateCell();
+  }
 
   openCell() {
     this.isOpened = true;
@@ -76,6 +81,11 @@ export default class Cell extends HTMLElement {
   isBoom() {
     this.classList.add(this.cellStyle.BOOM);
     this.textContent = this.cellIcon.BOOM;
+  }
+
+  isWin() {
+    this.classList.add(this.cellStyle.WIN);
+    this.textContent = this.cellIcon.WIN;
   }
 
   generateCell() {
