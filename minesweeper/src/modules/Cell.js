@@ -21,10 +21,16 @@ export default class Cell extends HTMLElement {
 
   static CELL_TAG = 'cell-div';
 
+  static FONT_RATIO = 0.8;
+
   cellIcon = {
     EMPTY: '',
     BOOM: '💥',
     MINE: '💣',
+    // MINE: '🧨',
+    // FLAG: '❓',
+    // FLAG: '⚠',
+    // FLAG: '🔒',
     FLAG: '✔',
   };
 
@@ -44,6 +50,7 @@ export default class Cell extends HTMLElement {
       'cell_mines-around-3',
       'cell_mines-around-4',
       'cell_mines-around-5',
+      'cell_mines-around-6',
     ],
   };
 
@@ -64,6 +71,11 @@ export default class Cell extends HTMLElement {
   changeFlag() {
     this.isFlag = !this.isFlag;
     this.textContent = this.isFlag ? this.cellIcon.FLAG : this.cellIcon.EMPTY;
+  }
+
+  isBoom() {
+    this.classList.add(this.cellStyle.BOOM);
+    this.textContent = this.cellIcon.BOOM;
   }
 
   generateCell() {

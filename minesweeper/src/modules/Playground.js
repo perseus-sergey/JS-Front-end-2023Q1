@@ -1,7 +1,8 @@
 import Cell from './Cell';
 
-// TO_DO: remove listner for flagged (rightClick)
-// TO_DO: extend element for Cell
+// TO_DO: timer
+// TO_DO: counter design
+// TO_DO: UI menu
 // TO_DO: try {*} = this
 
 class Playground {
@@ -57,24 +58,12 @@ class Playground {
     document.addEventListener('click', this.cellClickHandler);
     document.oncontextmenu = () => false;
     // ============== MEDIAQUERY ======== start ====
-
-    const mediaQueries = [
+    [
       window.matchMedia('(max-width: 1250px)'),
       window.matchMedia('(max-width: 767px)'),
       window.matchMedia('(orientation: portrait)'),
       window.matchMedia('(orientation: landscape)'),
-    ];
-
-    mediaQueries.forEach((mq) => mq.addEventListener('change', this.mediaQueryHandler));
-    // const medQryIpad = window.matchMedia('(max-width: 1250px)');
-    // const medQryIphone = window.matchMedia('(max-width: 767px)');
-    // const MQportrait = window.matchMedia('(orientation: portrait)');
-    // const MQlandscape = window.matchMedia('(orientation: landscape)');
-
-    // medQryIpad.addEventListener('change', this.mediaQueryHandler);
-    // medQryIphone.addEventListener('change', this.mediaQueryHandler);
-    // MQportrait.addEventListener('change', this.mediaQueryHandler);
-    // MQlandscape.addEventListener('change', this.mediaQueryHandler);
+    ].forEach((mq) => mq.addEventListener('change', this.mediaQueryHandler));
 
     // ______________ MEDIAQUERY ______ end _______
 
@@ -88,13 +77,15 @@ class Playground {
   }
 
   mediaQueryHandler() {
-    const cellSize = this.getCellSize();
+    const cellSizeNumb = this.getCellSize().numb;
+    const cellSizeExt = this.getCellSize().ext;
+
     for (let x = 0; x < this.ROW_NUM; x += 1) {
       for (let y = 0; y < this.COL_NUM; y += 1) {
         const cell = this.cells[x][y];
-        cell.style.width = cellSize;
-        cell.style.height = cellSize;
-        cell.style.fontSyze = cellSize;
+        cell.style.width = cellSizeNumb + cellSizeExt;
+        cell.style.height = cellSizeNumb + cellSizeExt;
+        cell.style.fontSize = cellSizeNumb * Cell.FONT_RATIO + cellSizeExt;
       }
     }
   }
@@ -105,57 +96,68 @@ class Playground {
   }
 
   cellClickHandler(event) {
-    const domCell = event.target.closest(`.${this.cells[0][0].cellStyle.CELL}`);
+    const domCell = event.target.closest(this.CELL_TAG);
 
-    if (this.isGameFinished) return;
-    if (domCell) {
-      // this.moovingCharColor = window.getComputedStyle(element).color;
-      // this.addKeyBtnPressedClass(element);
+    if (this.isGameFinished || !domCell || domCell.isOpened) return;
 
-      if (domCell.isOpened) return;
-
-      // if it's right click:
-      if (event.type === 'contextmenu') {
-        domCell.changeFlag();
-        if (domCell.isFlag) {
-          this.flags.push(domCell.cellID);
-        } else {
-          this.removeFlag(domCell.cellID);
-          // this.flags.filter((id) => id !== domCell.cellID);
-        }
-        this.flagCount();
-        return;
-      }
-
-      if (domCell.isFlag) return;
-
-      const { x, y } = domCell;
-
-      // to insert mines after first click
-      if (this.isFirstClick) {
-        this.isFirstClick = false;
-        do {
-          this.appendPlayground();
-        } while (this.calcMinesAround(x, y) !== 0);
-
-        window.addEventListener('contextmenu', this.cellClickHandler);
-
-        this.openCell(x, y);
-        return;
-      }
-
-      // if it's mine:
-      if (domCell.isMine) {
-        domCell.textContent = domCell.cellIcon.BOOM;
-        this.mines = this.mines.filter((id) => id !== domCell.cellID);
-        this.finishGame();
-      } else {
-        this.openCell(x, y);
-        this.flagCount();
-      }
-      // console.log(this.flags.length);
-      // this.removeKeyBtnPressedClass(element);
+    // if it's right click:
+    if (event.type === 'contextmenu') {
+      this.flagMarkClick(domCell);
+      return;
     }
+
+    if (domCell.isFlag) return;
+
+    const { x, y } = domCell;
+
+    // to insert mines after first click
+    if (this.isFirstClick) {
+      this.firstClick(x, y);
+      return;
+    }
+
+    // if it's mine:
+    if (domCell.isMine) {
+      this.mineClick(domCell);
+      return;
+    }
+
+    // this.moovigCharColor = window.getComputedStyle(element).color;
+    // this.addKeyBtnPressedClass(element);
+
+    this.openCell(x, y);
+    this.flagCount();
+    // console.log(this.flags.length);
+    // this.removeKeyBtnPressedClass(element);
+  }
+
+  firstClick(x, y) {
+    this.isFirstClick = false;
+    do {
+      this.appendPlayground();
+    } while (this.calcMinesAround(x, y) !== 0);
+
+    window.addEventListener('contextmenu', this.cellClickHandler);
+
+    this.flagCount();
+    this.openCell(x, y);
+  }
+
+  mineClick(cell) {
+    // cell.textContent = cell.cellIcon.BOOM;
+    cell.isBoom();
+    this.mines = this.mines.filter((id) => id !== cell.cellID);
+    this.finishGame();
+  }
+
+  flagMarkClick(cell) {
+    cell.changeFlag();
+    if (cell.isFlag) {
+      this.flags.push(cell.cellID);
+    } else {
+      this.removeFlag(cell.cellID);
+    }
+    this.flagCount();
   }
 
   flagCount() {
@@ -190,17 +192,20 @@ class Playground {
     const w = 90 / this.COL_NUM;
     const h = 70 / this.ROW_NUM;
 
-    let cellSize = `${h.toFixed(2)}vh`;
-    if (w < h) cellSize = `${w.toFixed(2)}vw`;
+    return (w < h) ? { numb: w.toFixed(2), ext: 'vw' } : { numb: h.toFixed(2), ext: 'vh' };
+    // if (w < h) cellSize = `${w.toFixed(2)}vw`;
+    // let cellSize = `${h.toFixed(2)}vh`;
+    // if (w < h) cellSize = `${w.toFixed(2)}vw`;
 
-    return cellSize;
+    // return cellSize;
   }
 
   makePlayground() {
     const playgrElem = Playground.generateDomElement(this.PLAYGROUND_TAG, '', this.PLAYGROUND_STYLE);
 
     this.cells = [];
-    const cellSize = this.getCellSize();
+    const cellSizeNumb = this.getCellSize().numb;
+    const cellSizeExt = this.getCellSize().ext;
 
     for (let x = 0; x < this.ROW_NUM; x += 1) {
       const cellRow = Playground.generateDomElement(this.CELL_ROW_TAG, '', this.CELL_ROW_STYLE);
@@ -209,9 +214,9 @@ class Playground {
       for (let y = 0; y < this.COL_NUM; y += 1) {
         const cell = new Cell(x, y);
 
-        cell.style.width = cellSize;
-        cell.style.height = cellSize;
-        cell.style.fontSize = cellSize;
+        cell.style.width = cellSizeNumb + cellSizeExt;
+        cell.style.height = cellSizeNumb + cellSizeExt;
+        cell.style.fontSize = cellSizeNumb * Cell.FONT_RATIO + cellSizeExt;
         this.cells[x].push(cell);
 
         cellRow.append(cell);
@@ -308,7 +313,7 @@ class Playground {
     return counter;
   }
 
-  openCell(x, y) {
+  async openCell(x, y) {
     if (this.outBounds(x, y)) return;
     const oCell = this.cells[x][y];
     if (oCell.isOpened) return;
@@ -316,6 +321,10 @@ class Playground {
     oCell.openCell();
     this.removeFlag(oCell.cellID);
     if (oCell.VALUE !== 0) return;
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 30);
+    });
 
     this.openCell(x, y - 1);
     this.openCell(x, y + 1);
@@ -343,4 +352,4 @@ class Playground {
     return element;
   }
 }
-const playground = new Playground(25, 7, 22);
+const playground = new Playground(5, 27, 22);
