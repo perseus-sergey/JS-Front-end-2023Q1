@@ -6,9 +6,82 @@
 }
 
 .body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  width: 100%;
   background-color: $bodyBgColor;
   background-image: $bodyBgImg;
   background-attachment: fixed;
+}
+
+body > * {
+  margin: 0 auto;
+}
+
+.counter-section {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  justify-content: space-between;
+  // align-items: center;
+  margin-bottom: 2%;
+  margin-top: 2%;
+  padding: 1vw;
+  border-bottom: 1px solid #222c44;
+  background-color: $bodyBgColor;
+  box-shadow: 0 0 3vh #1d2539;
+  border-radius: 1vh;
+
+  .counter-section__counter,
+  .counter-section__timer {
+    width: 15vw;
+    height: 5vw;
+    border: 1vw solid #35456b;
+    border-radius: 10%;
+    background-image: linear-gradient(to bottom, #1a2133, #4d6398);
+  }
+
+  .counter-section__receiver-wrapper {
+    display: flex;
+    font-family: "Lobster", cursive;
+    font-size: 2.5vw;
+    width: 90%;
+    align-items: center;
+    justify-content: space-between;
+    color: #7d869b;
+    text-shadow: 0px 4px 3px rgba(0, 0, 0, 0.4), 0px 8px 13px rgba(0, 0, 0, 0.1),
+      0px 18px 23px rgba(0, 0, 0, 0.1);
+  }
+
+  .counter-section__display-wrapper {
+    width: 95%;
+    border-radius: 6px;
+    margin-bottom: 1vh;
+    padding: 1vw;
+    background-image: linear-gradient(to bottom, #1a2133, #4d6398);
+
+    .counter-section__display {
+      text-align: center;
+      // padding: 2vw;
+      border-radius: 4px;
+      background-color: $displayColor;
+    }
+  }
+
+  .counter-section__textarea {
+    font-size: $monitorFontSize;
+    color: #ffffff;
+    width: 96%;
+    background-color: $displayColor;
+    border-color: $displayColor;
+    resize: none;
+
+    &:focus-visible {
+      outline: 0;
+    }
+  }
 }
 
 .main {
@@ -16,170 +89,178 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  margin: 0 auto;
+  margin: 5vh auto;
   max-width: 900px;
-  height: 90vh;
-  font-family: $keyboardFont;
-}
+  max-height: 80vh;
+  font-family: $cellFont;
 
-.playground {
-  display: flex;
-  text-align: center;
-  flex-direction: column;
-  // gap: 2vh;
-
-  .playground__row {
+  .playground {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    // gap: 0.5vw;
+    text-align: center;
+    flex-direction: column;
+    // gap: 2vh;
 
+    .playground__row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      // gap: 0.5vw;
+
+      .cell {
+        white-space: nowrap;
+        font-size: $cellFontSize;
+        line-height: $cellLineHeight;
+        user-select: none;
+        width: $cellLineHeight;
+        height: $cellLineHeight;
+        border-radius: 12%;
+        border: 0.1vw solid rgba(143, 197, 251, 1);
+        box-shadow: 0px 1px #1a2133;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: $keyBgColorDefault;
+        @include fontColor($keyColorYellow);
+        transition: transform 0.3s ease-in-out;
+
+        // @media (max-width: $ipad-max-width) {
+        //   width: calc($cellLineHeight + 0.5vw);
+        //   height: calc($cellLineHeight + 0.5vw);
+        // }
+
+        // @media (max-width: $iphone-max-width) {
+        //   width: calc($cellLineHeight + 1vw);
+        //   height: calc($cellLineHeight + 1vw);
+        // }
+
+        &.cell-opened {
+          background-image: none;
+          background-color: rgb(91 164 241);
+          // width: 7vw;
+        }
+
+        &.cell-flag_wrong {
+          // background-image: $keyBgColorPinc;
+          @include fontColor($keyColorOrange);
+          // width: 7vw;
+        }
+
+        &.cell-flag_good {
+          background-image: $keyBgColorGoodFlag;
+          // @include fontColor($keyColorGreen);
+          // width: 7vw;
+        }
+        &.cell_mines-around-1 {
+          // background-image: $keyBgColorGoodFlag;
+          @include fontColor($keyColorGreen);
+        }
+        &.cell_mines-around-2 {
+          // background-image: $keyBgColorGoodFlag;
+          @include fontColor($keyColorYellow);
+        }
+        &.cell_mines-around-3 {
+          // background-image: $keyBgColorGoodFlag;
+          @include fontColor($keyColorOrange);
+        }
+        &.cell_mines-around-4 {
+          // background-image: $keyBgColorGoodFlag;
+          @include fontColor($keyColorPinc);
+        }
+        &.cell_mines-around-5 {
+          // background-image: $keyBgColorGoodFlag;
+          @include fontColor($keyColorViolet);
+        }
+
+        // &.key-btn_space {
+        //   @include fontColor($keyColorYellow);
+        //   width: 18vw;
+        //   border-radius: 5%;
+        // }
+
+        // &.key-btn_enter {
+        //   width: 10vw;
+        //   border-radius: 10%;
+        // }
+
+        // &.key-btn_arrow {
+        //   @include fontColor($keyColorPinc);
+        // }
+
+        // &.key-btn_digit,
+        // &.key-btn_arrow {
+        //   @include fontColor($keyColorBlue);
+        //   background-image: $keyBgColorYellow;
+        // }
+
+        &.key-btn_pressed {
+          transform: scale(0.7);
+        }
+
+        &.key-btn_transparent {
+          color: transparent;
+          text-shadow: none;
+        }
+
+        &.key-btn_shift-activated {
+          color: #1bf407;
+          text-shadow: 1.5px 1.5px 0 #222c44, 0.5px -0.5px 10px #fff;
+        }
+      }
+    }
   }
-}
 
-.field {
-  white-space: nowrap;
-  font-size: $keyboardFontSize;
-  line-height: $keyboardLineHeight;
-  user-select: none;
-  width: 5vw;
-  height: 5vw;
-  border-radius: 12%;
-  border: 0.1vw solid rgba(143, 197, 251, 1);
-  box-shadow: 0px 1px #1a2133;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-image: $keyBgColorDefault;
-  @include fontColor($keyColorYellow);
-  transition: transform 0.3s ease-in-out;
-
-  &.field-opened {
-    background-image: none;
-    background-color: rgb(91 164 241);
-    // width: 7vw;
+  .key-btn_bgcolor_yellow {
+    background-image: $keyBgColorYellow;
   }
 
-  &.field-flag_wrong {
-    // background-image: $keyBgColorPinc;
-    @include fontColor($keyColorOrange);
-    // width: 7vw;
+  .key-btn_bgcolor_blue {
+    background-image: $keyBgColorBlue;
   }
 
-  &.field-flag_good {
-    background-image: $keyBgColorGoodFlag;
-    // @include fontColor($keyColorGreen);
-    // width: 7vw;
+  .key-btn_bgcolor_violet {
+    background-image: $keyBgColorViolet;
   }
-  &.field_mines-around-1 {
-    // background-image: $keyBgColorGoodFlag;
+
+  .key-btn_bgcolor_orange {
+    background-image: $keyBgColorOrange;
+  }
+
+  .key-btn_bgcolor_pinc {
+    background-image: $keyBgColorPinc;
+  }
+
+  .key-btn_bgcolor_green {
+    background-image: $keyBgColorGreen;
+  }
+
+  .key-btn_color_blue {
+    @include fontColor($keyColorBlue);
+  }
+
+  .key-btn_color_green {
     @include fontColor($keyColorGreen);
   }
-  &.field_mines-around-2 {
-    // background-image: $keyBgColorGoodFlag;
+
+  .key-btn_color_yellow {
     @include fontColor($keyColorYellow);
   }
-  &.field_mines-around-3 {
-    // background-image: $keyBgColorGoodFlag;
+
+  .key-btn_color_orange {
     @include fontColor($keyColorOrange);
   }
-  &.field_mines-around-4 {
-    // background-image: $keyBgColorGoodFlag;
+
+  .key-btn_color_pinc {
     @include fontColor($keyColorPinc);
   }
-  &.field_mines-around-5 {
-    // background-image: $keyBgColorGoodFlag;
+
+  .key-btn_color_violet {
     @include fontColor($keyColorViolet);
   }
-
-  // &.key-btn_space {
-  //   @include fontColor($keyColorYellow);
-  //   width: 18vw;
-  //   border-radius: 5%;
-  // }
-
-  // &.key-btn_enter {
-  //   width: 10vw;
-  //   border-radius: 10%;
-  // }
-
-  // &.key-btn_arrow {
-  //   @include fontColor($keyColorPinc);
-  // }
-
-  // &.key-btn_digit,
-  // &.key-btn_arrow {
-  //   @include fontColor($keyColorBlue);
-  //   background-image: $keyBgColorYellow;
-  // }
-
-  &.key-btn_pressed {
-    transform: scale(0.7);
-  }
-
-  &.key-btn_transparent {
-    color: transparent;
-    text-shadow: none;
-  }
-
-  &.key-btn_shift-activated {
-    color: #1bf407;
-    text-shadow: 1.5px 1.5px 0 #222c44, 0.5px -0.5px 10px #fff;
-  }
 }
-
-.key-btn_bgcolor_yellow {
-  background-image: $keyBgColorYellow;
-}
-
-.key-btn_bgcolor_blue {
-  background-image: $keyBgColorBlue;
-}
-
-.key-btn_bgcolor_violet {
-  background-image: $keyBgColorViolet;
-}
-
-.key-btn_bgcolor_orange {
-  background-image: $keyBgColorOrange;
-}
-
-.key-btn_bgcolor_pinc {
-  background-image: $keyBgColorPinc;
-}
-
-.key-btn_bgcolor_green {
-  background-image: $keyBgColorGreen;
-}
-
-.key-btn_color_blue {
-  @include fontColor($keyColorBlue);
-}
-
-.key-btn_color_green {
-  @include fontColor($keyColorGreen);
-}
-
-.key-btn_color_yellow {
-  @include fontColor($keyColorYellow);
-}
-
-.key-btn_color_orange {
-  @include fontColor($keyColorOrange);
-}
-
-.key-btn_color_pinc {
-  @include fontColor($keyColorPinc);
-}
-
-.key-btn_color_violet {
-  @include fontColor($keyColorViolet);
-}
-
 .mooving-char {
   visibility: visible;
-  font-family: $keyboardFont;
-  font-size: $keyboardFontSize;
+  font-family: $cellFont;
+  font-size: $cellFontSize;
   position: absolute;
   @include fontColor($keyColorYellow);
   transition: 0.4s ease-in-out;

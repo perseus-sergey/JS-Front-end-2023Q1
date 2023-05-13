@@ -1,7 +1,7 @@
-import Field from './Field';
+import Cell from './Cell';
 
 // TO_DO: remove listner for flagged (rightClick)
-// TO_DO: extend element for Field
+// TO_DO: extend element for Cell
 // TO_DO: try {*} = this
 
 class Playground {
@@ -9,17 +9,17 @@ class Playground {
     this.ROW_NUM = rowNumber;
     this.COL_NUM = colNumber;
     this.MINE_NUM = mineNum;
-    customElements.define(this.FIELD_TAG, Field);
-    this.fieldClickHandler = this.fieldClickHandler.bind(this);
+    customElements.define(this.CELL_TAG, Cell);
+    this.cellClickHandler = this.cellClickHandler.bind(this);
+    this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
     // this.rightClickHandler = this.rightClickHandler.bind(this);
     this.makeMainSection();
     this.appendPlayground();
     this.makeCountersSection();
     this.startListners();
-    // this._bindEvents = this._bindEvents.bind(this);
   }
 
-  fields = [];
+  cells = [];
 
   mines = [];
 
@@ -41,21 +41,42 @@ class Playground {
 
   PLAYGROUND_STYLE = 'playground';
 
-  FIELD_TAG = Field.FIELD_TAG;
+  CELL_TAG = Cell.CELL_TAG;
 
-  FIELD_ROW_TAG = 'div';
+  CELL_ROW_TAG = 'div';
 
-  FIELD_ROW_STYLE = 'playground__row';
+  CELL_ROW_STYLE = 'playground__row';
 
-  COUNTER_WRAPPER_STYLE = 'counter-wrapper';
+  COUNTER_SECTION_STYLE = 'counter-section';
 
-  COUNTER_STYLE = 'counter';
+  COUNTER_STYLE = 'counter-section__counter';
 
-  TIMER_STYLE = 'timer';
+  TIMER_STYLE = 'counter-section__timer';
 
   startListners() {
-    document.addEventListener('click', this.fieldClickHandler);
+    document.addEventListener('click', this.cellClickHandler);
     document.oncontextmenu = () => false;
+    // ============== MEDIAQUERY ======== start ====
+
+    const mediaQueries = [
+      window.matchMedia('(max-width: 1250px)'),
+      window.matchMedia('(max-width: 767px)'),
+      window.matchMedia('(orientation: portrait)'),
+      window.matchMedia('(orientation: landscape)'),
+    ];
+
+    mediaQueries.forEach((mq) => mq.addEventListener('change', this.mediaQueryHandler));
+    // const medQryIpad = window.matchMedia('(max-width: 1250px)');
+    // const medQryIphone = window.matchMedia('(max-width: 767px)');
+    // const MQportrait = window.matchMedia('(orientation: portrait)');
+    // const MQlandscape = window.matchMedia('(orientation: landscape)');
+
+    // medQryIpad.addEventListener('change', this.mediaQueryHandler);
+    // medQryIphone.addEventListener('change', this.mediaQueryHandler);
+    // MQportrait.addEventListener('change', this.mediaQueryHandler);
+    // MQlandscape.addEventListener('change', this.mediaQueryHandler);
+
+    // ______________ MEDIAQUERY ______ end _______
 
     // document.addEventListener('keydown', (event) => {
     //   if (!this.isMeta) this.keyDownHandler(event);
@@ -66,37 +87,49 @@ class Playground {
     // });
   }
 
-  endListners() {
-    document.removeEventListener('click', this.fieldClickHandler);
-    document.removeEventListener('contextmenu', this.fieldClickHandler);
+  mediaQueryHandler() {
+    const cellSize = this.getCellSize();
+    for (let x = 0; x < this.ROW_NUM; x += 1) {
+      for (let y = 0; y < this.COL_NUM; y += 1) {
+        const cell = this.cells[x][y];
+        cell.style.width = cellSize;
+        cell.style.height = cellSize;
+        cell.style.fontSyze = cellSize;
+      }
+    }
   }
 
-  fieldClickHandler(event) {
-    const domField = event.target.closest(`.${this.fields[0][0].fieldStyle.FIELD}`);
+  endListners() {
+    document.removeEventListener('click', this.cellClickHandler);
+    document.removeEventListener('contextmenu', this.cellClickHandler);
+  }
+
+  cellClickHandler(event) {
+    const domCell = event.target.closest(`.${this.cells[0][0].cellStyle.CELL}`);
 
     if (this.isGameFinished) return;
-    if (domField) {
+    if (domCell) {
       // this.moovingCharColor = window.getComputedStyle(element).color;
       // this.addKeyBtnPressedClass(element);
 
-      if (domField.isOpened) return;
+      if (domCell.isOpened) return;
 
       // if it's right click:
       if (event.type === 'contextmenu') {
-        domField.changeFlag();
-        if (domField.isFlag) {
-          this.flags.push(domField.fieldID);
+        domCell.changeFlag();
+        if (domCell.isFlag) {
+          this.flags.push(domCell.cellID);
         } else {
-          this.removeFlag(domField.fieldID);
-          // this.flags.filter((id) => id !== domField.fieldID);
+          this.removeFlag(domCell.cellID);
+          // this.flags.filter((id) => id !== domCell.cellID);
         }
         this.flagCount();
         return;
       }
 
-      if (domField.isFlag) return;
+      if (domCell.isFlag) return;
 
-      const { x, y } = domField;
+      const { x, y } = domCell;
 
       // to insert mines after first click
       if (this.isFirstClick) {
@@ -105,19 +138,19 @@ class Playground {
           this.appendPlayground();
         } while (this.calcMinesAround(x, y) !== 0);
 
-        window.addEventListener('contextmenu', this.fieldClickHandler);
+        window.addEventListener('contextmenu', this.cellClickHandler);
 
-        this.openField(x, y);
+        this.openCell(x, y);
         return;
       }
 
       // if it's mine:
-      if (domField.isMine) {
-        domField.textContent = domField.fieldIcon.BOOM;
-        this.mines = this.mines.filter((id) => id !== domField.fieldID);
+      if (domCell.isMine) {
+        domCell.textContent = domCell.cellIcon.BOOM;
+        this.mines = this.mines.filter((id) => id !== domCell.cellID);
         this.finishGame();
       } else {
-        this.openField(x, y);
+        this.openCell(x, y);
         this.flagCount();
       }
       // console.log(this.flags.length);
@@ -138,45 +171,59 @@ class Playground {
 
     this.mines.forEach((id) => {
       const [x, y] = id.split('-');
-      const domField = this.fields[x][y];
-      domField.showMine();
+      const domCell = this.cells[x][y];
+      domCell.showMine();
       if (this.flags.indexOf(id) !== -1) {
         this.removeFlag(id);
         // this.flags = this.flags.filter((el) => el !== id);
-        domField.isCorrectFlag(true);
+        domCell.isCorrectFlag(true);
       }
     });
     this.flags.forEach((id) => {
       const [x, y] = id.split('-');
-      this.fields[x][y].isCorrectFlag(false);
+      this.cells[x][y].isCorrectFlag(false);
     });
     this.endListners();
+  }
+
+  getCellSize() {
+    const w = 90 / this.COL_NUM;
+    const h = 70 / this.ROW_NUM;
+
+    let cellSize = `${h.toFixed(2)}vh`;
+    if (w < h) cellSize = `${w.toFixed(2)}vw`;
+
+    return cellSize;
   }
 
   makePlayground() {
     const playgrElem = Playground.generateDomElement(this.PLAYGROUND_TAG, '', this.PLAYGROUND_STYLE);
 
-    this.fields = [];
+    this.cells = [];
+    const cellSize = this.getCellSize();
 
     for (let x = 0; x < this.ROW_NUM; x += 1) {
-      const fieldRow = Playground.generateDomElement(this.FIELD_ROW_TAG, '', this.FIELD_ROW_STYLE);
+      const cellRow = Playground.generateDomElement(this.CELL_ROW_TAG, '', this.CELL_ROW_STYLE);
 
-      this.fields[x] = [];
+      this.cells[x] = [];
       for (let y = 0; y < this.COL_NUM; y += 1) {
-        const field = new Field(x, y);
+        const cell = new Cell(x, y);
 
-        this.fields[x].push(field);
+        cell.style.width = cellSize;
+        cell.style.height = cellSize;
+        cell.style.fontSize = cellSize;
+        this.cells[x].push(cell);
 
-        fieldRow.append(field);
+        cellRow.append(cell);
       }
-      playgrElem.append(fieldRow);
+      playgrElem.append(cellRow);
     }
 
     this.insertMines();
 
     for (let x = 0; x < this.ROW_NUM; x += 1) {
       for (let y = 0; y < this.COL_NUM; y += 1) {
-        this.fields[x][y].VALUE = this.calcMinesAround(x, y);
+        this.cells[x][y].VALUE = this.calcMinesAround(x, y);
       }
     }
 
@@ -184,7 +231,7 @@ class Playground {
   }
 
   makeCountersSection() {
-    const counterWrapper = Playground.generateDomElement('section', '', this.COUNTER_WRAPPER_STYLE);
+    const counterWrapper = Playground.generateDomElement('section', '', this.COUNTER_SECTION_STYLE);
     this.counterDiv = Playground.generateDomElement('div', '', this.COUNTER_STYLE);
     this.counterDiv.textContent = 0;
     this.timerDiv = Playground.generateDomElement('div', '', this.TIMER_STYLE);
@@ -192,7 +239,7 @@ class Playground {
     counterWrapper.append(this.counterDiv);
     counterWrapper.append(this.timerDiv);
 
-    // this.fields = [];
+    // this.cells = [];
     document.body.append(counterWrapper);
     // return counterWrapper;
   }
@@ -229,9 +276,9 @@ class Playground {
       const randX = Math.floor(Math.random() * this.ROW_NUM);
       const randY = Math.floor(Math.random() * this.COL_NUM);
 
-      if (!this.fields[randX][randY].isMine) {
-        this.fields[randX][randY].isMine = 1;
-        this.mines.push(this.fields[randX][randY].fieldID);
+      if (!this.cells[randX][randY].isMine) {
+        this.cells[randX][randY].isMine = 1;
+        this.mines.push(this.cells[randX][randY].cellID);
         counter += 1;
       }
     }
@@ -240,7 +287,7 @@ class Playground {
   // removeMines() {
   //   for (let x = 0; x < this.ROW_NUM; x += 1) {
   //     for (let y = 0; y < this.COL_NUM; y += 1) {
-  //       this.fields[x][y].isMine = 0;
+  //       this.cells[x][y].isMine = 0;
   //     }
   //   }
   // }
@@ -254,30 +301,30 @@ class Playground {
         const calcX = aroundX + x;
         const calcY = aroundY + y;
         if (!this.outBounds(calcX, calcY)) {
-          counter += this.fields[calcX][calcY].isMine;
+          counter += this.cells[calcX][calcY].isMine;
         }
       }
     }
     return counter;
   }
 
-  openField(x, y) {
+  openCell(x, y) {
     if (this.outBounds(x, y)) return;
-    const oField = this.fields[x][y];
-    if (oField.isOpened) return;
+    const oCell = this.cells[x][y];
+    if (oCell.isOpened) return;
 
-    oField.openField();
-    this.removeFlag(oField.fieldID);
-    if (oField.VALUE !== 0) return;
+    oCell.openCell();
+    this.removeFlag(oCell.cellID);
+    if (oCell.VALUE !== 0) return;
 
-    this.openField(x, y - 1);
-    this.openField(x, y + 1);
-    this.openField(x - 1, y);
-    this.openField(x + 1, y);
-    this.openField(x - 1, y - 1);
-    this.openField(x - 1, y + 1);
-    this.openField(x + 1, y - 1);
-    this.openField(x + 1, y + 1);
+    this.openCell(x, y - 1);
+    this.openCell(x, y + 1);
+    this.openCell(x - 1, y);
+    this.openCell(x + 1, y);
+    this.openCell(x - 1, y - 1);
+    this.openCell(x - 1, y + 1);
+    this.openCell(x + 1, y - 1);
+    this.openCell(x + 1, y + 1);
   }
 
   outBounds(x, y) {
@@ -296,4 +343,4 @@ class Playground {
     return element;
   }
 }
-const playground = new Playground();
+const playground = new Playground(25, 7, 22);
