@@ -18,9 +18,9 @@ export default class Cell extends HTMLElement {
 
   styles = [];
 
-  static CELL_TAG = 'cell-div';
+  // static CELL_TAG = 'cell-div';
 
-  static FONT_RATIO = 0.8;
+  // static FONT_RATIO = 0.8;
 
   cellIcon = {
     EMPTY: '',
@@ -31,6 +31,7 @@ export default class Cell extends HTMLElement {
     // FLAG: '⚠',
     // FLAG: '🔒',
     FLAG: '✔',
+    BAD_FLAG: '❗',
     WIN: '🎁',
   };
 
@@ -70,6 +71,7 @@ export default class Cell extends HTMLElement {
   }
 
   isCorrectFlag(isCorrect) {
+    if (!isCorrect) this.textContent = this.cellIcon.BAD_FLAG;
     this.classList.add(isCorrect ? this.cellStyle.GOOD_FLAG : this.cellStyle.WRONG_FLAG);
   }
 

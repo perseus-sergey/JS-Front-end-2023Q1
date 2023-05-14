@@ -1,0 +1,18 @@
+export const constants = {
+  MAIN_TAG: 'main',
+  MAIN_CLASS: 'main',
+  START_BTN_CLASS: 'start-btn',
+  INFO_SECTION_CLASS: 'info-section',
+  COUNTER_CLASS: 'info-section__counter',
+  TIMER_CLASS: 'info-section__timer',
+  TIMER_MS_CLASS: 'info-section__timer-ms',
+  TIMER_SEC_CLASS: 'info-section__timer-sec',
+  TIMER_MIN_CLASS: 'info-section__timer-min',
+  NAV_CLASS: 'nav-menu',
+  PLAYGROUND_TAG: 'section',
+  PLAYGROUND_CLASS: 'playground',
+  CELL_ROW_TAG: 'div',
+  CELL_ROW_CLASS: 'playground__row',
+  CELL_TAG: 'cell-div',
+  FONT_RATIO: 0.8,
+};

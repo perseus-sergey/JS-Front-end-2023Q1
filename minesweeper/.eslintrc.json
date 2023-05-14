@@ -11,6 +11,10 @@
         "sourceType": "module"
     },
     "rules": {
+      "import/prefer-default-export": [
+        "off",
+        { "target": "single" }
+      ],
       "indent": [
         "error",
         2

@@ -1,4 +1,25 @@
 import Cell from './Cell';
+import { constants } from './constants';
+import { gameTimer } from './gameTimer';
+
+const {
+  MAIN_TAG,
+  MAIN_CLASS,
+  INFO_SECTION_CLASS,
+  START_BTN_CLASS,
+  COUNTER_CLASS,
+  TIMER_CLASS,
+  TIMER_MS_CLASS,
+  TIMER_SEC_CLASS,
+  TIMER_MIN_CLASS,
+  NAV_CLASS,
+  PLAYGROUND_TAG,
+  PLAYGROUND_CLASS,
+  CELL_ROW_TAG,
+  CELL_ROW_CLASS,
+  CELL_TAG,
+  FONT_RATIO,
+} = constants;
 
 // TO_DO: timer
 // TO_DO: sound
@@ -7,18 +28,84 @@ import Cell from './Cell';
 // TO_DO: UI menu
 // TO_DO: try {*} = this
 
+const mainLayout = {
+  start() {
+    this.makeMainSection();
+    this.makeInfoSection();
+    this.makeMenuNav();
+    this.addListners();
+  },
+
+  makeMainSection() {
+    this.mainSection = mainLayout.generateDomElement(MAIN_TAG, '', MAIN_CLASS);
+    document.body.append(this.mainSection);
+  },
+
+  makeMenuNav() {
+    const menuNav = mainLayout.generateDomElement('nav', '', NAV_CLASS);
+    document.body.append(menuNav);
+  },
+
+  makeInfoSection() {
+    const infoSection = mainLayout.generateDomElement('section', '', INFO_SECTION_CLASS);
+    this.counterDiv = mainLayout.generateDomElement('div', '0', COUNTER_CLASS);
+
+    const timerDiv = mainLayout.generateDomElement('div', '', TIMER_CLASS);
+
+    this.startBtn = mainLayout.generateDomElement('div', 'Restart', START_BTN_CLASS);
+
+    this.ms = mainLayout.generateDomElement('div', '00', TIMER_MS_CLASS);
+    this.second = mainLayout.generateDomElement('div', '00', TIMER_SEC_CLASS);
+    this.minute = mainLayout.generateDomElement('div', '00', TIMER_MIN_CLASS);
+
+    timerDiv.append(this.minute);
+    timerDiv.append(this.second);
+    timerDiv.append(this.ms);
+
+    infoSection.append(this.counterDiv);
+    infoSection.append(this.startBtn);
+    infoSection.append(timerDiv);
+    document.body.append(infoSection);
+  },
+
+  restartBtnHandler() {
+    if (typeof play !== 'undefined') {
+      gameTimer.stopTimer();
+      this.ms.textContent = '00';
+      this.second.textContent = '00';
+      this.minute.textContent = '00';
+      this.counterDiv.textContent = '0';
+      this.mainSection.innerHTML = '';
+      play.finishGame();
+      play = new Playground();
+    }
+  },
+
+  addListners() {
+    this.startBtn.addEventListener('click', (event) => this.restartBtnHandler(event));
+  },
+
+  generateDomElement(tag, text = '', ...classes) {
+    const element = document.createElement(tag);
+    const arrClasses = [];
+    classes.forEach((el) => {
+      if (Array.isArray(el)) el.forEach((i) => arrClasses.push(i));
+      else el.split(' ').forEach((e) => arrClasses.push(e));
+    });
+    if (arrClasses.length) element.classList.add(...arrClasses);
+    element.textContent = text;
+    return element;
+  },
+};
+
 class Playground {
   constructor(rowNumber = 10, colNumber = 10, mineNum = 10) {
     this.ROW_NUM = rowNumber;
     this.COL_NUM = colNumber;
     this.MINE_NUM = mineNum;
-    customElements.define(this.CELL_TAG, Cell);
     this.cellClickHandler = this.cellClickHandler.bind(this);
     this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
-    // this.rightClickHandler = this.rightClickHandler.bind(this);
-    this.makeMainSection();
     this.appendPlayground();
-    this.makeCountersSection();
     this.startListners();
   }
 
@@ -28,41 +115,15 @@ class Playground {
 
   flags = [];
 
-  mainSection = '';
-
-  domPlayground = '';
-
   isFirstClick = true;
 
   isGameFinished = false;
 
-  timer = 0;
-
   opened = 0;
-
-  MAIN_TAG = 'main';
-
-  MAIN_CLASS = 'main';
-
-  PLAYGROUND_TAG = 'section';
-
-  PLAYGROUND_STYLE = 'playground';
-
-  CELL_TAG = Cell.CELL_TAG;
-
-  CELL_ROW_TAG = 'div';
-
-  CELL_ROW_STYLE = 'playground__row';
-
-  COUNTER_SECTION_STYLE = 'counter-section';
-
-  COUNTER_STYLE = 'counter-section__counter';
-
-  TIMER_STYLE = 'counter-section__timer';
 
   startListners() {
     document.addEventListener('click', this.cellClickHandler);
-    document.oncontextmenu = () => false;
+    // document.oncontextmenu = () => false;
     // ============== MEDIAQUERY ======== start ====
     [
       window.matchMedia('(max-width: 1250px)'),
@@ -102,12 +163,13 @@ class Playground {
   }
 
   cellClickHandler(event) {
-    const domCell = event.target.closest(this.CELL_TAG);
+    const domCell = event.target.closest(CELL_TAG);
 
     if (this.isGameFinished || !domCell || domCell.isOpened) return;
 
     // if it's right click:
     if (event.type === 'contextmenu') {
+      event.preventDefault();
       this.flagMarkClick(domCell);
       return;
     }
@@ -143,28 +205,11 @@ class Playground {
       this.appendPlayground();
     } while (this.calcMinesAround(x, y) !== 0);
 
-    window.addEventListener('contextmenu', this.cellClickHandler);
+    document.addEventListener('contextmenu', this.cellClickHandler);
 
-    this.startTimer();
+    gameTimer.startTimer();
     this.flagCount();
     this.openCell(x, y);
-  }
-
-  startTimer() {
-    this.stopTimer();
-    this.timerInterval = setInterval(() => {
-      this.timer += 1 / 60;
-      const msVal = Math.floor((this.timer - Math.floor(this.timer)) * 100);
-      const secondVal = Math.floor(this.timer) - Math.floor(this.timer / 60) * 60;
-      const minuteVal = Math.floor(this.timer / 60);
-      this.ms.innerHTML = msVal < 10 ? `0${msVal.toString()}` : msVal;
-      this.second.innerHTML = secondVal < 10 ? `0${secondVal.toString()}` : secondVal;
-      this.minute.innerHTML = minuteVal < 10 ? `0${minuteVal.toString()}` : minuteVal;
-    }, 1000 / 60);
-  }
-
-  stopTimer() {
-    clearInterval(this.timerInterval);
   }
 
   winClick(cell) {
@@ -190,7 +235,7 @@ class Playground {
   }
 
   flagCount() {
-    this.counterDiv.textContent = this.MINE_NUM - this.flags.length;
+    document.querySelector(`.${COUNTER_CLASS}`).textContent = this.MINE_NUM - this.flags.length;
   }
 
   removeFlag(flagId) {
@@ -198,46 +243,50 @@ class Playground {
   }
 
   finishGame(isWin) {
-    this.stopTimer();
+    this.endListners();
+    gameTimer.stopTimer();
     this.isGameFinished = true;
 
+    // show all mines except boom one
     this.mines.forEach((id) => {
       const [x, y] = id.split('-');
       const domCell = this.cells[x][y];
       domCell.showMine();
+
+      // if cell marked with correct flag
       if (this.flags.indexOf(id) !== -1) {
         this.removeFlag(id);
         domCell.isCorrectFlag(true);
       }
     });
+    // show incorrect flags
     this.flags.forEach((id) => {
       const [x, y] = id.split('-');
       this.cells[x][y].isCorrectFlag(false);
     });
-    this.endListners();
   }
 
   getCellSize() {
+    // window.innerWidth * 0.9 px  -  100
+    // window.innerWidth * 0.9 / this.COL_NUM px  -  x
     const w = 90 / this.COL_NUM;
     const h = 70 / this.ROW_NUM;
+    const rat = window.innerWidth / window.innerHeight;
 
-    return (w < h) ? { numb: w.toFixed(2), ext: 'vw' } : { numb: h.toFixed(2), ext: 'vh' };
-    // if (w < h) cellSize = `${w.toFixed(2)}vw`;
-    // let cellSize = `${h.toFixed(2)}vh`;
-    // if (w < h) cellSize = `${w.toFixed(2)}vw`;
-
-    // return cellSize;
+    return (rat < 1) ? { numb: w.toFixed(2), ext: 'vw' } : { numb: h.toFixed(2), ext: 'vh' };
+    // return (w < h) ? { numb: w.toFixed(2), ext: 'vw' } : { numb: h.toFixed(2), ext: 'vh' };
   }
 
   makePlayground() {
-    const playgrElem = Playground.generateDomElement(this.PLAYGROUND_TAG, '', this.PLAYGROUND_STYLE);
+    if (!customElements.get(CELL_TAG)) customElements.define(CELL_TAG, Cell);
+    const playgrElem = mainLayout.generateDomElement(PLAYGROUND_TAG, '', PLAYGROUND_CLASS);
 
     this.cells = [];
     const cellSizeNumb = this.getCellSize().numb;
     const cellSizeExt = this.getCellSize().ext;
 
     for (let x = 0; x < this.ROW_NUM; x += 1) {
-      const cellRow = Playground.generateDomElement(this.CELL_ROW_TAG, '', this.CELL_ROW_STYLE);
+      const cellRow = mainLayout.generateDomElement(CELL_ROW_TAG, '', CELL_ROW_CLASS);
 
       this.cells[x] = [];
       for (let y = 0; y < this.COL_NUM; y += 1) {
@@ -245,7 +294,7 @@ class Playground {
 
         cell.style.width = cellSizeNumb + cellSizeExt;
         cell.style.height = cellSizeNumb + cellSizeExt;
-        cell.style.fontSize = cellSizeNumb * Cell.FONT_RATIO + cellSizeExt;
+        cell.style.fontSize = cellSizeNumb * FONT_RATIO + cellSizeExt;
         this.cells[x].push(cell);
 
         cellRow.append(cell);
@@ -264,48 +313,14 @@ class Playground {
     return playgrElem;
   }
 
-  makeCountersSection() {
-    const counterWrapper = Playground.generateDomElement('section', '', this.COUNTER_SECTION_STYLE);
-    this.counterDiv = Playground.generateDomElement('div', '', this.COUNTER_STYLE);
-    this.counterDiv.textContent = 0;
-    this.timerDiv = Playground.generateDomElement('div', '', this.TIMER_STYLE);
-
-    this.ms = Playground.generateDomElement('div', '00');
-    this.second = Playground.generateDomElement('div', '00');
-    this.minute = Playground.generateDomElement('div', '00');
-
-    this.timerDiv.append(this.minute);
-    this.timerDiv.append(this.second);
-    this.timerDiv.append(this.ms);
-
-    counterWrapper.append(this.counterDiv);
-    counterWrapper.append(this.timerDiv);
-
-    document.body.append(counterWrapper);
-  }
-
   appendPlayground() {
-    if (this.domPlayground) this.domPlayground.remove();
+    let domPlayground = document.querySelector(`.${PLAYGROUND_CLASS}`);
+    if (domPlayground) domPlayground.remove();
+    // if (this.domPlayground) this.domPlayground.remove();
 
-    this.domPlayground = this.makePlayground();
+    domPlayground = this.makePlayground();
 
-    this.mainSection.append(this.domPlayground);
-  }
-
-  makeMainSection() {
-    const mainSection = Playground.generateDomElement(
-      this.MAIN_TAG,
-      '',
-      this.MAIN_CLASS,
-    );
-    document.body.append(mainSection);
-    this.mainSection = mainSection;
-  }
-
-  appendMonitor() {
-    this.mainSection.append(this.oEcran.ecran);
-    this.monitor = this.oEcran.monitor;
-    this.charReceiver = this.oEcran.charReceiver;
+    document.querySelector(MAIN_CLASS).append(domPlayground);
   }
 
   insertMines() {
@@ -381,17 +396,7 @@ class Playground {
   outBounds(x, y) {
     return x < 0 || y < 0 || x >= this.ROW_NUM || y >= this.COL_NUM;
   }
-
-  static generateDomElement(tag, text = '', ...classes) {
-    const element = document.createElement(tag);
-    const arrClasses = [];
-    classes.forEach((el) => {
-      if (Array.isArray(el)) el.forEach((i) => arrClasses.push(i));
-      else el.split(' ').forEach((e) => arrClasses.push(e));
-    });
-    if (arrClasses.length) element.classList.add(...arrClasses);
-    element.textContent = text;
-    return element;
-  }
 }
-const playground = new Playground(7, 7, 3);
+
+mainLayout.start();
+let play = new Playground();
