@@ -8,6 +8,7 @@ const {
 
 export const gameTimer = {
   timer: 0,
+  timerInterval: 0,
 
   startTimer() {
     this.stopTimer();
@@ -23,6 +24,7 @@ export const gameTimer = {
   },
 
   stopTimer() {
-    clearInterval(this.timerInterval);
+    this.timer = 0;
+    this.timerInterval = clearInterval(this.timerInterval);
   },
 };

@@ -3,30 +3,39 @@ import { constants } from './constants';
 import { gameTimer } from './gameTimer';
 
 const {
-  MAIN_TAG,
-  MAIN_CLASS,
-  INFO_SECTION_CLASS,
-  START_BTN_CLASS,
   COUNTER_CLASS,
-  TIMER_CLASS,
-  TIMER_MS_CLASS,
-  TIMER_SEC_CLASS,
-  TIMER_MIN_CLASS,
-  NAV_CLASS,
-  PLAYGROUND_TAG,
-  PLAYGROUND_CLASS,
+  COUNTER_WRAPPER_CLASS,
+  COUNTER_TITLE_CLASS,
+  CLICK_WRAPPER_CLASS,
+  CLICK_TITLE_CLASS,
+  CLICK_CLASS,
   CELL_ROW_TAG,
   CELL_ROW_CLASS,
   CELL_TAG,
   FONT_RATIO,
+  INFO_SECTION_CLASS,
+  MAIN_TAG,
+  MAIN_CLASS,
+  NAV_CLASS,
+  PLAYGROUND_TAG,
+  PLAYGROUND_CLASS,
+  START_BTN_CLASS,
+  SETTINGS_BTN_CLASS,
+  TIMER_CLASS,
+  TIMER_MS_CLASS,
+  TIMER_SEC_CLASS,
+  TIMER_MIN_CLASS,
 } = constants;
 
-// TO_DO: timer
-// TO_DO: sound
-// TO_DO: start button
-// TO_DO: counter design
-// TO_DO: UI menu
-// TO_DO: try {*} = this
+// TO_DO: MENU - Theme: option to choose different themes for the game board (dark/light themes)
+// TO_DO: MENU - Sound: sound accompaniment (on/off) when clicking on cell and at the end of the game
+// TO_DO: MENU - Level: implement ability to change the size (easy - 10x10, medium - 15x15, hard - 25x25)
+//        and number of mines for each size of the field (from 10 to 99)
+// TO_DO: MENU - Score: implemented saving the latest 10 results using LocalStorage
+// TO_DO: implemented saving the state of the game
+// TO_DO: game duration and number of clicks are displayed
+// TO_DO: the game should end when the player reveals all cells that do not contain mines (win)
+//        or clicks on mine (lose) and related message is displayed at the end of the game:
 
 const mainLayout = {
   start() {
@@ -48,11 +57,23 @@ const mainLayout = {
 
   makeInfoSection() {
     const infoSection = mainLayout.generateDomElement('section', '', INFO_SECTION_CLASS);
-    this.counterDiv = mainLayout.generateDomElement('div', '0', COUNTER_CLASS);
 
-    const timerDiv = mainLayout.generateDomElement('div', '', TIMER_CLASS);
+    const countWrapperDiv = mainLayout.generateDomElement('div', '', COUNTER_WRAPPER_CLASS);
+    const countTitleDiv = mainLayout.generateDomElement('div', 'Mines: ', COUNTER_TITLE_CLASS);
+    this.counterDiv = mainLayout.generateDomElement('div', '0', COUNTER_CLASS);
+    countWrapperDiv.append(countTitleDiv);
+    countWrapperDiv.append(this.counterDiv);
+
+    const clickWrapperDiv = mainLayout.generateDomElement('div', '', CLICK_WRAPPER_CLASS);
+    const clickTitleDiv = mainLayout.generateDomElement('div', 'Clicks: ', CLICK_TITLE_CLASS);
+    this.clickDiv = mainLayout.generateDomElement('div', '0', CLICK_CLASS);
+    clickWrapperDiv.append(clickTitleDiv);
+    clickWrapperDiv.append(this.clickDiv);
 
     this.startBtn = mainLayout.generateDomElement('div', 'Restart', START_BTN_CLASS);
+    this.settingsBtn = mainLayout.generateDomElement('div', '≓', SETTINGS_BTN_CLASS);
+
+    const timerDiv = mainLayout.generateDomElement('div', '', TIMER_CLASS);
 
     this.ms = mainLayout.generateDomElement('div', '00', TIMER_MS_CLASS);
     this.second = mainLayout.generateDomElement('div', '00', TIMER_SEC_CLASS);
@@ -62,9 +83,11 @@ const mainLayout = {
     timerDiv.append(this.second);
     timerDiv.append(this.ms);
 
-    infoSection.append(this.counterDiv);
+    infoSection.append(countWrapperDiv);
+    infoSection.append(clickWrapperDiv);
     infoSection.append(this.startBtn);
     infoSection.append(timerDiv);
+    infoSection.append(this.settingsBtn);
     document.body.append(infoSection);
   },
 
@@ -75,6 +98,7 @@ const mainLayout = {
       this.second.textContent = '00';
       this.minute.textContent = '00';
       this.counterDiv.textContent = '0';
+      this.clickDiv.textContent = '0';
       this.mainSection.innerHTML = '';
       play.finishGame();
       play = new Playground();
@@ -118,6 +142,8 @@ class Playground {
   isFirstClick = true;
 
   isGameFinished = false;
+
+  clicks = 0;
 
   opened = 0;
 
@@ -177,6 +203,8 @@ class Playground {
     if (domCell.isFlag) return;
 
     const { x, y } = domCell;
+
+    document.querySelector(`.${CLICK_CLASS}`).textContent = ++this.clicks;
 
     // to insert mines after first click
     if (this.isFirstClick) {
