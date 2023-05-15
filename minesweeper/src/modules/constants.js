@@ -11,6 +11,7 @@ export const constants = {
   CELL_TAG: 'cell-div',
   FONT_RATIO: 0.8,
   INFO_SECTION_CLASS: 'info-section',
+  LOCAL_DATA_KEY: 'currentState',
   MAIN_TAG: 'main',
   MAIN_CLASS: 'main',
   NAV_CLASS: 'nav-menu',

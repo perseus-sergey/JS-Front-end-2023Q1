@@ -10,8 +10,9 @@ export const gameTimer = {
   timer: 0,
   timerInterval: 0,
 
-  startTimer() {
+  startTimer(time = 0) {
     this.stopTimer();
+    this.timer = time;
     this.timerInterval = setInterval(() => {
       this.timer += 1 / 60;
       const msec = Math.floor((this.timer - Math.floor(this.timer)) * 100);

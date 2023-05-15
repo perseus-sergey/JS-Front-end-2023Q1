@@ -1,20 +1,22 @@
 export default class Cell extends HTMLElement {
   // 0 - not mine, 1 - mine
-  constructor(x, y) {
+  constructor(x, y, isOpened = false, VALUE = 0) {
     super();
     this.cellID = `${x}-${y}`;
     // this.dataset.id = this.cellID;
     this.x = x;
     this.y = y;
+    this.isOpened = isOpened;
+    this.VALUE = VALUE;
   }
 
-  isOpened = false;
+  // isOpened = false;
 
   isMine = 0;
 
   isFlag = false;
 
-  VALUE = 0;
+  // VALUE = 0;
 
   styles = [];
 
@@ -57,13 +59,16 @@ export default class Cell extends HTMLElement {
   };
 
   connectedCallback() {
-    this.generateCell();
+    this.generateClassList();
   }
 
   openCell() {
     this.isOpened = true;
     this.textContent = this.VALUE || '';
-    this.classList.add(this.cellStyle.OPENED, this.cellStyle.MINES_AROUND[this.VALUE]);
+    // this.classList.add(this.cellStyle.OPENED, this.cellStyle.MINES_AROUND[this.VALUE]);
+    // this.styles.push(this.cellStyle.OPENED);
+    // this.styles.push(this.cellStyle.MINES_AROUND[this.VALUE]);
+    this.generateClassList();
   }
 
   showMine() {
@@ -73,6 +78,7 @@ export default class Cell extends HTMLElement {
   isCorrectFlag(isCorrect) {
     if (!isCorrect) this.textContent = this.cellIcon.BAD_FLAG;
     this.classList.add(isCorrect ? this.cellStyle.GOOD_FLAG : this.cellStyle.WRONG_FLAG);
+    this.styles.push(isCorrect ? this.cellStyle.GOOD_FLAG : this.cellStyle.WRONG_FLAG);
   }
 
   changeFlag() {
@@ -83,16 +89,27 @@ export default class Cell extends HTMLElement {
   isBoom() {
     this.classList.add(this.cellStyle.BOOM);
     this.textContent = this.cellIcon.BOOM;
+    // this.styles.push(this.cellStyle.BOOM);
   }
 
   isWin() {
     this.classList.add(this.cellStyle.WIN);
+    // this.styles.push(this.cellStyle.WIN);
     this.textContent = this.cellIcon.WIN;
   }
 
-  generateCell() {
-    this.styles = [this.cellStyle.CELL];
+  generateClassList() {
+    // this.styles = [this.cellStyle.CELL];
+    // this.classList.add(this.cellStyle.CELL);
 
-    this.classList = [...this.styles];
+    if (this.isOpened) {
+      this.styles.push(this.cellStyle.OPENED);
+      this.styles.push(this.cellStyle.MINES_AROUND[this.VALUE]);
+    }
+
+    this.classList = this.cellStyle.CELL;
+    this.classList.add(...this.styles);
+
+    // this.classList = [...this.styles];
   }
 }

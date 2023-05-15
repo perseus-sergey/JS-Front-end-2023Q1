@@ -14,6 +14,7 @@ const {
   CELL_TAG,
   FONT_RATIO,
   INFO_SECTION_CLASS,
+  LOCAL_DATA_KEY,
   MAIN_TAG,
   MAIN_CLASS,
   NAV_CLASS,
@@ -36,6 +37,8 @@ const {
 // TO_DO: game duration and number of clicks are displayed
 // TO_DO: the game should end when the player reveals all cells that do not contain mines (win)
 //        or clicks on mine (lose) and related message is displayed at the end of the game:
+// TO_DO: dinamic saved cell size
+// TO_DO: refactor timer showing
 
 const mainLayout = {
   start() {
@@ -123,10 +126,12 @@ const mainLayout = {
 };
 
 class Playground {
-  constructor(rowNumber = 10, colNumber = 10, mineNum = 10) {
+  constructor(rowNumber = 10, colNumber = 10, mineNum = 10, savingData = '') {
     this.ROW_NUM = rowNumber;
     this.COL_NUM = colNumber;
     this.MINE_NUM = mineNum;
+    this.savingData = savingData;
+    this.getSavingData(savingData);
     this.cellClickHandler = this.cellClickHandler.bind(this);
     this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
     this.appendPlayground();
@@ -143,12 +148,58 @@ class Playground {
 
   isGameFinished = false;
 
+  timer = 0;
+
   clicks = 0;
 
   opened = 0;
 
+  getSavingData(data) {
+    if (!data) return;
+
+    const oSavingData = JSON.parse(data);
+
+    this.timer = oSavingData.timer;
+    this.ROW_NUM = oSavingData.ROW_NUM;
+    this.COL_NUM = oSavingData.COL_NUM;
+    this.MINE_NUM = oSavingData.MINE_NUM;
+    this.mines = oSavingData.mines;
+    this.flags = oSavingData.flags;
+    this.clicks = oSavingData.clicks;
+
+    if (!customElements.get(CELL_TAG)) customElements.define(CELL_TAG, Cell);
+
+    this.cells = [];
+    for (let x = 0; x < this.ROW_NUM; x += 1) {
+      this.cells[x] = [];
+      for (let y = 0; y < this.COL_NUM; y += 1) {
+        const sCell = oSavingData.cells[x][y];
+        const cell = new Cell(sCell.x, sCell.y, sCell.isOpened, sCell.VALUE);
+        if (sCell.isOpened) this.opened += 1;
+        cell.isMine = sCell.isMine;
+        cell.isFlag = sCell.isFlag;
+        cell.style.width = sCell.width;
+        cell.style.height = sCell.height;
+        cell.style.fontSize = sCell.fontSize;
+        cell.textContent = sCell.textContent;
+
+        this.cells[x].push(cell);
+      }
+    }
+    const msec = Math.floor((this.timer - Math.floor(this.timer)) * 100);
+    const sec = Math.floor(this.timer) - Math.floor(this.timer / 60) * 60;
+    const min = Math.floor(this.timer / 60);
+    document.querySelector(`.${TIMER_MS_CLASS}`).textContent = msec < 10 ? `0${msec.toString()}` : msec;
+    document.querySelector(`.${TIMER_SEC_CLASS}`).textContent = sec < 10 ? `0${sec.toString()}` : sec;
+    document.querySelector(`.${TIMER_MIN_CLASS}`).textContent = min < 10 ? `0${min.toString()}` : min;
+
+    document.querySelector(`.${CLICK_CLASS}`).textContent = this.clicks;
+    this.flagCount();
+  }
+
   startListners() {
     document.addEventListener('click', this.cellClickHandler);
+    document.addEventListener('contextmenu', this.cellClickHandler);
     // document.oncontextmenu = () => false;
     // ============== MEDIAQUERY ======== start ====
     [
@@ -159,14 +210,6 @@ class Playground {
     ].forEach((mq) => mq.addEventListener('change', this.mediaQueryHandler));
 
     // ______________ MEDIAQUERY ______ end _______
-
-    // document.addEventListener('keydown', (event) => {
-    //   if (!this.isMeta) this.keyDownHandler(event);
-    // });
-    // document.addEventListener('keyup', (event) => {
-    //   if (event.key === 'Shift') this.keyDownHandler(event);
-    //   this.isMeta = false;
-    // });
   }
 
   mediaQueryHandler() {
@@ -188,7 +231,7 @@ class Playground {
     document.removeEventListener('contextmenu', this.cellClickHandler);
   }
 
-  cellClickHandler(event) {
+  async cellClickHandler(event) {
     const domCell = event.target.closest(CELL_TAG);
 
     if (this.isGameFinished || !domCell || domCell.isOpened) return;
@@ -197,6 +240,7 @@ class Playground {
     if (event.type === 'contextmenu') {
       event.preventDefault();
       this.flagMarkClick(domCell);
+      this.saveDataToLocalStorage();
       return;
     }
 
@@ -208,8 +252,8 @@ class Playground {
 
     // to insert mines after first click
     if (this.isFirstClick) {
-      this.firstClick(x, y);
-      return;
+      const isSaved = await this.firstClick(x, y);
+      if (!isSaved) return;
     }
 
     // if it's mine:
@@ -221,23 +265,61 @@ class Playground {
     // this.moovigCharColor = window.getComputedStyle(element).color;
     // this.addKeyBtnPressedClass(element);
 
-    this.openCell(x, y);
+    const isWin = await this.openCell(x, y);
+    if (isWin) return;
     this.flagCount();
-    // console.log(this.flags.length);
-    // this.removeKeyBtnPressedClass(element);
+    this.saveDataToLocalStorage();
   }
 
-  firstClick(x, y) {
+  saveDataToLocalStorage() {
+    const storCells = [];
+    for (let x = 0; x < this.ROW_NUM; x += 1) {
+      storCells[x] = [];
+      for (let y = 0; y < this.COL_NUM; y += 1) {
+        const oCell = this.cells[x][y];
+        const strCell = {};
+        strCell.x = oCell.x;
+        strCell.y = oCell.y;
+        strCell.VALUE = oCell.VALUE;
+        strCell.isOpened = oCell.isOpened;
+        strCell.isMine = oCell.isMine;
+        strCell.isFlag = oCell.isFlag;
+        strCell.width = oCell.style.width;
+        strCell.height = oCell.style.height;
+        strCell.fontSize = oCell.style.fontSize;
+        strCell.textContent = oCell.textContent;
+
+        storCells[x].push(strCell);
+      }
+    }
+
+    const data = {
+      timer: gameTimer.timer,
+      ROW_NUM: this.ROW_NUM,
+      COL_NUM: this.COL_NUM,
+      MINE_NUM: this.MINE_NUM,
+      cells: storCells,
+      mines: this.mines,
+      flags: this.flags,
+      clicks: this.clicks,
+    };
+    localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(data));
+  }
+
+  async firstClick(x, y) {
+    gameTimer.startTimer(this.timer);
+
     this.isFirstClick = false;
+    if (this.savingData) return true;
     do {
       this.appendPlayground();
     } while (this.calcMinesAround(x, y) !== 0);
 
     document.addEventListener('contextmenu', this.cellClickHandler);
 
-    gameTimer.startTimer();
     this.flagCount();
-    this.openCell(x, y);
+    await this.openCell(x, y);
+    return false;
   }
 
   winClick(cell) {
@@ -271,6 +353,7 @@ class Playground {
   }
 
   finishGame(isWin) {
+    localStorage.removeItem(LOCAL_DATA_KEY);
     this.endListners();
     gameTimer.stopTimer();
     this.isGameFinished = true;
@@ -306,8 +389,15 @@ class Playground {
   }
 
   makePlayground() {
+    // Define custom cell tag
     if (!customElements.get(CELL_TAG)) customElements.define(CELL_TAG, Cell);
+
     const playgrElem = mainLayout.generateDomElement(PLAYGROUND_TAG, '', PLAYGROUND_CLASS);
+
+    // if saving data alredy exists in local storage
+    if (this.savingData) {
+      return this.makePlaygrFromSavingData(playgrElem);
+    }
 
     this.cells = [];
     const cellSizeNumb = this.getCellSize().numb;
@@ -341,10 +431,23 @@ class Playground {
     return playgrElem;
   }
 
+  makePlaygrFromSavingData(playgrElem) {
+    for (let x = 0; x < this.ROW_NUM; x += 1) {
+      const cellRow = mainLayout.generateDomElement(CELL_ROW_TAG, '', CELL_ROW_CLASS);
+
+      for (let y = 0; y < this.COL_NUM; y += 1) {
+        // this.cells[x][y] = this.cells[x][y].call(Cell);
+        cellRow.append(this.cells[x][y]);
+        // console.log(this.cells[x][y] instanceof Cell);
+      }
+      playgrElem.append(cellRow);
+    }
+    return playgrElem;
+  }
+
   appendPlayground() {
     let domPlayground = document.querySelector(`.${PLAYGROUND_CLASS}`);
     if (domPlayground) domPlayground.remove();
-    // if (this.domPlayground) this.domPlayground.remove();
 
     domPlayground = this.makePlayground();
 
@@ -392,33 +495,34 @@ class Playground {
   }
 
   async openCell(x, y) {
-    if (this.outBounds(x, y)) return;
+    if (this.outBounds(x, y)) return false;
     const oCell = this.cells[x][y];
-    if (oCell.isOpened) return;
+    if (oCell.isOpened) return false;
 
     oCell.openCell();
     this.removeFlag(oCell.cellID);
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10);
+    });
     this.opened += 1;
 
     if (this.opened === this.ROW_NUM * this.COL_NUM - this.MINE_NUM) {
       this.winClick(oCell);
-      return;
+      return true;
     }
 
-    if (oCell.VALUE !== 0) return;
+    if (oCell.VALUE !== 0) return false;
 
-    await new Promise((resolve) => {
-      setTimeout(resolve, 30);
-    });
+    await this.openCell(x, y - 1);
+    await this.openCell(x, y + 1);
+    await this.openCell(x - 1, y);
+    await this.openCell(x + 1, y);
+    await this.openCell(x - 1, y - 1);
+    await this.openCell(x - 1, y + 1);
+    await this.openCell(x + 1, y - 1);
+    await this.openCell(x + 1, y + 1);
 
-    this.openCell(x, y - 1);
-    this.openCell(x, y + 1);
-    this.openCell(x - 1, y);
-    this.openCell(x + 1, y);
-    this.openCell(x - 1, y - 1);
-    this.openCell(x - 1, y + 1);
-    this.openCell(x + 1, y - 1);
-    this.openCell(x + 1, y + 1);
+    // return false;
   }
 
   outBounds(x, y) {
@@ -427,4 +531,5 @@ class Playground {
 }
 
 mainLayout.start();
-let play = new Playground();
+// let play = new Playground(10, 10, 10);
+let play = new Playground(10, 10, 10, localStorage.getItem(LOCAL_DATA_KEY) || '');
