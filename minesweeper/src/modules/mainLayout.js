@@ -56,8 +56,11 @@ const navMenu = {
   menuOverlay: '',
 
   start() {
+    this.disactivateMenu = this.disactivateMenu.bind(this);
+    this.levelClickHandler = this.levelClickHandler.bind(this);
+    this.soundSliderClickHandler = this.soundSliderClickHandler.bind(this);
     this.makeMenuNav();
-    this.addListners();
+    // this.addListners();
   },
 
   makeMenuNav() {
@@ -106,11 +109,11 @@ const navMenu = {
       WRAPPER_SOUND,
     );
     const soundLabel = generateDomElement('label', '');
-    const soundSlider = generateDomElement('input', '', THEME_SLIDER);
-    soundSlider.id = SOUND_SLIDER;
-    soundSlider.type = 'checkbox';
-    soundLabel.htmlFor = soundSlider.id;
-    soundSliderWrapper.append(soundSlider);
+    this.soundSlider = generateDomElement('input', '', THEME_SLIDER);
+    this.soundSlider.id = SOUND_SLIDER;
+    this.soundSlider.type = 'checkbox';
+    soundLabel.htmlFor = this.soundSlider.id;
+    soundSliderWrapper.append(this.soundSlider);
     soundSliderWrapper.append(soundLabel);
     menuSound.append(soundTitle);
     menuSound.append(soundSliderWrapper);
@@ -198,19 +201,38 @@ const navMenu = {
   },
 
   activateMenu() {
+    this.addListners();
     this.menuNav.classList.add(NAV_MENU_ACTIVE);
     this.addMenuOverlay();
   },
 
   disactivateMenu() {
+    console.log('disactivateMenu --> toggle');
+    this.toggleLevelMenu(false);
     this.menuNav.classList.remove(NAV_MENU_ACTIVE);
     this.menuOverlay.remove();
+    this.removeListners();
   },
 
   addListners() {
-    this.closeBtn.addEventListener('click', (event) => this.disactivateMenu(event));
-    this.menuLevels.addEventListener('click', (event) => this.levelClickHandler(event));
+    console.log('addListners');
+    this.closeBtn.addEventListener('click', this.disactivateMenu);
+    this.menuLevels.addEventListener('click', this.levelClickHandler);
+    this.soundSlider.addEventListener('click', this.soundSliderClickHandler);
     // this.addListnersForCustomInput();
+  },
+  removeListners() {
+    console.log('removeListners');
+
+    this.closeBtn.removeEventListener('click', this.disactivateMenu);
+    this.menuLevels.removeEventListener('click', this.levelClickHandler);
+    this.soundSlider.removeEventListener('click', this.soundSliderClickHandler);
+    // this.addListnersForCustomInput();
+  },
+
+  soundSliderClickHandler() {
+    console.log(this.soundSlider.checked);
+    mainLayout.play.isSound = !this.soundSlider.checked;
   },
 
   addListnersForCustomInput() {
@@ -222,8 +244,9 @@ const navMenu = {
     });
   },
 
-  toggleLevelMenu() {
-    if (this.customLevelForm.classList.contains(NAV_MENU_ACTIVE)) {
+  toggleLevelMenu(isNavMenuActivated = true) {
+    console.log('toggleLevelMenu');
+    if (this.customLevelForm.classList.contains(NAV_MENU_ACTIVE) || !isNavMenuActivated) {
       this.customLevelForm.classList.remove(NAV_MENU_ACTIVE);
       this.removeListnersForCustomInput();
     } else {
@@ -262,8 +285,9 @@ const navMenu = {
       const element = event.target;
 
       if (event.target === this.leveldivCustom) {
+        console.log('levelClickHandler --> toggle');
         this.toggleLevelMenu();
-        this.startBtn.addEventListener('click', (event) => this.startCustomLevelHandler(event));
+        this.startBtn.addEventListener('click', (event) => this.startCustomLevelHandler(event), { once: true });
         return;
       }
 
@@ -281,7 +305,7 @@ const navMenu = {
         +this.customColumnVal.value * +this.customRowVal.value - 16,
       ),
     );
-    console.log(gameLevel.custom);
+    // console.log(gameLevel.custom);
     mainLayout.restartBtnHandler('', gameLevel.custom);
     this.disactivateMenu();
     [this.customColumnVal,
@@ -291,9 +315,7 @@ const navMenu = {
 
   addMenuOverlay() {
     this.menuOverlay = generateDomElement('div', '', MENU_OVERLAY);
-    this.menuOverlay.addEventListener('click', (e) => this.disactivateMenu(e), {
-      once: true,
-    });
+    this.menuOverlay.addEventListener('click', (e) => this.disactivateMenu(e), { once: true });
     document.body.prepend(this.menuOverlay);
   },
 };
@@ -302,12 +324,12 @@ const mainLayout = {
   start() {
     this.makeMainSection();
     this.makeInfoSection();
+    navMenu.start();
     this.play = new Playground(
       gameLevel.easy,
       localStorage.getItem(LOCAL_DATA_KEY) || '',
     );
-    navMenu.start();
-    this.addListners();
+    this.addMainLayoutListners();
   },
 
   makeMainSection() {
@@ -386,15 +408,17 @@ const mainLayout = {
       this.play = new Playground(
         oLevel,
         localStorage.getItem(LOCAL_DATA_KEY) || '',
+        !navMenu.soundSlider.checked,
       );
     }
   },
 
   showMenu() {
+    console.log('showMenu');
     navMenu.activateMenu();
   },
 
-  addListners() {
+  addMainLayoutListners() {
     this.startBtn.addEventListener('click', (event) => this.restartBtnHandler(event));
     this.settingsBtn.addEventListener('click', (event) => this.showMenu(event));
   },

@@ -1,23 +1,41 @@
 import Cell from './Cell';
-import { constants } from './constants';
+import { constants, menuClasses } from './constants';
 import { gameTimer } from './gameTimer';
 import { gameLevel } from './Level';
 import { generateDomElement } from './utilities';
 
+import boom from '../assets/sounds/boom.wav';
+import audioEndLev from '../assets/sounds/end-level.wav';
+import deleteSound from '../assets/sounds/delete.wav';
+import choise from '../assets/sounds/choise.wav';
+import keyboard from '../assets/sounds/keyboard.wav';
+import shortBell from '../assets/sounds/upali-dengi-na-igrovoy-schet.wav';
+
+// const audioDel = new Audio(`${soundFolder}delete.wav`);
+// const audioWrongAnsw = new Audio(`${soundFolder}podgotovka-k-startu.wav`);
+// const audioRightAnsw = new Audio(`${soundFolder}upali-dengi-na-igrovoy-schet.wav`);
+// const audioEnter = new Audio(`${soundFolder}enter.wav`);
+// const audioEnd = new Audio(`${soundFolder}zvuk-pobedyi-v-igrovom-urovne-30120.wav`);
+// const audioEndLev = new Audio(`${soundFolder}end-level.wav`);
+// const audioChoisNum = new Audio(`${soundFolder}choise.wav`);
+
 // TO_DO: MENU - Theme: option to choose different themes for the game board (dark/light themes)
 // TO_DO: MENU - Sound: sound accompaniment (on/off) when clicking on cell and at the end of the game
-// TO_DO: MENU - Level: implement ability to change the size (easy - 10x10, medium - 15x15, hard - 25x25)
+// TO_DO: --+ MENU - Level: implement ability to change the size (easy - 10x10, medium - 15x15, hard - 25x25)
 //        and number of mines for each size of the field (from 10 to 99)
 // TO_DO: MENU - Score: implemented saving the latest 10 results using LocalStorage
-// TO_DO: implemented saving the state of the game
+// TO_DO: --+ implemented saving the state of the game
 // TO_DO: --+ game duration and number of clicks are displayed
 // TO_DO: the game should end when the player reveals all cells that do not contain mines (win)
 //        or clicks on mine (lose) and related message is displayed at the end of the game:
 // TO_DO: dinamic saved cell size
-// TO_DO: refactor timer showing
-// TO_DO: clean CSS
+// TO_DO: --+ refactor timer showing
+// TO_DO: --+ clean CSS
 // TO_DO: Modal modul
-// TO_DO: Menu modul
+// TO_DO: --+ Menu modul
+// TO_DO: Cell size for lots column
+// TO_DO: getEventListeners(target)
+// TO_DO: deploy
 
 const {
   COUNTER_CLASS,
@@ -36,13 +54,17 @@ const {
   TIMER_MIN_CLASS,
 } = constants;
 
+const { SOUND_SLIDER } = menuClasses;
+
 export class Playground {
-  constructor(level = gameLevel.easy, savingData = '') {
+  constructor(level = gameLevel.easy, savingData = '', isSound = true) {
     if (level.rowNum * level.colNum - 16 < level.mineNum) level = gameLevel.easy;
     this.ROW_NUM = level.rowNum;
     this.COL_NUM = level.colNum;
     this.MINE_NUM = level.mineNum;
     this.savingData = savingData;
+    this.isSound = isSound;
+    this.setSounds();
     this.getSavingData(savingData);
     this.cellClickHandler = this.cellClickHandler.bind(this);
     this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
@@ -55,6 +77,8 @@ export class Playground {
   mines = [];
 
   flags = [];
+
+  isSound = true;
 
   isFirstClick = true;
 
@@ -71,6 +95,7 @@ export class Playground {
 
     const oSavingData = JSON.parse(data);
 
+    this.isSound = oSavingData.isSound;
     this.timer = oSavingData.timer;
     this.ROW_NUM = oSavingData.ROW_NUM;
     this.COL_NUM = oSavingData.COL_NUM;
@@ -98,15 +123,31 @@ export class Playground {
         this.cells[x].push(cell);
       }
     }
+    const chbSound = document.getElementById(SOUND_SLIDER);
+    if (chbSound) chbSound.checked = !this.isSound;
+    console.log('chbSound: ', chbSound);
+    this.setTimeValues();
+    gameTimer.startTimer(this.timer);
+    document.querySelector(`.${CLICK_CLASS}`).textContent = this.clicks;
+    this.flagCount();
+  }
+
+  setTimeValues() {
     const msec = Math.floor((this.timer - Math.floor(this.timer)) * 100);
     const sec = Math.floor(this.timer) - Math.floor(this.timer / 60) * 60;
     const min = Math.floor(this.timer / 60);
     document.querySelector(`.${TIMER_MS_CLASS}`).textContent = msec < 10 ? `0${msec.toString()}` : msec;
     document.querySelector(`.${TIMER_SEC_CLASS}`).textContent = sec < 10 ? `0${sec.toString()}` : sec;
     document.querySelector(`.${TIMER_MIN_CLASS}`).textContent = min < 10 ? `0${min.toString()}` : min;
+  }
 
-    document.querySelector(`.${CLICK_CLASS}`).textContent = this.clicks;
-    this.flagCount();
+  setSounds() {
+    this.audioBoom = new Audio(boom);
+    this.audioRemoveFlag = new Audio(deleteSound);
+    this.audioRightAnsw = new Audio(shortBell);
+    this.audioFlagged = new Audio(keyboard);
+    this.audioFirstClick = new Audio(choise);
+    this.audioWin = new Audio(audioEndLev);
   }
 
   startListners() {
@@ -164,6 +205,7 @@ export class Playground {
 
     // to insert mines after FIRST CLICK
     if (this.isFirstClick) {
+      if (this.isSound) this.audioFirstClick.play();
       const isSaved = await this.firstClick(x, y);
       this.saveDataToLocalStorage();
       if (!isSaved) return;
@@ -175,11 +217,10 @@ export class Playground {
       return;
     }
 
-    // this.moovigCharColor = window.getComputedStyle(element).color;
-    // this.addKeyBtnPressedClass(element);
-
     const isWin = await this.openCell(x, y);
     if (isWin) return;
+
+    if (this.isSound) this.audioRightAnsw.play();
     this.flagCount();
     this.saveDataToLocalStorage();
   }
@@ -207,6 +248,7 @@ export class Playground {
     }
 
     const data = {
+      isSound: this.isSound,
       timer: gameTimer.timer,
       ROW_NUM: this.ROW_NUM,
       COL_NUM: this.COL_NUM,
@@ -220,8 +262,6 @@ export class Playground {
   }
 
   async firstClick(x, y) {
-    gameTimer.startTimer(this.timer);
-
     this.isFirstClick = false;
     // console.log('this.savingData : ', this.savingData);
     if (this.savingData) return true;
@@ -233,6 +273,7 @@ export class Playground {
 
     this.flagCount();
     await this.openCell(x, y);
+    gameTimer.startTimer(this.timer);
     return false;
   }
 
@@ -261,21 +302,26 @@ export class Playground {
     // const sliced = arrSavingData.push(data).slice(-10);
     localStorage.setItem(LAST_WINS_KEY, JSON.stringify(arrSavingData));
 
-    this.finishGame(true);
+    if (this.isSound) this.audioWin.play();
+    this.finishGame();
     // alert('YOU WIN !!!!!!!!');
   }
 
   mineClick(cell) {
+    if (this.isSound) this.audioBoom.play();
+
     cell.isBoom();
     this.mines = this.mines.filter((id) => id !== cell.cellID);
-    this.finishGame(false);
+    this.finishGame();
   }
 
   flagMarkClick(cell) {
     cell.changeFlag();
     if (cell.isFlag) {
+      if (this.isSound) this.audioFlagged.play();
       this.flags.push(cell.cellID);
     } else {
+      if (this.isSound) this.audioRemoveFlag.play();
       this.removeFlag(cell.cellID);
     }
     this.flagCount();
@@ -293,7 +339,7 @@ export class Playground {
     localStorage.removeItem(LOCAL_DATA_KEY);
   }
 
-  finishGame(isWin) {
+  finishGame() {
     this.cleanCurrentStatusData();
     this.endListners();
     gameTimer.stopTimer();
