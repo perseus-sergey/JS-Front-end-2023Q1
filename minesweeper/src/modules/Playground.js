@@ -1,32 +1,8 @@
 import Cell from './Cell';
 import { constants } from './constants';
 import { gameTimer } from './gameTimer';
-
-const {
-  COUNTER_CLASS,
-  COUNTER_WRAPPER_CLASS,
-  COUNTER_TITLE_CLASS,
-  CLICK_WRAPPER_CLASS,
-  CLICK_TITLE_CLASS,
-  CLICK_CLASS,
-  CELL_ROW_TAG,
-  CELL_ROW_CLASS,
-  CELL_TAG,
-  FONT_RATIO,
-  INFO_SECTION_CLASS,
-  LOCAL_DATA_KEY,
-  MAIN_TAG,
-  MAIN_CLASS,
-  NAV_CLASS,
-  PLAYGROUND_TAG,
-  PLAYGROUND_CLASS,
-  START_BTN_CLASS,
-  SETTINGS_BTN_CLASS,
-  TIMER_CLASS,
-  TIMER_MS_CLASS,
-  TIMER_SEC_CLASS,
-  TIMER_MIN_CLASS,
-} = constants;
+import { gameLevel } from './Level';
+import { generateDomElement } from './utilities';
 
 // TO_DO: MENU - Theme: option to choose different themes for the game board (dark/light themes)
 // TO_DO: MENU - Sound: sound accompaniment (on/off) when clicking on cell and at the end of the game
@@ -34,102 +10,38 @@ const {
 //        and number of mines for each size of the field (from 10 to 99)
 // TO_DO: MENU - Score: implemented saving the latest 10 results using LocalStorage
 // TO_DO: implemented saving the state of the game
-// TO_DO: game duration and number of clicks are displayed
+// TO_DO: --+ game duration and number of clicks are displayed
 // TO_DO: the game should end when the player reveals all cells that do not contain mines (win)
 //        or clicks on mine (lose) and related message is displayed at the end of the game:
 // TO_DO: dinamic saved cell size
 // TO_DO: refactor timer showing
+// TO_DO: clean CSS
+// TO_DO: Modal modul
+// TO_DO: Menu modul
 
-const mainLayout = {
-  start() {
-    this.makeMainSection();
-    this.makeInfoSection();
-    this.makeMenuNav();
-    this.addListners();
-  },
+const {
+  COUNTER_CLASS,
+  CLICK_CLASS,
+  CELL_ROW_TAG,
+  CELL_ROW_CLASS,
+  CELL_TAG,
+  FONT_RATIO,
+  LAST_WINS_KEY,
+  LOCAL_DATA_KEY,
+  MAIN_CLASS,
+  PLAYGROUND_TAG,
+  PLAYGROUND_CLASS,
+  TIMER_MS_CLASS,
+  TIMER_SEC_CLASS,
+  TIMER_MIN_CLASS,
+} = constants;
 
-  makeMainSection() {
-    this.mainSection = mainLayout.generateDomElement(MAIN_TAG, '', MAIN_CLASS);
-    document.body.append(this.mainSection);
-  },
-
-  makeMenuNav() {
-    const menuNav = mainLayout.generateDomElement('nav', '', NAV_CLASS);
-    document.body.append(menuNav);
-  },
-
-  makeInfoSection() {
-    const infoSection = mainLayout.generateDomElement('section', '', INFO_SECTION_CLASS);
-
-    const countWrapperDiv = mainLayout.generateDomElement('div', '', COUNTER_WRAPPER_CLASS);
-    const countTitleDiv = mainLayout.generateDomElement('div', 'Mines: ', COUNTER_TITLE_CLASS);
-    this.counterDiv = mainLayout.generateDomElement('div', '0', COUNTER_CLASS);
-    countWrapperDiv.append(countTitleDiv);
-    countWrapperDiv.append(this.counterDiv);
-
-    const clickWrapperDiv = mainLayout.generateDomElement('div', '', CLICK_WRAPPER_CLASS);
-    const clickTitleDiv = mainLayout.generateDomElement('div', 'Clicks: ', CLICK_TITLE_CLASS);
-    this.clickDiv = mainLayout.generateDomElement('div', '0', CLICK_CLASS);
-    clickWrapperDiv.append(clickTitleDiv);
-    clickWrapperDiv.append(this.clickDiv);
-
-    this.startBtn = mainLayout.generateDomElement('div', 'Restart', START_BTN_CLASS);
-    this.settingsBtn = mainLayout.generateDomElement('div', '≓', SETTINGS_BTN_CLASS);
-
-    const timerDiv = mainLayout.generateDomElement('div', '', TIMER_CLASS);
-
-    this.ms = mainLayout.generateDomElement('div', '00', TIMER_MS_CLASS);
-    this.second = mainLayout.generateDomElement('div', '00', TIMER_SEC_CLASS);
-    this.minute = mainLayout.generateDomElement('div', '00', TIMER_MIN_CLASS);
-
-    timerDiv.append(this.minute);
-    timerDiv.append(this.second);
-    timerDiv.append(this.ms);
-
-    infoSection.append(countWrapperDiv);
-    infoSection.append(clickWrapperDiv);
-    infoSection.append(this.startBtn);
-    infoSection.append(timerDiv);
-    infoSection.append(this.settingsBtn);
-    document.body.append(infoSection);
-  },
-
-  restartBtnHandler() {
-    if (typeof play !== 'undefined') {
-      gameTimer.stopTimer();
-      this.ms.textContent = '00';
-      this.second.textContent = '00';
-      this.minute.textContent = '00';
-      this.counterDiv.textContent = '0';
-      this.clickDiv.textContent = '0';
-      this.mainSection.innerHTML = '';
-      play.finishGame();
-      play = new Playground();
-    }
-  },
-
-  addListners() {
-    this.startBtn.addEventListener('click', (event) => this.restartBtnHandler(event));
-  },
-
-  generateDomElement(tag, text = '', ...classes) {
-    const element = document.createElement(tag);
-    const arrClasses = [];
-    classes.forEach((el) => {
-      if (Array.isArray(el)) el.forEach((i) => arrClasses.push(i));
-      else el.split(' ').forEach((e) => arrClasses.push(e));
-    });
-    if (arrClasses.length) element.classList.add(...arrClasses);
-    element.textContent = text;
-    return element;
-  },
-};
-
-class Playground {
-  constructor(rowNumber = 10, colNumber = 10, mineNum = 10, savingData = '') {
-    this.ROW_NUM = rowNumber;
-    this.COL_NUM = colNumber;
-    this.MINE_NUM = mineNum;
+export class Playground {
+  constructor(level = gameLevel.easy, savingData = '') {
+    if (level.rowNum * level.colNum - 16 < level.mineNum) level = gameLevel.easy;
+    this.ROW_NUM = level.rowNum;
+    this.COL_NUM = level.colNum;
+    this.MINE_NUM = level.mineNum;
     this.savingData = savingData;
     this.getSavingData(savingData);
     this.cellClickHandler = this.cellClickHandler.bind(this);
@@ -236,7 +148,7 @@ class Playground {
 
     if (this.isGameFinished || !domCell || domCell.isOpened) return;
 
-    // if it's right click:
+    // if it's RIGHT CLICK:
     if (event.type === 'contextmenu') {
       event.preventDefault();
       this.flagMarkClick(domCell);
@@ -250,13 +162,14 @@ class Playground {
 
     document.querySelector(`.${CLICK_CLASS}`).textContent = ++this.clicks;
 
-    // to insert mines after first click
+    // to insert mines after FIRST CLICK
     if (this.isFirstClick) {
       const isSaved = await this.firstClick(x, y);
+      this.saveDataToLocalStorage();
       if (!isSaved) return;
     }
 
-    // if it's mine:
+    // if it's MINE:
     if (domCell.isMine) {
       this.mineClick(domCell);
       return;
@@ -310,6 +223,7 @@ class Playground {
     gameTimer.startTimer(this.timer);
 
     this.isFirstClick = false;
+    // console.log('this.savingData : ', this.savingData);
     if (this.savingData) return true;
     do {
       this.appendPlayground();
@@ -322,8 +236,31 @@ class Playground {
     return false;
   }
 
-  winClick(cell) {
-    cell.isWin();
+  getLocalSavedWins() {
+    localStorage.getItem(LAST_WINS_KEY);
+  }
+
+  winClick(winCell) {
+    winCell.isWin();
+
+    const oSavingData = JSON.parse(localStorage.getItem(LAST_WINS_KEY)) || '';
+    let arrSavingData = Array.from(oSavingData);
+    // a.push(12);
+    // b = a.slice(-10);
+    // b;
+
+    const data = {
+      timer: gameTimer.timer.toFixed(1),
+      ROW_NUM: this.ROW_NUM,
+      COL_NUM: this.COL_NUM,
+      MINE_NUM: this.MINE_NUM,
+      clicks: this.clicks,
+    };
+    arrSavingData.push(data);
+    if (arrSavingData.length > 10) arrSavingData = arrSavingData.slice(-10);
+    // const sliced = arrSavingData.push(data).slice(-10);
+    localStorage.setItem(LAST_WINS_KEY, JSON.stringify(arrSavingData));
+
     this.finishGame(true);
     // alert('YOU WIN !!!!!!!!');
   }
@@ -352,8 +289,12 @@ class Playground {
     this.flags = this.flags.filter((el) => el !== flagId);
   }
 
-  finishGame(isWin) {
+  cleanCurrentStatusData() {
     localStorage.removeItem(LOCAL_DATA_KEY);
+  }
+
+  finishGame(isWin) {
+    this.cleanCurrentStatusData();
     this.endListners();
     gameTimer.stopTimer();
     this.isGameFinished = true;
@@ -384,7 +325,9 @@ class Playground {
     const h = 70 / this.ROW_NUM;
     const rat = window.innerWidth / window.innerHeight;
 
-    return (rat < 1) ? { numb: w.toFixed(2), ext: 'vw' } : { numb: h.toFixed(2), ext: 'vh' };
+    return rat < 1
+      ? { numb: w.toFixed(2), ext: 'vw' }
+      : { numb: h.toFixed(2), ext: 'vh' };
     // return (w < h) ? { numb: w.toFixed(2), ext: 'vw' } : { numb: h.toFixed(2), ext: 'vh' };
   }
 
@@ -392,7 +335,7 @@ class Playground {
     // Define custom cell tag
     if (!customElements.get(CELL_TAG)) customElements.define(CELL_TAG, Cell);
 
-    const playgrElem = mainLayout.generateDomElement(PLAYGROUND_TAG, '', PLAYGROUND_CLASS);
+    const playgrElem = generateDomElement(PLAYGROUND_TAG, '', PLAYGROUND_CLASS);
 
     // if saving data alredy exists in local storage
     if (this.savingData) {
@@ -404,7 +347,7 @@ class Playground {
     const cellSizeExt = this.getCellSize().ext;
 
     for (let x = 0; x < this.ROW_NUM; x += 1) {
-      const cellRow = mainLayout.generateDomElement(CELL_ROW_TAG, '', CELL_ROW_CLASS);
+      const cellRow = generateDomElement(CELL_ROW_TAG, '', CELL_ROW_CLASS);
 
       this.cells[x] = [];
       for (let y = 0; y < this.COL_NUM; y += 1) {
@@ -433,7 +376,7 @@ class Playground {
 
   makePlaygrFromSavingData(playgrElem) {
     for (let x = 0; x < this.ROW_NUM; x += 1) {
-      const cellRow = mainLayout.generateDomElement(CELL_ROW_TAG, '', CELL_ROW_CLASS);
+      const cellRow = generateDomElement(CELL_ROW_TAG, '', CELL_ROW_CLASS);
 
       for (let y = 0; y < this.COL_NUM; y += 1) {
         // this.cells[x][y] = this.cells[x][y].call(Cell);
@@ -529,7 +472,3 @@ class Playground {
     return x < 0 || y < 0 || x >= this.ROW_NUM || y >= this.COL_NUM;
   }
 }
-
-mainLayout.start();
-// let play = new Playground(10, 10, 10);
-let play = new Playground(10, 10, 10, localStorage.getItem(LOCAL_DATA_KEY) || '');
