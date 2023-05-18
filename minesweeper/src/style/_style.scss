@@ -297,13 +297,17 @@ body > * {
 
     .nav-slider-wrapper {
       width: 100px;
-      height: 30px;
+      height: 4vh;
       background: linear-gradient(to bottom, #0e2f84 0%, #708ae8 100%);
       // margin: 0 10px;
       position: relative;
       border-radius: 50px;
       box-shadow: inset 0px 2px 1px rgba(0, 0, 0, 0.5),
         0px 2px 0px rgba(255, 255, 255, 0.2);
+
+        // @media (orientation: portrait) {
+        //   width: 15vw;
+        // }
 
       &.wrapper_theme {
         &:before {
@@ -331,16 +335,11 @@ body > * {
       &:before {
         content: "OFF";
         color: #b30101;
-        // position: absolute;
         left: 6px;
-        // z-index: 0;
-        // font: 2vh/5v Arial, sans-serif;
-        // font-weight: bold;
         text-shadow: 1px 1px 0px rgb(255 255 255 / 18%);
       }
 
       .theme-slider {
-        // margin: 5px 10px;
         visibility: hidden;
 
         &:checked + label {
@@ -350,7 +349,7 @@ body > * {
       label {
         display: block;
         width: 50px;
-        height: 26px;
+        height: 3.5vh;
         cursor: pointer;
         position: absolute;
         top: 3px;
@@ -385,19 +384,18 @@ body > * {
       display: flex;
       max-width: 25vw;
       min-width: 15vw;
-      padding: 3px 11px;
+      padding: 0.5vh 11px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      // text-shadow: 0 -1px 0 #fff, 0 -2px 0 #1a2133;
       border: 0.8vw solid #35456b;
       border-radius: 5px;
       background-image: linear-gradient(to bottom, #1a2133, #4d6398);
     }
     .custom-level-form {
       visibility: hidden;
-      
-      &.nav_active{
+
+      &.nav_active {
         display: flex;
         gap: 1vh;
         flex-direction: column;
@@ -417,10 +415,112 @@ body > * {
   }
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(41, 41, 41, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .modal-score {
+    position: relative;
+    color: #ffffff;
+    padding: 5vh 5vw;
+    background: rgb(53 69 107 / 95%);
+
+    .nav-menu__close-btn {
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 3.5vh;
+      width: 6vh;
+      height: 6vh;
+      border: 1px solid;
+      padding: 1.5vh;
+      line-height: 3vh;
+      border-radius: 3vh;
+      color: rgb(245 242 226);
+
+      @media (orientation: portrait) {
+        font-size: 3.5vh;
+      }
+
+    }
+
+    .modal-score-title {
+      text-align: center;
+      font-size: 5vh;
+      padding-bottom: 5vh;
+    }
+
+    .modal-score-tbl {
+      display: flex;
+      flex-direction: column;
+      gap: 2vh;
+
+      .score-tbl-titles,
+      .score-tbl-results {
+        display: flex;
+        gap: 2vw;
+        font-size: 3.5vw;
+
+        & > * {
+          width: 15vw;
+        }
+      }
+      .score-tbl-results {
+        font-size: 2.5vh;
+        // @media (orientation: landscape) {
+        //   font-size: 3vh;
+        // }
+        @media (orientation: portrait) {
+          font-size: 2.5vw;
+        }
+      }
+      .score-tbl-titles {
+        font-size: 3.5vh;
+        border-top: 1px solid;
+        border-bottom: 1px solid;
+        padding: 1vh 0;
+        
+        @media (orientation: portrait) {
+          font-size: 3.5vw;
+        }
+      }
+    }
+  }
+}
+
 // Remove arrows from input[type="number"]
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    // display: none; <- Crashes Chrome on hover
-    -webkit-appearance: none;
-    margin: 0; // <-- Apparently some margin are still there even though it's hidden
+  // display: none; <- Crashes Chrome on hover
+  -webkit-appearance: none;
+  margin: 0; // <-- Apparently some margin are still there even though it's hidden
+}
+
+[title] {
+  position: relative;
+}
+[title]:after {
+  content: attr(title);
+  color: #fff;
+  @include bgImageSvgBlue;
+  padding: 10px;
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  bottom: 100%;
+  white-space: nowrap;
+  border-radius: 3px;
+  // transition:0.25s linear opacity;
+}
+[title]:hover:after {
+  left: 5px;
+  opacity: 1;
 }

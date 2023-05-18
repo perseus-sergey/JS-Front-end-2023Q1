@@ -1,4 +1,5 @@
-import { constants, menuClasses } from './constants';
+/* eslint-disable guard-for-in */
+import { constants, menuClasses, modalConst } from './constants';
 import { gameTimer } from './gameTimer';
 import { gameLevel } from './Level';
 import { Playground } from './Playground';
@@ -12,6 +13,7 @@ const {
   CLICK_TITLE_CLASS,
   CLICK_CLASS,
   INFO_SECTION_CLASS,
+  LAST_WINS_KEY,
   LOCAL_DATA_KEY,
   MAIN_TAG,
   MAIN_CLASS,
@@ -23,6 +25,20 @@ const {
   TIMER_SEC_CLASS,
   TIMER_MIN_CLASS,
 } = constants;
+
+const {
+  MODAL_OVERLAY,
+  MODAL_CLASS,
+  MODAL_TITLE,
+  MODAL_SCORE_TBL,
+  MODAL_RESULT_TITLES,
+  RESULT_TITLE_DATE,
+  RESULT_TITLE_SIZE,
+  RESULT_TITLE_MINES,
+  RESULT_TITLE_TIME,
+  RESULT_TITLE_CLICKS,
+  MODAL_RESULT_ROW,
+} = modalConst;
 
 const {
   NAV_MENU,
@@ -51,14 +67,87 @@ const {
   LEVEL_ID_CUSTOM,
 } = menuClasses;
 
+const scoreModal = {
+  modalOverlay: '',
+
+  start() {
+    this.modalCloseHandler = this.modalCloseHandler.bind(this);
+    this.makeModal();
+    this.closeBtn.addEventListener('click', this.modalCloseHandler, { once: true });
+  },
+
+  modalCloseHandler() {
+    this.modalOverlay.remove();
+  },
+
+  makeModal() {
+    this.modalOverlay = generateDomElement('div', '', MODAL_OVERLAY);
+    const modal = generateDomElement('div', '', MODAL_CLASS);
+
+    this.closeBtn = generateDomElement(
+      'div',
+      NAV_CLOSE_BTN,
+      NAV_CLOSE_BTN_CLASS,
+    );
+    this.closeBtn.title = 'Close';
+    const scoreTitle = generateDomElement('div', 'Score', MODAL_TITLE);
+    this.modalScoreTable = generateDomElement('div', '', MODAL_SCORE_TBL);
+    const resTitleTr = generateDomElement('div', '', MODAL_RESULT_TITLES);
+    [
+      generateDomElement('div', RESULT_TITLE_DATE),
+      generateDomElement('div', RESULT_TITLE_SIZE),
+      generateDomElement('div', RESULT_TITLE_MINES),
+      generateDomElement('div', RESULT_TITLE_TIME),
+      generateDomElement('div', RESULT_TITLE_CLICKS),
+    ].forEach((el) => resTitleTr.append(el));
+
+    this.modalScoreTable.append(resTitleTr);
+
+    this.appendSavedScoreData();
+
+    modal.append(this.closeBtn);
+    modal.append(scoreTitle);
+    modal.append(this.modalScoreTable);
+
+    this.modalOverlay.append(modal);
+
+    document.body.append(this.modalOverlay);
+  },
+
+  appendSavedScoreData() {
+    const savedData = localStorage.getItem(LAST_WINS_KEY);
+    const oSavingData = JSON.parse(savedData);
+
+    if (!oSavingData) return false;
+
+    // const abjArr = Object.entries(populations);
+    const sorted = [...oSavingData].sort((a, b) => (a.date > b.date ? 1 : -1));
+
+    sorted.forEach((data) => {
+      const resTr = generateDomElement('div', '', MODAL_RESULT_ROW);
+      const dateFormatted = data.date ? new Date(data.date).toLocaleString() : '';
+      [
+        generateDomElement('td', dateFormatted),
+        generateDomElement('td', `${data.ROW_NUM} x ${data.COL_NUM}`),
+        generateDomElement('td', data.MINE_NUM),
+        generateDomElement('td', `${data.timer} s`),
+        generateDomElement('td', data.clicks),
+      ].forEach((el) => resTr.append(el));
+      this.modalScoreTable.append(resTr);
+    });
+  },
+};
+
 const navMenu = {
   menuNav: '',
   menuOverlay: '',
+  scoreTitle: '',
 
   start() {
     this.disactivateMenu = this.disactivateMenu.bind(this);
     this.levelClickHandler = this.levelClickHandler.bind(this);
     this.soundSliderClickHandler = this.soundSliderClickHandler.bind(this);
+    this.modalScoreHandler = this.modalScoreHandler.bind(this);
     this.makeMenuNav();
     // this.addListners();
   },
@@ -70,17 +159,18 @@ const navMenu = {
       NAV_CLOSE_BTN,
       NAV_CLOSE_BTN_CLASS,
     );
+    this.closeBtn.title = 'Close';
 
     const menuWrap = generateDomElement('div', '', NAV_MENU_WRAPPER);
 
-    const scoreTitle = generateDomElement(
+    this.scoreTitle = generateDomElement(
       'div',
       'Score',
       MENU_TITLE,
       MENU_TITLE_SCORE,
     );
     const menuScore = generateDomElement('div', '');
-    menuScore.append(scoreTitle);
+    menuScore.append(this.scoreTitle);
 
     const menuTheme = generateDomElement('div', '');
     const themeTitle = generateDomElement('div', 'Theme', MENU_TITLE);
@@ -207,7 +297,7 @@ const navMenu = {
   },
 
   disactivateMenu() {
-    console.log('disactivateMenu --> toggle');
+    // console.log('disactivateMenu --> toggle');
     this.toggleLevelMenu(false);
     this.menuNav.classList.remove(NAV_MENU_ACTIVE);
     this.menuOverlay.remove();
@@ -215,19 +305,26 @@ const navMenu = {
   },
 
   addListners() {
-    console.log('addListners');
+    // console.log('addListners');
     this.closeBtn.addEventListener('click', this.disactivateMenu);
+    this.scoreTitle.addEventListener('click', this.modalScoreHandler);
     this.menuLevels.addEventListener('click', this.levelClickHandler);
     this.soundSlider.addEventListener('click', this.soundSliderClickHandler);
     // this.addListnersForCustomInput();
   },
   removeListners() {
-    console.log('removeListners');
+    // console.log('removeListners');
 
     this.closeBtn.removeEventListener('click', this.disactivateMenu);
     this.menuLevels.removeEventListener('click', this.levelClickHandler);
+    this.scoreTitle.removeEventListener('click', this.modalScoreHandler);
     this.soundSlider.removeEventListener('click', this.soundSliderClickHandler);
     // this.addListnersForCustomInput();
+  },
+
+  modalScoreHandler() {
+    this.disactivateMenu();
+    scoreModal.start();
   },
 
   soundSliderClickHandler() {
@@ -236,17 +333,20 @@ const navMenu = {
   },
 
   addListnersForCustomInput() {
-    [this.customColumnVal,
-      this.customRowVal,
-      this.customMineVal].forEach((input) => {
-      input.addEventListener('blur', (event) => this.inputBlurHandler(event));
-      // input.addEventListener('focus', (event) => this.inputfocusHandler(event));
-    });
+    [this.customColumnVal, this.customRowVal, this.customMineVal].forEach(
+      (input) => {
+        input.addEventListener('blur', (event) => this.inputBlurHandler(event));
+        // input.addEventListener('focus', (event) => this.inputfocusHandler(event));
+      },
+    );
   },
 
   toggleLevelMenu(isNavMenuActivated = true) {
     console.log('toggleLevelMenu');
-    if (this.customLevelForm.classList.contains(NAV_MENU_ACTIVE) || !isNavMenuActivated) {
+    if (
+      this.customLevelForm.classList.contains(NAV_MENU_ACTIVE)
+      || !isNavMenuActivated
+    ) {
       this.customLevelForm.classList.remove(NAV_MENU_ACTIVE);
       this.removeListnersForCustomInput();
     } else {
@@ -256,12 +356,12 @@ const navMenu = {
   },
 
   removeListnersForCustomInput() {
-    [this.customColumnVal,
-      this.customRowVal,
-      this.customMineVal].forEach((input) => {
-      input.removeEventListener('blur', (event) => this.inputBlurHandler(event));
-      // input.addEventListener('focus', (event) => this.inputfocusHandler(event));
-    });
+    [this.customColumnVal, this.customRowVal, this.customMineVal].forEach(
+      (input) => {
+        input.removeEventListener('blur', (event) => this.inputBlurHandler(event));
+        // input.addEventListener('focus', (event) => this.inputfocusHandler(event));
+      },
+    );
   },
 
   inputBlurHandler(event) {
@@ -287,7 +387,11 @@ const navMenu = {
       if (event.target === this.leveldivCustom) {
         console.log('levelClickHandler --> toggle');
         this.toggleLevelMenu();
-        this.startBtn.addEventListener('click', (event) => this.startCustomLevelHandler(event), { once: true });
+        this.startBtn.addEventListener(
+          'click',
+          (event) => this.startCustomLevelHandler(event),
+          { once: true },
+        );
         return;
       }
 
@@ -308,14 +412,16 @@ const navMenu = {
     // console.log(gameLevel.custom);
     mainLayout.restartBtnHandler('', gameLevel.custom);
     this.disactivateMenu();
-    [this.customColumnVal,
-      this.customRowVal,
-      this.customMineVal].forEach((input) => input.value = '');
+    [this.customColumnVal, this.customRowVal, this.customMineVal].forEach(
+      (input) => (input.value = ''),
+    );
   },
 
   addMenuOverlay() {
     this.menuOverlay = generateDomElement('div', '', MENU_OVERLAY);
-    this.menuOverlay.addEventListener('click', (e) => this.disactivateMenu(e), { once: true });
+    this.menuOverlay.addEventListener('click', (e) => this.disactivateMenu(e), {
+      once: true,
+    });
     document.body.prepend(this.menuOverlay);
   },
 };

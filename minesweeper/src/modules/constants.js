@@ -59,3 +59,17 @@ export const menuClasses = {
   CUSTOM_DONE_BTN: 'custom-done-btn',
   CUSTOM_LEVEL_FORM: 'custom-level-form',
 };
+
+export const modalConst = {
+  MODAL_OVERLAY: 'modal-overlay',
+  MODAL_CLASS: 'modal-score',
+  MODAL_TITLE: 'modal-score-title',
+  MODAL_SCORE_TBL: 'modal-score-tbl',
+  MODAL_RESULT_TITLES: 'score-tbl-titles',
+  RESULT_TITLE_DATE: 'Date',
+  RESULT_TITLE_SIZE: 'Size',
+  RESULT_TITLE_MINES: 'Mines',
+  RESULT_TITLE_TIME: 'Time',
+  RESULT_TITLE_CLICKS: 'Clicks',
+  MODAL_RESULT_ROW: 'score-tbl-results',
+};

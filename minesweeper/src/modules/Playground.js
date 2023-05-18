@@ -11,31 +11,15 @@ import choise from '../assets/sounds/choise.wav';
 import keyboard from '../assets/sounds/keyboard.wav';
 import shortBell from '../assets/sounds/upali-dengi-na-igrovoy-schet.wav';
 
-// const audioDel = new Audio(`${soundFolder}delete.wav`);
-// const audioWrongAnsw = new Audio(`${soundFolder}podgotovka-k-startu.wav`);
-// const audioRightAnsw = new Audio(`${soundFolder}upali-dengi-na-igrovoy-schet.wav`);
-// const audioEnter = new Audio(`${soundFolder}enter.wav`);
-// const audioEnd = new Audio(`${soundFolder}zvuk-pobedyi-v-igrovom-urovne-30120.wav`);
-// const audioEndLev = new Audio(`${soundFolder}end-level.wav`);
-// const audioChoisNum = new Audio(`${soundFolder}choise.wav`);
-
-// TO_DO: MENU - Theme: option to choose different themes for the game board (dark/light themes)
-// TO_DO: MENU - Sound: sound accompaniment (on/off) when clicking on cell and at the end of the game
-// TO_DO: --+ MENU - Level: implement ability to change the size (easy - 10x10, medium - 15x15, hard - 25x25)
-//        and number of mines for each size of the field (from 10 to 99)
-// TO_DO: MENU - Score: implemented saving the latest 10 results using LocalStorage
-// TO_DO: --+ implemented saving the state of the game
-// TO_DO: --+ game duration and number of clicks are displayed
-// TO_DO: the game should end when the player reveals all cells that do not contain mines (win)
-//        or clicks on mine (lose) and related message is displayed at the end of the game:
-// TO_DO: dinamic saved cell size
-// TO_DO: --+ refactor timer showing
-// TO_DO: --+ clean CSS
 // TO_DO: Modal modul
-// TO_DO: --+ Menu modul
-// TO_DO: Cell size for lots column
-// TO_DO: getEventListeners(target)
+// TO_DO: MENU - Score: implemented saving the latest 10 results using LocalStorage
+// TO_DO: MENU - Theme: option to choose different themes for the game board (dark/light themes)
+// TO_DO: the game should end (win) (lose) and related message is displayed at the end of the game:
 // TO_DO: deploy
+// TO_DO: dinamic saved cell size
+// TO_DO: Cell size for lots column
+// TO_DO: Show game level
+// TO_DO: clean code
 
 const {
   COUNTER_CLASS,
@@ -291,6 +275,7 @@ export class Playground {
     // b;
 
     const data = {
+      date: new Date(),
       timer: gameTimer.timer.toFixed(1),
       ROW_NUM: this.ROW_NUM,
       COL_NUM: this.COL_NUM,
