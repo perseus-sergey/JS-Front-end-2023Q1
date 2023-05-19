@@ -11,15 +11,17 @@ import choise from '../assets/sounds/choise.wav';
 import keyboard from '../assets/sounds/keyboard.wav';
 import shortBell from '../assets/sounds/upali-dengi-na-igrovoy-schet.wav';
 
-// TO_DO: Modal modul
-// TO_DO: MENU - Score: implemented saving the latest 10 results using LocalStorage
-// TO_DO: MENU - Theme: option to choose different themes for the game board (dark/light themes)
+// TO_DO: --+ Modal modul
+// TO_DO: --+ MENU - Score: implemented saving the latest 10 results using LocalStorage
+// TO_DO: --+ MENU - Theme: option to choose different themes for the game board (dark/light themes)
 // TO_DO: the game should end (win) (lose) and related message is displayed at the end of the game:
 // TO_DO: deploy
-// TO_DO: dinamic saved cell size
-// TO_DO: Cell size for lots column
+// TO_DO: --+ dinamic saved cell size media portrait
+// TO_DO: --+ Cell size for lots column
+// TO_DO: Save theme after reload
 // TO_DO: Show game level
 // TO_DO: clean code
+// TO_DO: remove isSound = true
 
 const {
   COUNTER_CLASS,
@@ -27,6 +29,9 @@ const {
   CELL_ROW_TAG,
   CELL_ROW_CLASS,
   CELL_TAG,
+  END_GAME_TEXT_CLASS,
+  END_GAME_TEXT_WIN,
+  END_GAME_TEXT_LOSE,
   FONT_RATIO,
   LAST_WINS_KEY,
   LOCAL_DATA_KEY,
@@ -38,11 +43,11 @@ const {
   TIMER_MIN_CLASS,
 } = constants;
 
-const { SOUND_SLIDER } = menuClasses;
+const { SOUND_SLIDER, THEME_SLIDER } = menuClasses;
 
 export class Playground {
   constructor(level = gameLevel.easy, savingData = '', isSound = true) {
-    if (level.rowNum * level.colNum - 16 < level.mineNum) level = gameLevel.easy;
+    // if (level.rowNum * level.colNum - 16 < level.mineNum) level = gameLevel.easy;
     this.ROW_NUM = level.rowNum;
     this.COL_NUM = level.colNum;
     this.MINE_NUM = level.mineNum;
@@ -64,6 +69,8 @@ export class Playground {
 
   isSound = true;
 
+  isDarkTheme = true;
+
   isFirstClick = true;
 
   isGameFinished = false;
@@ -80,6 +87,7 @@ export class Playground {
     const oSavingData = JSON.parse(data);
 
     this.isSound = oSavingData.isSound;
+    this.isDarkTheme = oSavingData.isDarkTheme;
     this.timer = oSavingData.timer;
     this.ROW_NUM = oSavingData.ROW_NUM;
     this.COL_NUM = oSavingData.COL_NUM;
@@ -99,17 +107,19 @@ export class Playground {
         if (sCell.isOpened) this.opened += 1;
         cell.isMine = sCell.isMine;
         cell.isFlag = sCell.isFlag;
-        cell.style.width = sCell.width;
-        cell.style.height = sCell.height;
-        cell.style.fontSize = sCell.fontSize;
+        // cell.style.width = sCell.width;
+        // cell.style.height = sCell.height;
+        // cell.style.fontSize = sCell.fontSize;
         cell.textContent = sCell.textContent;
 
         this.cells[x].push(cell);
       }
     }
     const chbSound = document.getElementById(SOUND_SLIDER);
-    if (chbSound) chbSound.checked = !this.isSound;
-    console.log('chbSound: ', chbSound);
+    // const chbTheme = document.getElementById(THEME_SLIDER);
+    chbSound.checked = !this.isSound;
+    // chbTheme.checked = this.isDarkTheme;
+    // console.log('chbSound: ', chbSound);
     this.setTimeValues();
     gameTimer.startTimer(this.timer);
     document.querySelector(`.${CLICK_CLASS}`).textContent = this.clicks;
@@ -222,17 +232,19 @@ export class Playground {
         strCell.isOpened = oCell.isOpened;
         strCell.isMine = oCell.isMine;
         strCell.isFlag = oCell.isFlag;
-        strCell.width = oCell.style.width;
-        strCell.height = oCell.style.height;
-        strCell.fontSize = oCell.style.fontSize;
+        // strCell.width = oCell.style.width;
+        // strCell.height = oCell.style.height;
+        // strCell.fontSize = oCell.style.fontSize;
         strCell.textContent = oCell.textContent;
 
         storCells[x].push(strCell);
       }
     }
-
+    const chbTheme = document.getElementById(THEME_SLIDER).checked;
+    console.log('dark ', chbTheme);
     const data = {
       isSound: this.isSound,
+      isDarkTheme: chbTheme,
       timer: gameTimer.timer,
       ROW_NUM: this.ROW_NUM,
       COL_NUM: this.COL_NUM,
@@ -270,9 +282,6 @@ export class Playground {
 
     const oSavingData = JSON.parse(localStorage.getItem(LAST_WINS_KEY)) || '';
     let arrSavingData = Array.from(oSavingData);
-    // a.push(12);
-    // b = a.slice(-10);
-    // b;
 
     const data = {
       date: new Date(),
@@ -284,12 +293,21 @@ export class Playground {
     };
     arrSavingData.push(data);
     if (arrSavingData.length > 10) arrSavingData = arrSavingData.slice(-10);
-    // const sliced = arrSavingData.push(data).slice(-10);
     localStorage.setItem(LAST_WINS_KEY, JSON.stringify(arrSavingData));
 
     if (this.isSound) this.audioWin.play();
     this.finishGame();
-    // alert('YOU WIN !!!!!!!!');
+    this.showEndText(true);
+  }
+
+  showEndText(isWin) {
+    const endTextDiv = generateDomElement(
+      'div',
+      isWin ? END_GAME_TEXT_WIN : END_GAME_TEXT_LOSE,
+      END_GAME_TEXT_CLASS,
+    );
+    document.body.append(endTextDiv);
+    document.addEventListener('click', () => endTextDiv.remove(), { once: true });
   }
 
   mineClick(cell) {
@@ -298,6 +316,7 @@ export class Playground {
     cell.isBoom();
     this.mines = this.mines.filter((id) => id !== cell.cellID);
     this.finishGame();
+    this.showEndText(false);
   }
 
   flagMarkClick(cell) {
@@ -350,16 +369,11 @@ export class Playground {
   }
 
   getCellSize() {
-    // window.innerWidth * 0.9 px  -  100
-    // window.innerWidth * 0.9 / this.COL_NUM px  -  x
     const w = 90 / this.COL_NUM;
     const h = 70 / this.ROW_NUM;
     const rat = window.innerWidth / window.innerHeight;
 
-    return rat < 1
-      ? { numb: w.toFixed(2), ext: 'vw' }
-      : { numb: h.toFixed(2), ext: 'vh' };
-    // return (w < h) ? { numb: w.toFixed(2), ext: 'vw' } : { numb: h.toFixed(2), ext: 'vh' };
+    return { numb: Math.min(w, h).toFixed(2), ext: rat < 1 ? 'vw' : 'vh' };
   }
 
   makePlayground() {
@@ -374,8 +388,7 @@ export class Playground {
     }
 
     this.cells = [];
-    const cellSizeNumb = this.getCellSize().numb;
-    const cellSizeExt = this.getCellSize().ext;
+    const oCellSize = this.getCellSize();
 
     for (let x = 0; x < this.ROW_NUM; x += 1) {
       const cellRow = generateDomElement(CELL_ROW_TAG, '', CELL_ROW_CLASS);
@@ -384,9 +397,9 @@ export class Playground {
       for (let y = 0; y < this.COL_NUM; y += 1) {
         const cell = new Cell(x, y);
 
-        cell.style.width = cellSizeNumb + cellSizeExt;
-        cell.style.height = cellSizeNumb + cellSizeExt;
-        cell.style.fontSize = cellSizeNumb * FONT_RATIO + cellSizeExt;
+        cell.style.width = oCellSize.numb + oCellSize.ext;
+        cell.style.height = oCellSize.numb + oCellSize.ext;
+        cell.style.fontSize = oCellSize.numb * FONT_RATIO + oCellSize.ext;
         this.cells[x].push(cell);
 
         cellRow.append(cell);
@@ -406,13 +419,18 @@ export class Playground {
   }
 
   makePlaygrFromSavingData(playgrElem) {
+    const oCellSize = this.getCellSize();
+
     for (let x = 0; x < this.ROW_NUM; x += 1) {
       const cellRow = generateDomElement(CELL_ROW_TAG, '', CELL_ROW_CLASS);
 
       for (let y = 0; y < this.COL_NUM; y += 1) {
-        // this.cells[x][y] = this.cells[x][y].call(Cell);
+        const cell = this.cells[x][y];
+        cell.style.width = oCellSize.numb + oCellSize.ext;
+        cell.style.height = oCellSize.numb + oCellSize.ext;
+        cell.style.fontSize = oCellSize.numb * FONT_RATIO + oCellSize.ext;
+
         cellRow.append(this.cells[x][y]);
-        // console.log(this.cells[x][y] instanceof Cell);
       }
       playgrElem.append(cellRow);
     }

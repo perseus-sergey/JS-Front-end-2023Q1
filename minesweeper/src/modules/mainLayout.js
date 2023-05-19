@@ -20,6 +20,7 @@ const {
   START_BTN_CLASS,
   SETTINGS_BTN,
   SETTINGS_BTN_CLASS,
+  THEME_LIGHT,
   TIMER_CLASS,
   TIMER_MS_CLASS,
   TIMER_SEC_CLASS,
@@ -57,6 +58,12 @@ const {
   CUSTOM_LEVEL_FORM,
   THEME_SLIDER,
   SOUND_SLIDER,
+  CUSTOM_ROW_MAX,
+  CUSTOM_ROW_MIN,
+  CUSTOM_MINE_RATIO_MIN,
+  CUSTOM_MINE_RATIO_MAX,
+  CUSTOM_COLUMN_MAX,
+  CUSTOM_COLUMN_MIN,
   CUSTOM_LEVEL_WRAP_CLASS,
   CUSTOM_COLUMN_VAL,
   CUSTOM_ROW_VAL,
@@ -121,7 +128,7 @@ const scoreModal = {
     if (!oSavingData) return false;
 
     // const abjArr = Object.entries(populations);
-    const sorted = [...oSavingData].sort((a, b) => (a.date > b.date ? 1 : -1));
+    const sorted = [...oSavingData].sort((a, b) => (a.date < b.date ? 1 : -1));
 
     sorted.forEach((data) => {
       const resTr = generateDomElement('div', '', MODAL_RESULT_ROW);
@@ -146,8 +153,10 @@ const navMenu = {
   start() {
     this.disactivateMenu = this.disactivateMenu.bind(this);
     this.levelClickHandler = this.levelClickHandler.bind(this);
-    this.soundSliderClickHandler = this.soundSliderClickHandler.bind(this);
+    this.soundSliderChangeHandler = this.soundSliderChangeHandler.bind(this);
+    this.themeSliderChangeHandler = this.themeSliderChangeHandler.bind(this);
     this.modalScoreHandler = this.modalScoreHandler.bind(this);
+    this.customMineInputHandler = this.customMineInputHandler.bind(this);
     this.makeMenuNav();
     // this.addListners();
   },
@@ -181,11 +190,12 @@ const navMenu = {
       WRAPPER_THEME,
     );
     const themeLabel = generateDomElement('label', '');
-    const themeSlider = generateDomElement('input', '', THEME_SLIDER);
-    themeSlider.id = THEME_SLIDER;
-    themeSlider.type = 'checkbox';
-    themeLabel.htmlFor = themeSlider.id;
-    themeSliderWrapper.append(themeSlider);
+    this.themeSlider = generateDomElement('input', '', THEME_SLIDER);
+    this.themeSlider.id = THEME_SLIDER;
+    this.themeSlider.type = 'checkbox';
+    this.themeSlider.checked = true;
+    themeLabel.htmlFor = this.themeSlider.id;
+    themeSliderWrapper.append(this.themeSlider);
     themeSliderWrapper.append(themeLabel);
     menuTheme.append(themeTitle);
     menuTheme.append(themeSliderWrapper);
@@ -227,12 +237,12 @@ const navMenu = {
       '',
       CUSTOM_LEVEL_WRAP_CLASS,
     );
-    const columnTitleDiv = generateDomElement('div', 'Rows: ');
+    const columnTitleDiv = generateDomElement('div', `Rows: (${CUSTOM_COLUMN_MIN}-${CUSTOM_COLUMN_MAX})`);
     this.customColumnVal = generateDomElement('input', '', CUSTOM_COLUMN_VAL);
     this.customColumnVal.type = 'number';
     this.customColumnVal.maxLength = 2;
-    this.customColumnVal.max = 30;
-    this.customColumnVal.min = 5;
+    this.customColumnVal.max = CUSTOM_COLUMN_MAX;
+    this.customColumnVal.min = CUSTOM_COLUMN_MIN;
     levelColWrapDiv.append(columnTitleDiv);
     levelColWrapDiv.append(this.customColumnVal);
 
@@ -241,12 +251,12 @@ const navMenu = {
       '',
       CUSTOM_LEVEL_WRAP_CLASS,
     );
-    const rowTitleDiv = generateDomElement('div', 'Columns: ');
+    const rowTitleDiv = generateDomElement('div', `Columns: (${CUSTOM_ROW_MIN}-${CUSTOM_ROW_MAX})`);
     this.customRowVal = generateDomElement('input', '', CUSTOM_ROW_VAL);
     this.customRowVal.type = 'number';
     this.customRowVal.maxLength = 2;
-    this.customRowVal.max = 30;
-    this.customRowVal.min = 5;
+    this.customRowVal.max = CUSTOM_ROW_MAX;
+    this.customRowVal.min = CUSTOM_ROW_MIN;
     levelRowWrapDiv.append(rowTitleDiv);
     levelRowWrapDiv.append(this.customRowVal);
 
@@ -255,13 +265,13 @@ const navMenu = {
       '',
       CUSTOM_LEVEL_WRAP_CLASS,
     );
-    const mineTitleDiv = generateDomElement('div', 'Mines: ');
+    this.mineTitleDiv = generateDomElement('div', 'Mines: ');
     this.customMineVal = generateDomElement('input', '', CUSTOM_MINES_VAL);
     this.customMineVal.type = 'number';
     this.customMineVal.maxLength = 3;
-    this.customMineVal.max = 300;
-    this.customMineVal.min = 3;
-    levelMineWrapDiv.append(mineTitleDiv);
+    this.customMineVal.max = 999;
+    // this.customMineVal.min = 5;
+    levelMineWrapDiv.append(this.mineTitleDiv);
     levelMineWrapDiv.append(this.customMineVal);
 
     this.startBtn = generateDomElement('div', 'Done', 'btn', CUSTOM_DONE_BTN);
@@ -309,7 +319,8 @@ const navMenu = {
     this.closeBtn.addEventListener('click', this.disactivateMenu);
     this.scoreTitle.addEventListener('click', this.modalScoreHandler);
     this.menuLevels.addEventListener('click', this.levelClickHandler);
-    this.soundSlider.addEventListener('click', this.soundSliderClickHandler);
+    this.themeSlider.addEventListener('change', this.themeSliderChangeHandler);
+    this.soundSlider.addEventListener('change', this.soundSliderChangeHandler);
     // this.addListnersForCustomInput();
   },
   removeListners() {
@@ -318,7 +329,8 @@ const navMenu = {
     this.closeBtn.removeEventListener('click', this.disactivateMenu);
     this.menuLevels.removeEventListener('click', this.levelClickHandler);
     this.scoreTitle.removeEventListener('click', this.modalScoreHandler);
-    this.soundSlider.removeEventListener('click', this.soundSliderClickHandler);
+    this.themeSlider.removeEventListener('change', this.themeSliderChangeHandler);
+    this.soundSlider.removeEventListener('change', this.soundSliderChangeHandler);
     // this.addListnersForCustomInput();
   },
 
@@ -327,9 +339,18 @@ const navMenu = {
     scoreModal.start();
   },
 
-  soundSliderClickHandler() {
-    console.log(this.soundSlider.checked);
+  soundSliderChangeHandler() {
+    // console.log(this.soundSlider.checked);
     mainLayout.play.isSound = !this.soundSlider.checked;
+  },
+  themeSliderChangeHandler() {
+    // console.log(this.soundSlider.checked);
+    if (this.themeSlider.checked) {
+      document.body.classList.remove(THEME_LIGHT);
+    } else {
+      document.body.classList.add(THEME_LIGHT);
+    }
+    // mainLayout.play.isDarkTheme = !this.themeSlider.checked;
   },
 
   addListnersForCustomInput() {
@@ -362,6 +383,7 @@ const navMenu = {
         // input.addEventListener('focus', (event) => this.inputfocusHandler(event));
       },
     );
+    this.customMineVal.removeEventListener('focus', this.customMineInputHandler);
   },
 
   inputBlurHandler(event) {
@@ -385,8 +407,9 @@ const navMenu = {
       const element = event.target;
 
       if (event.target === this.leveldivCustom) {
-        console.log('levelClickHandler --> toggle');
+        // console.log('levelClickHandler --> toggle');
         this.toggleLevelMenu();
+        this.customMineVal.addEventListener('focus', this.customMineInputHandler);
         this.startBtn.addEventListener(
           'click',
           (event) => this.startCustomLevelHandler(event),
@@ -400,14 +423,42 @@ const navMenu = {
     }
   },
 
+  customMineInputHandler() {
+    // const minCellNum = Math.max(+this.customColumnVal.value, CUSTOM_COLUMN_MIN)
+    // * Math.max(+this.customRowVal.value || 1, CUSTOM_ROW_MIN);
+    const minColNum = Math.max(+this.customColumnVal.value, CUSTOM_COLUMN_MIN);
+    const minRowNum = Math.max(+this.customRowVal.value, CUSTOM_ROW_MIN);
+    // * Math.min(+this.customRowVal.value, CUSTOM_ROW_MIN);
+    const minCells = minColNum * minRowNum;
+    // const maxCells = Math.max()
+    // Math.min(Math.max(parseInt(number), 1), 20);
+    // const maxCellNum = Math.min(Math.max(+this.customColumnVal.value, CUSTOM_COLUMN_MIN), CUSTOM_COLUMN_MAX)
+    // * Math.min(Math.max(+this.customRowVal.value, CUSTOM_ROW_MIN), CUSTOM_ROW_MAX);
+
+    // const minCellNum = Math.max(+this.customColumnVal.value) * +this.customRowVal.value;
+    const minMine = Math.ceil(minCells * CUSTOM_MINE_RATIO_MIN);
+    const maxMine = Math.ceil(minCells * CUSTOM_MINE_RATIO_MAX);
+    // const maxMine = minCells - 20;
+    console.log('maxCellNum');
+
+    this.mineTitleDiv.textContent = `Mines (${minMine}-${maxMine}):`;
+  },
+
   startCustomLevelHandler() {
+    // // Between 5 and mineMax
+    // console.log('mineMax ', mineMax);
+    // const mine = Math.max(5, mineMax);
+    const cellNum = +this.customColumnVal.value * +this.customRowVal.value;
+    const minMine = Math.ceil(cellNum * CUSTOM_MINE_RATIO_MIN);
+    const maxMine = Math.ceil(cellNum * CUSTOM_MINE_RATIO_MAX);
+    // const maxMine = cellNum - 20;
+    console.log('maxMine ', maxMine);
+    const mine = Math.min(Math.max(+this.customMineVal.value, minMine), maxMine);
+
     gameLevel.setParams(
       +this.customColumnVal.value,
       +this.customRowVal.value,
-      Math.min(
-        +this.customMineVal.value,
-        +this.customColumnVal.value * +this.customRowVal.value - 16,
-      ),
+      mine,
     );
     // console.log(gameLevel.custom);
     mainLayout.restartBtnHandler('', gameLevel.custom);
@@ -427,15 +478,30 @@ const navMenu = {
 };
 
 const mainLayout = {
+  storageData: '',
+
   start() {
     this.makeMainSection();
     this.makeInfoSection();
     navMenu.start();
+    this.getStorageData();
+    this.setTheme();
     this.play = new Playground(
       gameLevel.easy,
-      localStorage.getItem(LOCAL_DATA_KEY) || '',
+      this.storageData,
     );
     this.addMainLayoutListners();
+  },
+
+  getStorageData() {
+    this.storageData = localStorage.getItem(LOCAL_DATA_KEY) || '';
+  },
+  setTheme() {
+    if (!this.storageData) return;
+    const oSavingData = JSON.parse(this.storageData);
+    console.log(oSavingData);
+    navMenu.themeSlider.checked = oSavingData.isDarkTheme;
+    navMenu.themeSliderChangeHandler();
   },
 
   makeMainSection() {
@@ -481,6 +547,7 @@ const mainLayout = {
       SETTINGS_BTN,
       SETTINGS_BTN_CLASS,
     );
+    this.settingsBtn.title = 'Menu';
 
     const timerDiv = generateDomElement('div', '', TIMER_CLASS);
 
@@ -513,14 +580,15 @@ const mainLayout = {
       this.play.finishGame();
       this.play = new Playground(
         oLevel,
-        localStorage.getItem(LOCAL_DATA_KEY) || '',
+        '',
+        // localStorage.getItem(LOCAL_DATA_KEY) || '',
         !navMenu.soundSlider.checked,
       );
     }
   },
 
   showMenu() {
-    console.log('showMenu');
+    // console.log('showMenu');
     navMenu.activateMenu();
   },
 
