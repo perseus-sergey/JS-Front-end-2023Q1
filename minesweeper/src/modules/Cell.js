@@ -3,26 +3,17 @@ export default class Cell extends HTMLElement {
   constructor(x, y, isOpened = false, VALUE = 0) {
     super();
     this.cellID = `${x}-${y}`;
-    // this.dataset.id = this.cellID;
     this.x = x;
     this.y = y;
     this.isOpened = isOpened;
     this.VALUE = VALUE;
   }
 
-  // isOpened = false;
-
   isMine = 0;
 
   isFlag = false;
 
-  // VALUE = 0;
-
   styles = [];
-
-  // static CELL_TAG = 'cell-div';
-
-  // static FONT_RATIO = 0.8;
 
   cellIcon = {
     EMPTY: '',
@@ -65,9 +56,6 @@ export default class Cell extends HTMLElement {
   openCell() {
     this.isOpened = true;
     this.textContent = this.VALUE || '';
-    // this.classList.add(this.cellStyle.OPENED, this.cellStyle.MINES_AROUND[this.VALUE]);
-    // this.styles.push(this.cellStyle.OPENED);
-    // this.styles.push(this.cellStyle.MINES_AROUND[this.VALUE]);
     this.generateClassList();
   }
 
@@ -89,19 +77,14 @@ export default class Cell extends HTMLElement {
   isBoom() {
     this.classList.add(this.cellStyle.BOOM);
     this.textContent = this.cellIcon.BOOM;
-    // this.styles.push(this.cellStyle.BOOM);
   }
 
   isWin() {
     this.classList.add(this.cellStyle.WIN);
-    // this.styles.push(this.cellStyle.WIN);
     this.textContent = this.cellIcon.WIN;
   }
 
   generateClassList() {
-    // this.styles = [this.cellStyle.CELL];
-    // this.classList.add(this.cellStyle.CELL);
-
     if (this.isOpened) {
       this.styles.push(this.cellStyle.OPENED);
       this.styles.push(this.cellStyle.MINES_AROUND[this.VALUE]);
@@ -109,7 +92,5 @@ export default class Cell extends HTMLElement {
 
     this.classList = this.cellStyle.CELL;
     this.classList.add(...this.styles);
-
-    // this.classList = [...this.styles];
   }
 }

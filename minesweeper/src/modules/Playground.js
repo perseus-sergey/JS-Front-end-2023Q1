@@ -11,9 +11,6 @@ import choise from '../assets/sounds/choise.wav';
 import keyboard from '../assets/sounds/keyboard.wav';
 import shortBell from '../assets/sounds/upali-dengi-na-igrovoy-schet.wav';
 
-// TO_DO: Show game level
-// TO_DO: clean code
-
 const {
   COUNTER_CLASS,
   CLICK_CLASS,
