@@ -4,7 +4,7 @@
   "description": "",
   "main": "webpack.config.js",
   "scripts": {
-    "deploy": "npm run prod && npx gh-pages -d dist",
+    "deploy": "npm run prod && npx gh-pages -d dist -e minesweeper",
     "dev": "webpack --mode development",
     "prod": "webpack  --node-env=production",
     "building": "webpack --config webpack.config.js",

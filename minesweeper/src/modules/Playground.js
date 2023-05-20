@@ -11,17 +11,8 @@ import choise from '../assets/sounds/choise.wav';
 import keyboard from '../assets/sounds/keyboard.wav';
 import shortBell from '../assets/sounds/upali-dengi-na-igrovoy-schet.wav';
 
-// TO_DO: --+ Modal modul
-// TO_DO: --+ MENU - Score: implemented saving the latest 10 results using LocalStorage
-// TO_DO: --+ MENU - Theme: option to choose different themes for the game board (dark/light themes)
-// TO_DO: the game should end (win) (lose) and related message is displayed at the end of the game:
-// TO_DO: deploy
-// TO_DO: --+ dinamic saved cell size media portrait
-// TO_DO: --+ Cell size for lots column
-// TO_DO: Save theme after reload
 // TO_DO: Show game level
 // TO_DO: clean code
-// TO_DO: remove isSound = true
 
 const {
   COUNTER_CLASS,
@@ -47,7 +38,6 @@ const { SOUND_SLIDER, THEME_SLIDER } = menuClasses;
 
 export class Playground {
   constructor(level = gameLevel.easy, savingData = '', isSound = true) {
-    // if (level.rowNum * level.colNum - 16 < level.mineNum) level = gameLevel.easy;
     this.ROW_NUM = level.rowNum;
     this.COL_NUM = level.colNum;
     this.MINE_NUM = level.mineNum;
@@ -55,6 +45,7 @@ export class Playground {
     this.isSound = isSound;
     this.setSounds();
     this.getSavingData(savingData);
+    this.flagCount();
     this.cellClickHandler = this.cellClickHandler.bind(this);
     this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
     this.appendPlayground();
@@ -107,23 +98,16 @@ export class Playground {
         if (sCell.isOpened) this.opened += 1;
         cell.isMine = sCell.isMine;
         cell.isFlag = sCell.isFlag;
-        // cell.style.width = sCell.width;
-        // cell.style.height = sCell.height;
-        // cell.style.fontSize = sCell.fontSize;
         cell.textContent = sCell.textContent;
 
         this.cells[x].push(cell);
       }
     }
     const chbSound = document.getElementById(SOUND_SLIDER);
-    // const chbTheme = document.getElementById(THEME_SLIDER);
     chbSound.checked = !this.isSound;
-    // chbTheme.checked = this.isDarkTheme;
-    // console.log('chbSound: ', chbSound);
     this.setTimeValues();
     gameTimer.startTimer(this.timer);
     document.querySelector(`.${CLICK_CLASS}`).textContent = this.clicks;
-    this.flagCount();
   }
 
   setTimeValues() {
@@ -232,16 +216,12 @@ export class Playground {
         strCell.isOpened = oCell.isOpened;
         strCell.isMine = oCell.isMine;
         strCell.isFlag = oCell.isFlag;
-        // strCell.width = oCell.style.width;
-        // strCell.height = oCell.style.height;
-        // strCell.fontSize = oCell.style.fontSize;
         strCell.textContent = oCell.textContent;
 
         storCells[x].push(strCell);
       }
     }
     const chbTheme = document.getElementById(THEME_SLIDER).checked;
-    console.log('dark ', chbTheme);
     const data = {
       isSound: this.isSound,
       isDarkTheme: chbTheme,
@@ -259,7 +239,6 @@ export class Playground {
 
   async firstClick(x, y) {
     this.isFirstClick = false;
-    // console.log('this.savingData : ', this.savingData);
     if (this.savingData) return true;
     do {
       this.appendPlayground();
@@ -462,14 +441,6 @@ export class Playground {
     }
   }
 
-  // removeMines() {
-  //   for (let x = 0; x < this.ROW_NUM; x += 1) {
-  //     for (let y = 0; y < this.COL_NUM; y += 1) {
-  //       this.cells[x][y].isMine = 0;
-  //     }
-  //   }
-  // }
-
   calcMinesAround(x, y) {
     if (this.outBounds(x, y)) return 0;
 
@@ -513,8 +484,6 @@ export class Playground {
     await this.openCell(x - 1, y + 1);
     await this.openCell(x + 1, y - 1);
     await this.openCell(x + 1, y + 1);
-
-    // return false;
   }
 
   outBounds(x, y) {

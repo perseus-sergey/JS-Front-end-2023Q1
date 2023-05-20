@@ -68,6 +68,7 @@ export const menuClasses = {
   CUSTOM_MINES_VAL: 'custom-mines-val',
   CUSTOM_DONE_BTN: 'custom-done-btn',
   CUSTOM_LEVEL_FORM: 'custom-level-form',
+  WRONG_INPUT: 'wrong-input',
 };
 
 export const modalConst = {

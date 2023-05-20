@@ -86,13 +86,10 @@ body > * {
   align-items: center;
   font-family: Times;
   margin-bottom: 2%;
-  // margin-top: 2%;
-  padding: 1%;
+  padding: 0 1%;
   background-color: #3c4d77;
   box-shadow: 0px 1px 10px #233c84;
   border-radius: 10px;
-  // color: #bfc39f;
-  // font-size: 2.5vw;
   text-align: center;
   font-size: 2vw;
   color: #9fa9c3;
@@ -123,40 +120,6 @@ body > * {
     cursor: pointer;
     font-size: 5vw;
   }
-
-  // .start-btn {
-  //   margin: 0.1em;
-  //   font-weight: bold;
-  //   color: #ffffff;
-  //   cursor: pointer;
-  //   padding: 0.5rem 2.5rem;
-  //   text-shadow: -1px -1px 0px black;
-  //   border: none;
-  //   border-radius: 10px;
-  //   background-image: linear-gradient(
-  //     #bdd7fa,
-  //     #5d66b1 35.71%,
-  //     #010767 38.24%,
-  //     #40def7
-  //   );
-  //   background-color: blue;
-  //   box-shadow: 0px 4px 2px #232b3a;
-
-  //   &:hover {
-  //     background-image: linear-gradient(
-  //       #bdd7fa,
-  //       #5d66b1 35.71%,
-  //       #3b3f85 38.24%,
-  //       #40def7
-  //     );
-  //     // transform: perspective(500px) rotateX(20deg);
-  //   }
-
-  //   &:active {
-  //     transform: translateY(1px) scale(0.97);
-  //     box-shadow: none;
-  //   }
-  // }
 }
 
 .main {
@@ -174,12 +137,13 @@ body > * {
     text-align: center;
     flex-direction: column;
     box-shadow: 3px 3px 10px 0px #000000;
+    // transform: perspective(1000px) rotateX(30deg);
+
 
     .playground__row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      // gap: 0.5vw;
 
       .cell {
         @include fontColor($keyColorLightGreen);
@@ -206,34 +170,27 @@ body > * {
         &.cell-flag_wrong,
         &.cell-mine_boom {
           @include fontColor($keyColorPinc);
-          // width: 7vw;
         }
 
         &.cell-flag_good {
           background-image: $keyBgColorGoodFlag;
         }
         &.cell_mines-around-1 {
-          // background-image: $keyBgColorGoodFlag;
           @include fontColor($keyColorGreen);
         }
         &.cell_mines-around-2 {
-          // background-image: $keyBgColorGoodFlag;
           @include fontColor($keyColorYellow);
         }
         &.cell_mines-around-3 {
-          // background-image: $keyBgColorGoodFlag;
           @include fontColor($keyColorOrange);
         }
         &.cell_mines-around-4 {
-          // background-image: $keyBgColorGoodFlag;
           @include fontColor($keyColorPinc);
         }
         &.cell_mines-around-5 {
-          // background-image: $keyBgColorGoodFlag;
           @include fontColor($keyColorDarkBlue);
         }
         &.cell_mines-around-6 {
-          // background-image: $keyBgColorGoodFlag;
           @include fontColor($keyColorViolet);
         }
       }
@@ -266,8 +223,6 @@ body > * {
   }
 
   .nav-menu__close-btn {
-    // position: relative;
-    // font-size: 4vw;
     cursor: pointer;
   }
 
@@ -276,7 +231,6 @@ body > * {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    // gap: 2.3rem;
     gap: 1vh;
 
     .nav-menu__title {
@@ -292,7 +246,6 @@ body > * {
       width: 100px;
       height: 4vh;
       background: linear-gradient(to bottom, #0e2f84 0%, #708ae8 100%);
-      // margin: 0 10px;
       position: relative;
       border-radius: 50px;
       box-shadow: inset 0px 2px 1px rgba(0, 0, 0, 0.5),
@@ -375,7 +328,6 @@ body > * {
     }
     .level-custom-wrapper {
       display: flex;
-      max-width: 25vw;
       min-width: 15vw;
       padding: 0.5vh 11px;
       display: flex;
@@ -405,6 +357,9 @@ body > * {
         max-width: 5rem;
       }
     }
+    .wrong-input {
+      border: red solid 1px;
+    }
   }
 }
 
@@ -424,6 +379,7 @@ body > * {
     color: #ffffff;
     padding: 5vh 5vw;
     background: rgb(53 69 107 / 95%);
+    border-top-left-radius: 3vh;
 
     .nav-menu__close-btn {
       cursor: pointer;
