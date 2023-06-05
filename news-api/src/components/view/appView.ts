@@ -1,3 +1,4 @@
+import { NewsJson } from '../types';
 import News from './news/news';
 import Sources from './sources/sources';
 
@@ -11,12 +12,12 @@ export class AppView {
         this.sources = new Sources();
     }
 
-   protected drawNews(data) {
+   public drawNews(data: NewsJson): void {
         const values = data?.articles ? data?.articles : [];
         this.news.draw(values);
     }
 
-   protected drawSources(data) {
+   public drawSources(data: NewsJson): void {
         const values = data?.sources ? data?.sources : [];
         this.sources.draw(values);
     }
