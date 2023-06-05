@@ -12,7 +12,7 @@ class Loader {
 
   protected getResp(
       { endpoint, options = {} }: ResponseMaker,
-      callback = (): void => {
+      callback = (data: NewsJson): void => {
           console.error('No callback for GET response');
       }
   ): void {
@@ -40,7 +40,7 @@ class Loader {
       return url.slice(0, -1);
   }
 
-  public load(method: string, endpoint: string, callback: (data?: NewsJson) => void, options: LinkOptions = {}): void {
+  public load(method: string, endpoint: string, callback: (data: NewsJson) => void, options: LinkOptions = {}): void {
       fetch(this.makeUrl(options, endpoint), { method })
           .then(this.errorHandler)
           .then((res) => res.json())

@@ -2,7 +2,7 @@ import { NewsJson } from '../types';
 import AppLoader from './appLoader';
 
 class AppController extends AppLoader {
-  public getSources(callback: () => void): void {
+  public getSources(callback: (data: NewsJson) => void): void {
       super.getResp(
           {
               endpoint: 'sources',
@@ -12,7 +12,7 @@ class AppController extends AppLoader {
   }
 
   // (data) => this.view.drawNews(data)
-  public getNews(e: Event, callback: (data?: NewsJson) => void): void {
+  public getNews(e: Event, callback: (data: NewsJson) => void): void {
       let target: HTMLElement = e.target as HTMLElement;
       const newsContainer: HTMLElement = e.currentTarget as HTMLElement;
 
