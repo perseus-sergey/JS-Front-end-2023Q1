@@ -19,7 +19,7 @@ class News {
                 const newsMetaAuthor = newsClone.querySelector('.news__meta-author') as HTMLElement;
                 newsMetaAuthor.textContent = item.author || item.source.name;
                 const newsMetaDate = newsClone.querySelector('.news__meta-date') as HTMLElement;
-                newsMetaDate.textContent = item.publishedAt.slice(0, 10).split('-').reverse().join('-');
+                newsMetaDate.textContent = item.publishedAt ? item.publishedAt.slice(0, 10).split('-').reverse().join('-') : '';
 
                 const newsDescriptionTitle = newsClone.querySelector('.news__description-title') as HTMLElement;
                 newsDescriptionTitle.textContent = item.title;

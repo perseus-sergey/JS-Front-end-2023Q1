@@ -8,20 +8,21 @@ export interface Source {
     id: string | null;
     name: string;
 }
-export interface Articles {
+export interface Articles extends Source {
     source: Source;
     author: string;
     title: string;
     description: string;
     url: string;
-    urlToImage: string;
-    publishedAt: string;
-    content: string;
+    urlToImage?: string;
+    publishedAt?: string;
+    content?: string;
 }
-export interface NewsJson {
+export interface NewsJson extends Articles {
     status: string;
     totalResults: number;
-    articles: Articles[];
+    articles?: Articles[];
+    sources?: Articles[];
 }
 // export interface NewsJson {
 //   [x: string]: string | number | boolean | Date | NewsJson | NewsJsonArray;
