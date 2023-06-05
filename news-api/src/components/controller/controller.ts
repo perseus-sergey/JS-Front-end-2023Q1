@@ -13,6 +13,7 @@ class AppController extends AppLoader {
 
   // (data) => this.view.drawNews(data)
   public getNews(e: Event, callback: (data: NewsJson) => void): void {
+    // if (e.type !== 'click') return
       let target: HTMLElement = e.target as HTMLElement;
       const newsContainer: HTMLElement = e.currentTarget as HTMLElement;
 
