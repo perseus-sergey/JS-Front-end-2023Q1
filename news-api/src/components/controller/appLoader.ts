@@ -15,15 +15,15 @@
 // type LinkOptions = { string: string } | Record<string, never>;
 // type LinkOptions = { apiKey?: string };
 interface IJson {
-  [x: string]: string|number|boolean|Date|IJson|IJsonArray;
+    [x: string]: string | number | boolean | Date | IJson | IJsonArray;
 }
-type IJsonArray = (string|number|boolean|Date|IJson|IJsonArray)[]
+type IJsonArray = (string | number | boolean | Date | IJson | IJsonArray)[];
 type LinkOptions = { [key: string]: string };
 interface ResponseMaker {
-    endpoint: string,
+    endpoint: string;
     options?: {
-        sources?: string
-    }
+        sources?: string;
+    };
 }
 
 class Loader {
@@ -60,9 +60,7 @@ class Loader {
         let url = `${this.baseLink}${endpoint}?`;
 
         Object.keys(urlOptions).forEach((key) => {
-          // if(Object.prototype.hasOwnProperty.call(urlOptions, "apiKey"))
-          if(key)
-            url += `${key}=${urlOptions[key]}&`;
+            if (key) url += `${key}=${urlOptions[key]}&`;
         });
 
         return url.slice(0, -1);

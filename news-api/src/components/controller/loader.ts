@@ -1,48 +1,53 @@
+import { LinkOptions, ResponseMaker, IJson } from "../types";
+
 class Loader {
   private baseLink;
 
-    constructor(baseLink: string, options) {
-        this.baseLink = baseLink;
-        this.options = options;
-    }
+  private options;
 
-    getResp(
-        { endpoint, options = {} },
-        callback = () => {
-            console.error('No callback for GET response');
-        }
-    ) {
-        this.load('GET', endpoint, callback, options);
-    }
+  constructor(baseLink: string, options: LinkOptions) {
+      this.baseLink = baseLink;
+      this.options = options;
+  }
 
-    errorHandler(res) {
-        if (!res.ok) {
-            if (res.status === 401 || res.status === 404)
-                console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
-            throw Error(res.statusText);
-        }
+  protected getResp(
+      { endpoint, options = {} }: ResponseMaker,
+      callback = (): void => {
+          console.error('No callback for GET response');
+      }
+  ): void {
+      this.load('GET', endpoint, callback, options);
+  }
 
-        return res;
-    }
+  private errorHandler(res: Response): Response {
+      if (!res.ok) {
+          if (res.status === 401 || res.status === 404)
+              console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
+          throw Error(res.statusText);
+      }
 
-    makeUrl(options, endpoint) {
-        const urlOptions = { ...this.options, ...options };
-        let url = `${this.baseLink}${endpoint}?`;
+      return res;
+  }
 
-        Object.keys(urlOptions).forEach((key) => {
-            url += `${key}=${urlOptions[key]}&`;
-        });
+  private makeUrl(options: LinkOptions, endpoint: string): string {
+      const urlOptions = { ...this.options, ...options };
+      let url = `${this.baseLink}${endpoint}?`;
 
-        return url.slice(0, -1);
-    }
+      Object.keys(urlOptions).forEach((key) => {
+          if (key) url += `${key}=${urlOptions[key]}&`;
+      });
 
-    load(method, endpoint, callback, options = {}) {
-        fetch(this.makeUrl(options, endpoint), { method })
-            .then(this.errorHandler)
-            .then((res) => res.json())
-            .then((data) => callback(data))
-            .catch((err) => console.error(err));
-    }
+      return url.slice(0, -1);
+  }
+
+  public load(method: string, endpoint: string, callback: (data?: IJson) => void, options: LinkOptions = {}): void {
+      fetch(this.makeUrl(options, endpoint), { method })
+          .then(this.errorHandler)
+          .then((res) => res.json())
+          .then((data) => callback(data))
+          .catch((err) => console.error(err));
+  }
 }
+
 
 export default Loader;
