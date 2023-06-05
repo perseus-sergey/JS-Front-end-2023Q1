@@ -1,3 +1,4 @@
+import { IJson } from '../types';
 import AppLoader from './appLoader';
 
 class AppController extends AppLoader {
@@ -11,7 +12,7 @@ class AppController extends AppLoader {
   }
 
   // (data) => this.view.drawNews(data)
-  public getNews(e: Event, callback: () => void): void {
+  public getNews(e: Event, callback: (data?: IJson) => void): void {
       let target: HTMLElement = e.target as HTMLElement;
       const newsContainer: HTMLElement = e.currentTarget as HTMLElement;
 
