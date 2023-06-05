@@ -1,4 +1,4 @@
-import { NewsJson, Articles } from '../../types';
+import { Articles } from '../../types';
 import './news.css';
 
 class News {
@@ -12,22 +12,25 @@ class News {
         news.forEach((item, idx) => {
             const newsClone = newsItemTemp.content.cloneNode(true) as HTMLElement;
             if (newsClone !== null) {
-                if (idx % 2) newsClone.querySelector('.news__item').classList.add('alt');
+                if (idx % 2) newsClone.querySelector('.news__item')?.classList.add('alt');
 
-                newsClone.querySelector('.news__meta-photo').style.backgroundImage = `url(${
-                    item.urlToImage || 'img/news_placeholder.jpg'
-                })`;
-                newsClone.querySelector('.news__meta-author').textContent = item.author || item.source.name;
-                newsClone.querySelector('.news__meta-date').textContent = item.publishedAt
-                    .slice(0, 10)
-                    .split('-')
-                    .reverse()
-                    .join('-');
+                const newsMetaFoto = newsClone.querySelector('.news__meta-photo') as HTMLImageElement;
+                newsMetaFoto.style.backgroundImage = `url(${item.urlToImage || 'img/news_placeholder.jpg'})`;
+                const newsMetaAuthor = newsClone.querySelector('.news__meta-author') as HTMLElement;
+                newsMetaAuthor.textContent = item.author || item.source.name;
+                const newsMetaDate = newsClone.querySelector('.news__meta-date') as HTMLElement;
+                newsMetaDate.textContent = item.publishedAt.slice(0, 10).split('-').reverse().join('-');
 
-                newsClone.querySelector('.news__description-title').textContent = item.title;
-                newsClone.querySelector('.news__description-source').textContent = item.source.name;
-                newsClone.querySelector('.news__description-content').textContent = item.description;
-                newsClone.querySelector('.news__read-more a').setAttribute('href', item.url);
+                const newsDescriptionTitle = newsClone.querySelector('.news__description-title') as HTMLElement;
+                newsDescriptionTitle.textContent = item.title;
+
+                const newsDescriptionSource = newsClone.querySelector('.news__description-source') as HTMLElement;
+                newsDescriptionSource.textContent = item.source.name;
+
+                const newsDescriptionContent = newsClone.querySelector('.news__description-content') as HTMLElement;
+                newsDescriptionContent.textContent = item.description;
+                const newsReadMore = newsClone.querySelector('.news__read-more a') as HTMLElement;
+                newsReadMore.setAttribute('href', item.url);
 
                 fragment.append(newsClone);
             }
