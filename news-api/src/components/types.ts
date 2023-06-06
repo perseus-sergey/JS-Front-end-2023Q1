@@ -1,8 +1,43 @@
-export interface IJson {
-    status: string;
-    totalResults: number;
-    // articles: Array<{ [x: string]: string }>;
+enum Category {
+  CAT_BUSINESS = 'business',
+  CAT_ENTERTAINMENT = 'entertainment',
+  CAT_GENERAL = 'general',
+  CAT_HEALTH = 'health',
+  CAT_SCIENCE = 'science',
+  CAT_SPORTS = 'sports',
+  CAT_TECHNOLOGY = 'technology',
 }
+
+enum Endpoint {
+  ENDPOINT_EVERITHING = 'everything',
+  ENDPOINT_HEADLINES = 'top-headlines',
+  ENDPOINT_SOURCES = 'top-headlines/sources',
+}
+
+export const RequestUrl = {
+  baseUrl:   {key: 'baseUrl', value: 'https://newsapi.org/v2/'},
+  endpoint:  {key: 'endpoint', value: Endpoint},
+  apiKey:    {key: 'apiKey', value: 'd6ea0b2a090449e58eb36a5b2f8ef27f'},
+  category:   {key: 'category', value: Category},
+  find:       {key: 'q', value: ''},
+  dateFrom:   {key: 'from', value: ''},
+  country:    {key: 'country', value: ''},
+  language:   {key: 'language', value: ''},
+  sortBy:     {key: 'sortBy', value: ''},
+}
+
+// var url = 'https://newsapi.org/v2/everything?' +
+//           'country=us&' +
+//           'q=Apple&' +
+//           'from=2023-06-06&' +
+//           'sortBy=popularity&' +
+//           'apiKey=d6ea0b2a090449e58eb36a5b2f8ef27f';
+
+// export interface IJson {
+//     status: string;
+//     totalResults: number;
+//     // articles: Array<{ [x: string]: string }>;
+// }
 
 export interface Source {
     id: string | null;
@@ -24,10 +59,8 @@ export interface NewsJson extends Articles {
     articles?: Articles[];
     sources?: Articles[];
 }
-// export interface NewsJson {
-//   [x: string]: string | number | boolean | Date | NewsJson | NewsJsonArray;
-// }
-export type NewsJsonArray = (string | number | boolean | Date | NewsJson | NewsJsonArray)[];
+
+// export type NewsJsonArray = (string | number | boolean | Date | NewsJson | NewsJsonArray)[];
 export type LinkOptions = { [key: string]: string };
 export interface ResponseMaker {
     endpoint: string;
@@ -35,6 +68,7 @@ export interface ResponseMaker {
         sources?: string;
     };
 }
+
 
 // {
 //   "status": "ok",

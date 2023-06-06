@@ -1,9 +1,12 @@
+import { RequestUrl } from '../types';
 import Loader from './loader';
+
+const { baseUrl, apiKey } = RequestUrl;
 
 class AppLoader extends Loader {
     constructor() {
-        super('https://newsapi.org/v2/', {
-            apiKey: 'd6ea0b2a090449e58eb36a5b2f8ef27f',
+        super(baseUrl.value, {
+            [apiKey.key]: apiKey.value,
         });
     }
 }

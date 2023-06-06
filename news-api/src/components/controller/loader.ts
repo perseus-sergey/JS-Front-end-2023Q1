@@ -31,6 +31,7 @@ class Loader {
 
   private makeUrl(options: LinkOptions, endpoint: string): string {
       const urlOptions = { ...this.options, ...options };
+      console.log(urlOptions)
       let url = `${this.baseLink}${endpoint}?`;
 
       Object.keys(urlOptions).forEach((key) => {
@@ -39,6 +40,7 @@ class Loader {
 
       return url.slice(0, -1);
   }
+// https://newsapi.org/v2/everything?q=tesla&from=2023-05-05&sortBy=publishedAt&apiKey=d6ea0b2a090449e58eb36a5b2f8ef27f
 
   public load(method: string, endpoint: string, callback: (data: NewsJson) => void, options: LinkOptions = {}): void {
       fetch(this.makeUrl(options, endpoint), { method })
