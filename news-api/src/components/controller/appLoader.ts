@@ -1,12 +1,12 @@
-import { RequestUrl } from '../types';
+import { BaseUrlApiKey } from '../types';
 import Loader from './loader';
 
-const { baseUrl, apiKey } = RequestUrl;
+const { baseUrl, apiKey } = BaseUrlApiKey;
 
 class AppLoader extends Loader {
     constructor() {
-        super(baseUrl.value, {
-            [apiKey.key]: apiKey.value,
+        super(Object.values(baseUrl)[0], {
+            [Object.keys(apiKey)[0]]: Object.values(apiKey)[0],
         });
     }
 }

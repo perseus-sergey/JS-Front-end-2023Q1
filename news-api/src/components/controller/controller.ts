@@ -1,11 +1,11 @@
-import { NewsJson } from '../types';
+import { Endpoint, NewsJson } from '../types';
 import AppLoader from './appLoader';
 
 class AppController extends AppLoader {
   public getSources(callback: (data: NewsJson) => void): void {
       super.getResp(
           {
-              endpoint: 'sources',
+              endpoint: Endpoint.ENDPOINT_SOURCES,
           },
           callback
       );
@@ -25,7 +25,7 @@ class AppController extends AppLoader {
                   newsContainer.setAttribute('data-source', sourceId);
                   super.getResp(
                       {
-                          endpoint: 'everything',
+                          endpoint: Endpoint.ENDPOINT_EVERITHING,
                           options: {
                               sources: sourceId,
                           },

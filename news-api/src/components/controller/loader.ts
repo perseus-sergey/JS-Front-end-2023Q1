@@ -1,17 +1,18 @@
-import { LinkOptions, ResponseMaker, NewsJson } from "../types";
+import { UrlOptions, RequestMaker, NewsJson, Endpoint } from "../types";
 
 class Loader {
   private baseLink;
 
   private options;
 
-  constructor(baseLink: string, options: LinkOptions) {
+  constructor(baseLink: string, options: Partial<UrlOptions>) {
+    // console.log("baseLink  ")
       this.baseLink = baseLink;
       this.options = options;
   }
 
   protected getResp(
-      { endpoint, options = {} }: ResponseMaker,
+      { endpoint, options = {} }: RequestMaker<Endpoint>,
       callback = (data: NewsJson): void => {
           console.error('No callback for GET response');
       }
@@ -29,7 +30,7 @@ class Loader {
       return res;
   }
 
-  private makeUrl(options: LinkOptions, endpoint: string): string {
+  private makeUrl(options: Partial<UrlOptions>, endpoint: string): string {
       const urlOptions = { ...this.options, ...options };
       console.log(urlOptions)
       let url = `${this.baseLink}${endpoint}?`;
@@ -37,12 +38,13 @@ class Loader {
       Object.keys(urlOptions).forEach((key) => {
           if (key) url += `${key}=${urlOptions[key]}&`;
       });
-
+      console.log('url.slice(0, -1) ', url.slice(0, -1))
       return url.slice(0, -1);
   }
 // https://newsapi.org/v2/everything?q=tesla&from=2023-05-05&sortBy=publishedAt&apiKey=d6ea0b2a090449e58eb36a5b2f8ef27f
+// https://newsapi.org/v2/sources?apiKey=d6ea0b2a090449e58eb36a5b2f8ef27f
 
-  public load(method: string, endpoint: string, callback: (data: NewsJson) => void, options: LinkOptions = {}): void {
+  public load(method: string, endpoint: string, callback: (data: NewsJson) => void, options: Partial<UrlOptions> = {}): void {
       fetch(this.makeUrl(options, endpoint), { method })
           .then(this.errorHandler)
           .then((res) => res.json())
