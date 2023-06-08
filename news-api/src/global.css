@@ -1,7 +1,21 @@
+html,
+body {
+    height: 100%;
+}
+
+@font-face {
+  font-family: 'Alexander';
+  src: local('Alexander'), url('./components/fonts/alexander.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
 body {
     color: #fff;
     background: #17181c;
     font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
 }
 
 header {
@@ -9,11 +23,17 @@ header {
 }
 
 header h1 {
+    font-family: 'Alexander';
     font-size: 40px;
     font-weight: 800;
 }
 
+.main {
+    flex: 1 0 auto;
+}
+
 footer {
+    flex-shrink: 0;
     height: 100px;
     display: flex;
     align-items: center;

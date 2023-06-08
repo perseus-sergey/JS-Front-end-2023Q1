@@ -12,10 +12,16 @@ class App {
     }
 
     public start(): void {
+      // console.log("startttttttttttt")
         const sources = document.querySelector('.sources');
         if (sources)
             sources.addEventListener('click', (e) => this.controller.getNews(e, (data) => this.view.drawNews(data)));
-        this.controller.getSources((data) => this.view.drawSources(data));
+
+        const categories = document.querySelector('.categories');
+        if (categories)
+            categories.addEventListener('click', (e) => this.controller.getNews(e, (data) => this.view.drawSources(data)));
+
+        this.controller.getSources(() => this.view.drawCategories());
     }
 }
 

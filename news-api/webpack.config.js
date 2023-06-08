@@ -8,10 +8,17 @@ const baseConfig = {
     mode: 'development',
     module: {
         rules: [
-          { test: /\.ts$/i, use: 'ts-loader' },
+            { test: /\.ts$/i, use: 'ts-loader' },
             {
                 test: /\.css$/i,
                 use: ['style-loader', 'css-loader'],
+            },
+            {
+              test: /\.(woff2?|eot|ttf|otf)$/i,
+              type: 'asset/resource',
+              generator: {
+                filename: 'fonts/[name][ext]',
+              },
             },
         ],
     },

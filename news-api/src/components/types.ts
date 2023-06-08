@@ -1,4 +1,4 @@
-enum Category {
+export enum Category {
     CAT_BUSINESS = 'business',
     CAT_ENTERTAINMENT = 'entertainment',
     CAT_GENERAL = 'general',
@@ -11,29 +11,40 @@ enum Category {
 export enum Endpoint {
     ENDPOINT_EVERITHING = 'everything',
     ENDPOINT_HEADLINES = 'top-headlines',
-    ENDPOINT_SOURCES = 'sources',
-    // ENDPOINT_SOURCES = 'top-headlines/sources',
+    // ENDPOINT_SOURCES = 'sources',
+    ENDPOINT_SOURCES = 'top-headlines/sources',
 }
 
 export const BaseUrlApiKey = {
     baseUrl: { baseUrl: 'https://newsapi.org/v2/' },
     apiKey: { apiKey: 'd6ea0b2a090449e58eb36a5b2f8ef27f' },
-    // endpoint: { endpoint: Endpoint.ENDPOINT_EVERITHING },
-    // category: { category: Category.CAT_GENERAL },
-    // find: { q: '' },
-    // dateFrom: { from: '' },
-    // country: { country: '' },
-    // language: { language: '' },
-    // sortBy: { sortBy: '' },
 };
 
-export type LinkOptions = { [key: string]: string };
+export type LinkOptions = { [key: string]: string | number };
 
 export interface RequestMaker<T> {
     endpoint: T;
     options?: Partial<UrlOptions>;
 }
 
+export interface Endpoints {
+  everything: Everything;
+  sources: Sources;
+}
+
+export interface Sources extends LinkOptions {
+    category: Category;
+    country: string;
+    language: string;
+}
+export interface Everything extends LinkOptions {
+    sources: string;
+    q: string;
+    from: string;
+    language: string;
+    sortBy: string;
+    pageSize: number;
+}
 export interface UrlOptions extends LinkOptions {
     sources: string;
     q: string;
@@ -42,6 +53,7 @@ export interface UrlOptions extends LinkOptions {
     country: string;
     language: string;
     sortBy: string;
+    pageSize: number;
 }
 
 // var url = 'https://newsapi.org/v2/everything?' +
@@ -65,7 +77,7 @@ export interface Articles extends Source {
     publishedAt?: string;
     content?: string;
 }
-export interface NewsJson extends Articles {
+export interface NewsJson {
     status: string;
     totalResults: number;
     articles?: Articles[];

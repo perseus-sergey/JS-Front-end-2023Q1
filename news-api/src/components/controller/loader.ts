@@ -14,7 +14,7 @@ class Loader {
   protected getResp(
       { endpoint, options = {} }: RequestMaker<Endpoint>,
       callback = (data: NewsJson): void => {
-          console.error('No callback for GET response');
+          console.error('No callback for GET response\nData :\n', data);
       }
   ): void {
       this.load('GET', endpoint, callback, options);

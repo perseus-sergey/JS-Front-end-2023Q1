@@ -10,8 +10,11 @@
         <header>
             <h1>News Portal</h1>
         </header>
-        <main>
+        <main class="main">
+          <div class="source-wrapper">
+            <div class="categories buttons"></div>
             <div class="sources buttons"></div>
+          </div>
             <div class="news"></div>
         </main>
         <footer>
@@ -20,11 +23,17 @@
             </p>
         </footer>
 
+        <template id="categoryItemTemp">
+            <div class="category__item">
+                <span class="category__item-name"></span>
+            </div>
+        </template>
+
         <template id="sourceItemTemp">
             <div class="source__item">
                 <span class="source__item-name"></span>
-            </div>
-        </template>
+            </div>    
+        </template>    
 
         <template id="newsItemTemp">
             <div class="news__item">
@@ -46,6 +55,5 @@
             </div>
         </template>
 
-        <script type="module" src="./index.js"></script>
     </body>
 </html>
