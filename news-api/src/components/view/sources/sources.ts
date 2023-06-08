@@ -23,6 +23,9 @@ class Sources {
             fragment.append(sourceClone);
         });
         const sourcesEl = document.querySelector('.sources');
+        const catEl = document.querySelector('.categories');
+
+        if (catEl) catEl.classList.add('active');
 
         if (sourcesEl) {
             sourcesEl.innerHTML = '';
@@ -48,10 +51,7 @@ class Sources {
             catFragment.append(sourceClone);
         });
         const catEl = document.querySelector('.categories');
-        if (catEl) {
-            // catEl.innerHTML = '';
-            catEl.append(catFragment);
-        }
+        if (catEl) catEl.append(catFragment);
     }
 }
 

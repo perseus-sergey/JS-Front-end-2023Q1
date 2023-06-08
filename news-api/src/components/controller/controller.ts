@@ -12,7 +12,6 @@ class AppController extends AppLoader {
     }
 
     public getNews(e: Event, callback: (data: NewsJson) => void): void {
-        // if (e.type !== 'click') return
         let target: HTMLElement = e.target as HTMLElement;
         const newsContainer: HTMLElement = e.currentTarget as HTMLElement;
         console.log('target = ', target);
@@ -21,11 +20,25 @@ class AppController extends AppLoader {
         while (target !== newsContainer) {
             if (!target || !newsContainer) return;
             if (target.classList.contains('source__item')) {
-                this.targetHandler(target, newsContainer, callback, Endpoint.ENDPOINT_EVERITHING, 'sources');
+                this.targetHandler(
+                    target,
+                    'source__item',
+                    newsContainer,
+                    callback,
+                    Endpoint.ENDPOINT_EVERITHING,
+                    'sources'
+                );
                 return;
             }
             if (target.classList.contains('category__item')) {
-                this.targetHandler(target, newsContainer, callback, Endpoint.ENDPOINT_SOURCES, 'category');
+                this.targetHandler(
+                    target,
+                    'category__item',
+                    newsContainer,
+                    callback,
+                    Endpoint.ENDPOINT_SOURCES,
+                    'category'
+                );
                 return;
             }
             target = target.parentNode as HTMLElement;
@@ -34,15 +47,21 @@ class AppController extends AppLoader {
 
     private targetHandler(
         target: HTMLElement,
+        selector: string,
         container: HTMLElement,
         callback: (data: NewsJson) => void,
         point: Endpoint,
         optionsKey: string
     ): void {
+        console.log('targetHandler');
+        const sel = document.querySelectorAll(`.${selector}`);
+        sel.forEach((item) => item.classList.remove('active'));
+        target.classList.add('active');
+
         const sourceId = target.getAttribute('data-source-id') || '';
         if (container.getAttribute('data-source') !== sourceId) {
             container.setAttribute('data-source', sourceId);
-            console.log('Endpoint = ', point)
+            console.log('Endpoint = ', point);
             super.getResp(
                 {
                     endpoint: point,
