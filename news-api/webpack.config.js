@@ -1,6 +1,8 @@
 const path = require('path');
 const { merge } = require('webpack-merge');
+const imgDir = path.resolve(__dirname, 'src/assets/images');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FileManagerPlugin = require('filemanager-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const baseConfig = {
@@ -14,11 +16,18 @@ const baseConfig = {
                 use: ['style-loader', 'css-loader'],
             },
             {
-              test: /\.(woff2?|eot|ttf|otf)$/i,
-              type: 'asset/resource',
-              generator: {
-                filename: 'fonts/[name][ext]',
-              },
+                test: /\.(png|jpg|jpeg|gif)$/i,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'images/[name][ext]',
+                },
+            },
+            {
+                test: /\.(woff2?|eot|ttf|otf)$/i,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'fonts/[name][ext]',
+                },
             },
         ],
     },
@@ -27,12 +36,24 @@ const baseConfig = {
     },
     output: {
         filename: 'index.js',
-        path: path.resolve(__dirname, '../dist'),
+        path: path.resolve(__dirname, 'dist'),
+        assetModuleFilename: path.join('assets/images', '[name][ext]'),
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, './src/index.html'),
             filename: 'index.html',
+            favicon: `${imgDir}/favicon.ico`,
+            minify: {
+                collapseWhitespace: true,
+            },
+        }),
+        new FileManagerPlugin({
+            events: {
+                onStart: {
+                    delete: ['dist'],
+                },
+            },
         }),
         new CleanWebpackPlugin(),
     ],

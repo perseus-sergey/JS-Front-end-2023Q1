@@ -17,7 +17,8 @@ export enum Endpoint {
 
 export const BaseUrlApiKey = {
     baseUrl: { baseUrl: 'https://newsapi.org/v2/' },
-    apiKey: { apiKey: 'd6ea0b2a090449e58eb36a5b2f8ef27f' },
+    apiKey: { apiKey: 'a24d4ce99ded4068b87dd3c3973924be' },
+    // apiKey: { apiKey: 'd6ea0b2a090449e58eb36a5b2f8ef27f' },
 };
 
 export type LinkOptions = { [key: string]: string | number };
