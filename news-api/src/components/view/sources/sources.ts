@@ -38,7 +38,6 @@ class Sources {
         const categoryItemTemp = document.querySelector('#categoryItemTemp') as HTMLTemplateElement;
 
         const catArr = Object.values(Category);
-        console.log('catArr = ', catArr);
         catArr.forEach((item: string) => {
             const sourceClone = categoryItemTemp.content.cloneNode(true) as HTMLElement;
 

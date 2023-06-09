@@ -25,15 +25,24 @@ body {
 }
 
 header {
-    padding: 10px 30px;
+    padding: 0 2vh;
+    display: flex;
+    align-items: center;
+    gap: 2%;
+    height: 10vh;
+    margin-bottom: 5vh;
+    border-bottom: 5px groove rgb(188, 188, 188);
 }
 
 header h1 {
-    border-bottom: 5px groove rgb(188, 188, 188);
     font-family: 'Alexander';
     font-size: 7vh;
-    margin-top: 1vh;
     font-weight: 800;
+    white-space: nowrap;
+}
+
+header .swu-img {
+    height: 5.5vh;
 }
 
 .main {
@@ -42,7 +51,8 @@ header h1 {
 
 footer {
     flex-shrink: 0;
-    height: 100px;
+    height: 12vh;
+    /* height: 100px; */
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -51,7 +61,7 @@ footer {
 }
 
 footer .copyright {
-    font-size: 14px;
+    font-size: 3.5vh;
     color: #999;
     text-align: center;
 }
@@ -66,13 +76,29 @@ footer .copyright:before {
 }
 footer .rss-ref__img,
 .git-ref__img {
-  height: 2rem;
-  fill: #777;
+    height: 6vh;
+    fill: #777;
 }
 @media (orientation: portrait) {
-  header h1 {
-      text-align: center;
-      font-size: 7vw;
-      margin-top: 1vw;
+    header {
+        padding: 0 2vw;
+        height: 10vw;
+        margin-bottom: 5vw;
+    }
+    header h1 {
+        font-size: 7vw;
+    }
+    header .swu-img {
+        height: 5.5vw;
+    }
+    footer {
+        height: 12vw;
+    }
+    footer .rss-ref__img,
+    .git-ref__img {
+        height: 6vw;
+    }
+    footer .copyright {
+      font-size: 3.5vw;
   }
 }

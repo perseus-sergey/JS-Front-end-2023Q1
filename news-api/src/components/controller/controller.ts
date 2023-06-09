@@ -14,8 +14,6 @@ class AppController extends AppLoader {
     public getNews(e: Event, callback: (data: NewsJson) => void): void {
         let target: HTMLElement = e.target as HTMLElement;
         const newsContainer: HTMLElement = e.currentTarget as HTMLElement;
-        console.log('target = ', target);
-        console.log('currentTarget = ', newsContainer);
 
         while (target !== newsContainer) {
             if (!target || !newsContainer) return;
@@ -53,7 +51,6 @@ class AppController extends AppLoader {
         point: Endpoint,
         optionsKey: string
     ): void {
-        console.log('targetHandler');
         const sel = document.querySelectorAll(`.${selector}`);
         sel.forEach((item) => item.classList.remove('active'));
         target.classList.add('active');
@@ -61,7 +58,6 @@ class AppController extends AppLoader {
         const sourceId = target.getAttribute('data-source-id') || '';
         if (container.getAttribute('data-source') !== sourceId) {
             container.setAttribute('data-source', sourceId);
-            console.log('Endpoint = ', point);
             super.getResp(
                 {
                     endpoint: point,

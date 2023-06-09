@@ -6,7 +6,6 @@ class Loader {
   private options;
 
   constructor(baseLink: string, options: Partial<UrlOptions>) {
-    // console.log("baseLink  ")
       this.baseLink = baseLink;
       this.options = options;
   }
@@ -32,13 +31,11 @@ class Loader {
 
   private makeUrl(options: Partial<UrlOptions>, endpoint: string): string {
       const urlOptions = { ...this.options, ...options };
-      console.log(urlOptions)
       let url = `${this.baseLink}${endpoint}?`;
 
       Object.keys(urlOptions).forEach((key) => {
           if (key) url += `${key}=${urlOptions[key]}&`;
       });
-      console.log('url.slice(0, -1) ', url.slice(0, -1))
       return url.slice(0, -1);
   }
 // https://newsapi.org/v2/everything?q=tesla&from=2023-05-05&sortBy=publishedAt&apiKey=d6ea0b2a090449e58eb36a5b2f8ef27f
