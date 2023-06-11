@@ -61,9 +61,19 @@ footer {
 }
 
 footer .copyright {
-    font-size: 3.5vh;
+    font-size: 2.5vh;
     color: #999;
     text-align: center;
+}
+footer .git-ref {
+    font-size: 2.5vh;
+    color: #999;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 2%;
+    white-space: nowrap;
+    width: 20%;
 }
 footer .copyright a {
     color: #777;
@@ -98,7 +108,8 @@ footer .rss-ref__img,
     .git-ref__img {
         height: 6vw;
     }
-    footer .copyright {
-      font-size: 3.5vw;
+    footer .copyright,
+    footer .git-ref {
+      font-size: 2.5vw;
   }
 }

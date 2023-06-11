@@ -11,12 +11,12 @@ export enum Category {
 export enum Endpoint {
     ENDPOINT_EVERITHING = 'everything',
     ENDPOINT_HEADLINES = 'top-headlines',
-    // ENDPOINT_SOURCES = 'sources',
     ENDPOINT_SOURCES = 'top-headlines/sources',
 }
 
 export const BaseUrlApiKey = {
-    baseUrl: { baseUrl: 'https://newsapi.org/v2/' },
+    baseUrl: { baseUrl: 'https://nodenews.herokuapp.com/' },
+    // baseUrl: { baseUrl: 'https://newsapi.org/v2/' },
     apiKey: { apiKey: 'a24d4ce99ded4068b87dd3c3973924be' },
     // apiKey: { apiKey: 'd6ea0b2a090449e58eb36a5b2f8ef27f' },
 };

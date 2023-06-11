@@ -4,6 +4,7 @@
     "description": "",
     "main": "webpack.base.config.js",
     "scripts": {
+        "deploy": "npm run build && npx gh-pages -d dist -e news-api",
         "start": "webpack serve --open --config ./webpack.config.js --env mode=dev",
         "dev": "webpack --mode development",
         "build": "webpack --config ./webpack.config.js --env mode=prod",
@@ -29,6 +30,7 @@
         "eslint-plugin-import": "^2.23.3",
         "eslint-plugin-prettier": "^3.4.0",
         "filemanager-webpack-plugin": "^8.0.0",
+        "gh-pages": "^5.0.0",
         "html-loader": "^4.2.0",
         "html-webpack-plugin": "^5.5.1",
         "prettier": "2.2.1",
