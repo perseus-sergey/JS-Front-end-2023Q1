@@ -14,11 +14,14 @@ export enum Endpoint {
     ENDPOINT_SOURCES = 'top-headlines/sources',
 }
 
+// https://rss-news-api.onrender.com/
+// https://news-proxy.spanb4.shop/
+// baseUrl: { baseUrl: 'https://newsapi.org/v2/' },
+// apiKey: { apiKey: 'd6ea0b2a090449e58eb36a5b2f8ef27f' },
+
 export const BaseUrlApiKey = {
-    baseUrl: { baseUrl: 'https://nodenews.herokuapp.com/' },
-    // baseUrl: { baseUrl: 'https://newsapi.org/v2/' },
+    baseUrl: { baseUrl: 'https://news-proxy.spanb4.shop/' },
     apiKey: { apiKey: 'a24d4ce99ded4068b87dd3c3973924be' },
-    // apiKey: { apiKey: 'd6ea0b2a090449e58eb36a5b2f8ef27f' },
 };
 
 export type LinkOptions = { [key: string]: string | number };
@@ -29,8 +32,8 @@ export interface RequestMaker<T> {
 }
 
 export interface Endpoints {
-  everything: Everything;
-  sources: Sources;
+    everything: Everything;
+    sources: Sources;
 }
 
 export interface Sources extends LinkOptions {
