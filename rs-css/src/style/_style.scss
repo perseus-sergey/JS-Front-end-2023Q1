@@ -1,0 +1,123 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: all 0.4s ease-in-out;
+}
+// *************************
+// Put Footer Down to Page
+// *************************
+html,
+body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+main {
+  flex: 1 0 auto;
+}
+footer {
+  flex-shrink: 0;
+}
+// *************************
+
+body {
+  background-color: $bodyBgColor;
+  background-image: $bodyBgImg;
+  background-attachment: fixed;
+}
+
+header {
+  // @include fontColor($keyColorYellow);
+  padding: 0 2vh;
+  display: flex;
+  align-items: center;
+  gap: 2%;
+  height: 10vh;
+  margin-bottom: 5vh;
+  border-bottom: 5px groove rgb(188, 188, 188);
+
+  @media (orientation: portrait) {
+    padding: 0 2vw;
+    height: 10vw;
+    margin-bottom: 5vw;
+  }
+  .swu-img {
+    height: 5.5vh;
+
+    @media (orientation: portrait) {
+      height: 5.5vw;
+    }
+  }
+}
+
+h1 {
+  font-family: "Alexander";
+  font-size: 7vh;
+  font-weight: 800;
+  white-space: nowrap;
+  @media (orientation: portrait) {
+    font-size: 7vw;
+  }
+}
+
+footer {
+  height: 12vh;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px groove rgb(114 114 114);
+  background: linear-gradient(to bottom, #19011a, transparent);
+
+  @media (orientation: portrait) {
+    height: 12vw;
+  }
+
+  .copyright {
+    color: #999;
+    text-align: center;
+
+    @media (orientation: portrait) {
+      font-size: 2.5vw;
+    }
+  }
+
+  .git-ref {
+    color: #999;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 2%;
+    white-space: nowrap;
+    width: 20%;
+
+    .copyright,
+    .git-ref {
+      font-size: 2.5vh;
+
+      @media (orientation: portrait) {
+        font-size: 2.5vw;
+      }
+    }
+  }
+  .copyright a {
+    color: #777;
+  }
+  .copyright a:hover {
+    color: #999;
+  }
+  .copyright:before {
+    content: "©";
+  }
+  .rss-ref__img,
+  .git-ref__img {
+    height: 6vh;
+    fill: #777;
+
+    @media (orientation: portrait) {
+      height: 6vw;
+    }
+  }
+}
