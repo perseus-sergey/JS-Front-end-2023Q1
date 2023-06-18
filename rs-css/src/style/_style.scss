@@ -51,12 +51,13 @@ header {
 
   .logo {
     font-family: "Alexander";
-    font-size: 7vh;
+    // font-size: 7vh;
+    font-size: 5vw;
     font-weight: 800;
     white-space: nowrap;
-    @media (orientation: portrait) {
-      font-size: 7vw;
-    }
+    // @media (orientation: portrait) {
+    //   font-size: 7vw;
+    // }
   }
 
   .swu-img {
@@ -80,12 +81,13 @@ main {
     gap: 10%;
 
     h1 {
-      font-size: 5vh;
+      // font-size: 5vh;
+      font-size: 3.5vw;
       font-weight: 800;
       white-space: nowrap;
-      @media (orientation: portrait) {
-        font-size: 5vw;
-      }
+      // @media (orientation: portrait) {
+      //   font-size: 5vw;
+      // }
     }
   }
 }
@@ -157,17 +159,44 @@ footer {
   color: #ccc;
   cursor: default;
 
+  &.wrong-answer {
+    animation: wrong-answer 0.5s infinite both;
+
+    @keyframes wrong-answer {
+      0%,
+      100% {
+        transform: translate3d(0, 0, 0);
+      }
+
+      10%,
+      30%,
+      50%,
+      70%,
+      90% {
+        transform: translate3d(-10px, 0, 0);
+      }
+
+      20%,
+      40%,
+      60%,
+      80% {
+        transform: translate3d(10px, 0, 0);
+      }
+    }
+  }
+
   // same width for children
   & > * {
     // flex: 1 0;
-    font-size: 2.5vh;
+    // font-size: 2.5vh;
+    font-size: 1.5vw;
     line-height: 150%;
     width: 50%;
     height: 100%;
-    
-    @media (orientation: portrait) {
-      font-size: 2.5vw;
-    }
+
+    // @media (orientation: portrait) {
+    //   font-size: 2.5vw;
+    // }
   }
 
   .html-viewer {
@@ -191,6 +220,7 @@ footer {
       .viewer-numbers {
         display: flex;
         flex-direction: column;
+        align-items: flex-end;
         background-color: #19011a;
         color: #ffffff;
       }
@@ -199,26 +229,6 @@ footer {
 
   .css-editor {
     background-color: #ddd;
-
-    .input-wrapper {
-      display: flex;
-      gap: 1vw;
-
-      .editor-input {
-        font-size: 3vh;
-        flex-grow: 2;
-        border: none;
-        background: none;
-
-        @media (orientation: portrait) {
-          font-size: 3vw;
-        }
-
-        &:focus {
-          outline: none;
-        }
-      }
-    }
 
     .editor-field {
       color: #999;
@@ -231,11 +241,67 @@ footer {
       .editor-numbers {
         display: flex;
         flex-direction: column;
+        align-items: flex-end;
         background-color: #19011a;
         color: #ffffff;
       }
 
       .editor-info {
+        width: 100%;
+
+        .input-wrapper {
+          display: flex;
+          gap: 1vw;
+
+          .editor-input {
+            // font-size: 3vh;
+            font-size: inherit;
+            flex-grow: 2;
+            border: none;
+            background: none;
+
+            // @media (orientation: portrait) {
+            //   font-size: 3vw;
+            // }
+
+            &:focus {
+              outline: none;
+            }
+          }
+
+          .enter-btn {
+            height: 2.5vw;
+            background: #ddd;
+            border-radius: 0.3rem;
+            padding: 0.5vh 1vw;
+            color: #666;
+            line-height: 100%;
+            border: solid 3px #999;
+            border-width: 1px 1px 6px 1px;
+            font-size: 1vw;
+            cursor: pointer;
+            z-index: 999999;
+            box-shadow: 1px 4px 10px rgba(0, 0, 0, 0.3);
+            transform: perspective(50px) rotateX(24deg);
+            transition: all 0.3s ease;
+
+            &.pressed {
+              transform: translateY(5px);
+              box-shadow: 1px 4px 10px rgb(156, 247, 250);
+            }
+          }
+
+          // .enterhit {
+          //   animation: enterhit 0.1s 1;
+          // }
+
+          // @keyframes enterhit {
+          //   50% {
+          //     border-width: 1px 1px 2px 1px;
+          //     top: 12px;
+          //   }
+          // }
+        }
       }
     }
   }
@@ -283,6 +349,34 @@ footer {
       transform: skew(4deg, 0deg) scaleX(1);
     }
   }
+
+  .table-wrapper {
+    .wrong-answer {
+      animation: wrong-answer 0.5s infinite both;
+
+      @keyframes wrong-answer {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0);
+        }
+
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translate3d(-10px, 0, 0);
+        }
+
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translate3d(10px, 0, 0);
+        }
+      }
+    }
+  }
 }
 
 .playground-hint {
@@ -290,7 +384,7 @@ footer {
   display: none;
   color: #ffffff;
   background-color: #711c12;
-  padding: 1vh;
+  padding: 1rem;
 
   &.show {
     display: block;
@@ -572,61 +666,61 @@ bento > pickle.small:only-child {
   z-index: 99999;
 }
 
-.shake {
-  animation: shake 0.1s 5;
-}
+// .shake {
+//   animation: shake 0.1s 5;
+// }
 
-@keyframes shake {
-  0% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  50% {
-    transform: translateX(0);
-  }
-  75% {
-    transform: translateX(5px);
-  }
-}
+// @keyframes shake {
+//   0% {
+//     transform: translateX(0);
+//   }
+//   25% {
+//     transform: translateX(-5px);
+//   }
+//   50% {
+//     transform: translateX(0);
+//   }
+//   75% {
+//     transform: translateX(5px);
+//   }
+// }
 
-.enter-button {
-  background: #ddd;
-  display: block;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
-  padding: 2px 7px 2px 7px;
-  color: #666;
-  border: solid 3px #999;
-  border-width: 1px 1px 6px 1px;
-  position: absolute;
-  right: 13px;
-  font-size: 9px;
-  position: absolute;
-  cursor: pointer;
-  top: 7px;
-  right: 7px;
-  z-index: 999999;
-}
+// .enter-button {
+//   background: #ddd;
+//   display: block;
+//   -webkit-border-radius: 2px;
+//   border-radius: 2px;
+//   padding: 2px 7px 2px 7px;
+//   color: #666;
+//   border: solid 3px #999;
+//   border-width: 1px 1px 6px 1px;
+//   position: absolute;
+//   right: 13px;
+//   font-size: 9px;
+//   position: absolute;
+//   cursor: pointer;
+//   top: 7px;
+//   right: 7px;
+//   z-index: 999999;
+// }
 
-.enterhit {
-  -webkit-animation: enterhit 0.1s 1;
-  animation: enterhit 0.1s 1;
-}
+// .enterhit {
+//   -webkit-animation: enterhit 0.1s 1;
+//   animation: enterhit 0.1s 1;
+// }
 
-@-webkit-keyframes enterhit {
-  50% {
-    border-width: 1px 1px 2px 1px;
-    top: 12px;
-  }
-}
-@keyframes enterhit {
-  50% {
-    border-width: 1px 1px 2px 1px;
-    top: 12px;
-  }
-}
+// @-webkit-keyframes enterhit {
+//   50% {
+//     border-width: 1px 1px 2px 1px;
+//     top: 12px;
+//   }
+// }
+// @keyframes enterhit {
+//   50% {
+//     border-width: 1px 1px 2px 1px;
+//     top: 12px;
+//   }
+// }
 
 .plus {
   color: #666;

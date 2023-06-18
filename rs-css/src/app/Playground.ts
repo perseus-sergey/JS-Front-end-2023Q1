@@ -26,6 +26,7 @@ const {
   END_GAME_TEXT_WIN,
   END_GAME_TEXT_LOSE,
   FONT_RATIO,
+  WRONG_ANSWER_CLASS,
   LAST_WINS_KEY,
   LOCAL_DATA_KEY,
   EDITOR_INFO_TEXT,
@@ -42,7 +43,7 @@ const {
 // const { SOUND_SLIDER, THEME_SLIDER } = menuClasses;
 
 export class Playground {
-  constructor(private level: ILevel = gameLevels[0], private savingData = '', public isSound = true) {
+  constructor(private level: ILevel = gameLevels[11], private savingData = '', public isSound = true) {
     // this.ROW_NUM = level.rowNum;
     // this.COL_NUM = level.colNum;
     // this.MINE_NUM = level.mineNum;
@@ -70,9 +71,11 @@ export class Playground {
 
   private playgroundElement!: HTMLElement;
 
-  private rightElement!: HTMLElement;
+  private rightElements!: HTMLElement[];
 
   private playgroundHint!: HTMLElement;
+
+  private editors!: HTMLElement;
 
   private viewerPre!: HTMLDivElement;
 
@@ -218,12 +221,78 @@ export class Playground {
     if (event.code === 'Enter') this.inputCheckValue();
   }
 
-  private inputCheckValue(): void {
+  private async inputCheckValue(): Promise<void> {
     const { value } = this.editorInput;
+    let answerElems: HTMLElement[] | null;
+
+    this.enterBtn.classList.add('pressed');
+    this.enterBtn.setAttribute('disabled', '');
+
+    await new Promise((resolve) => { setTimeout(resolve, 100); });
+    this.enterBtn.removeAttribute('disabled');
+    this.enterBtn.classList.remove('pressed');
     if (!value) return;
-    const answerElem = this.playgroundElement.querySelector(value);
-    if (answerElem === this.rightElement) alert('You Win!!!');
-    else alert('Looooose!!!');
+    try {
+      answerElems = [...this.playgroundElement.querySelectorAll(value)] as HTMLElement[];
+    } catch (error) {
+      answerElems = null;
+    }
+    if (!answerElems || answerElems.length === 0) {
+      this.editors.classList.add(WRONG_ANSWER_CLASS);
+    } else if (
+      answerElems.length
+      && answerElems.length === this.rightElements.length
+      && this.isRightAnswer(answerElems)
+    ) this.winLevel();
+    else {
+      answerElems.forEach((ansEl) => ansEl.classList.add(WRONG_ANSWER_CLASS));
+    }
+    this.removeWrongAnswerClass();
+  }
+
+  private async removeWrongAnswerClass(): Promise<void> {
+    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    [...document.body.querySelectorAll(`.${WRONG_ANSWER_CLASS}`)]
+      .forEach((el) => el.classList.remove(WRONG_ANSWER_CLASS));
+  }
+
+  private isRightAnswer(answerElems: HTMLElement[]): boolean {
+    let isWin = true;
+    answerElems.forEach((ansEl) => {
+      if (!this.rightElements.includes(ansEl)) isWin = false;
+    });
+    return isWin;
+  }
+
+  private winLevel(): void {
+    this.rightElements.forEach((ansEl) => {
+      ansEl.removeAttribute('twist');
+      ansEl.classList.add('win');
+    });
+
+    // $(".input-wrapper").css("opacity",.2);
+    // updateProgressUI(currentLevel, true);
+    // currentLevel++;
+
+    // if(currentLevel >= levels.length) {
+    //   winGame();
+    // } else {
+    //   setTimeout(function(){
+    //     loadLevel();
+    //   },levelTimeout);
+    // }
+  }
+
+  private setNewLevel(): void {
+    this.editorInput.value = '';
+  }
+
+  private async loose(answerElems: HTMLElement | null): Promise<void> {
+    if (!answerElems) this.editors.classList.add(WRONG_ANSWER_CLASS);
+    else answerElems.classList.add(WRONG_ANSWER_CLASS);
+    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    if (answerElems) answerElems.classList.remove(WRONG_ANSWER_CLASS);
+    this.editors.classList.remove(WRONG_ANSWER_CLASS);
   }
 
   private playgrMousOverHandler(event: Event):void {
@@ -244,8 +313,8 @@ export class Playground {
       equalEl = playgrElmnts[indx];
       playEl = equalEl;
     } else return;
-    el.setAttribute('highlight', 'yes');
-    if (equalEl) equalEl.setAttribute('highlight', 'yes');
+    el.setAttribute('highlight', '');
+    if (equalEl) equalEl.setAttribute('highlight', '');
     this.showHint(playEl);
   }
 
@@ -490,8 +559,8 @@ export class Playground {
     }
     this.playgroundHint = generateDomElement('div', '', document.body, 'playground-hint');
 
-    this.rightElement = this.playgroundElement
-      .querySelector(this.level.levelRightAnswer) as HTMLElement;
+    this.rightElements = [...this.playgroundElement
+      .querySelectorAll(this.level.levelRightAnswer)] as HTMLElement[];
   }
 
   private makePlayground(): void {
@@ -526,9 +595,9 @@ export class Playground {
   }
 
   private appendEditor(): void {
-    const editors = document.querySelector('.editors');
-    if (!editors) return;
-    const editorWrap = editors.querySelector(`.${EDITOR_CLASS}`) as HTMLDivElement;
+    this.editors = document.querySelector('.editors') as HTMLDivElement;
+    if (!this.editors) return;
+    const editorWrap = this.editors.querySelector(`.${EDITOR_CLASS}`) as HTMLDivElement;
     generateDomElement('div', '', editorWrap, 'editor-header');
     const editorField = generateDomElement('div', '', editorWrap, 'editor-field');
     const lefNumbers = generateDomElement('div', '', editorField, 'editor-numbers');
@@ -544,7 +613,7 @@ export class Playground {
     editorInfoPre.innerHTML = EDITOR_INFO_TEXT;
     // generateDomElement('pre', EDITOR_INFO_TEXT, editorInfoField, 'editor-info__pre');
 
-    editors.append(editorWrap);
+    this.editors.append(editorWrap);
   }
 
   private appendRightAside(): void {
@@ -599,7 +668,7 @@ export class Playground {
       const divWrapped = this.wrapToDiv(el);
       this.viewerPre.append(divWrapped);
     });
-    this.rightElement.setAttribute('twist', 'y');
+    this.rightElements.forEach((el) => el.setAttribute('twist', ''));
   }
 
   private wrapToDiv(elem: HTMLElement): HTMLElement {
