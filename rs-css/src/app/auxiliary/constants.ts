@@ -19,13 +19,13 @@ export const constants = {
   EDITOR_CLASS: 'css-editor',
   VIEWER_CLASS: 'html-viewer',
   EDITOR_INFO_TEXT: `
-  {
-    /* Styles would go here. */
-  }
-
-  /*
-    Type a number to skip to a level.
-    Ex &rarr; "5" for level 5
+  { <br>
+    /* Styles would go here. */<br>
+  }<br>
+<br>
+  /*<br>
+    Type a number to skip to a level.<br>
+    Ex &rarr; "5" for level 5<br>
   */
 `,
   MAIN_CLASS: 'game-wrapper',

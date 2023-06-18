@@ -228,7 +228,7 @@ export class Playground {
 
   private playgrMousOverHandler(event: Event):void {
     const el = event.target as HTMLElement;
-    if (el === this.playgroundElement || (!el.closest(`.${PLAYGROUND_CLASS}`) && !el.closest('.html-viewer'))) return;
+    if (el === this.playgroundElement || (!el.closest(`.${PLAYGROUND_CLASS}`) && !el.closest('.viewer-pre'))) return;
 
     const playgrElmnts = [...this.playgroundElement.querySelectorAll('*')] as HTMLElement[];
     const viewElements = [...this.viewerPre.querySelectorAll('*')] as HTMLElement[];
@@ -239,7 +239,7 @@ export class Playground {
       playEl = el;
       indx = playgrElmnts.indexOf(el);
       equalEl = viewElements[indx];
-    } else if (el.closest('.html-viewer')) {
+    } else if (el.closest('.viewer-pre')) {
       indx = viewElements.indexOf(el);
       equalEl = playgrElmnts[indx];
       playEl = equalEl;
@@ -540,7 +540,9 @@ export class Playground {
     this.editorInput = generateDomElement('input', '', inputWrapper, 'editor-input');
     this.editorInput.placeholder = 'Tipe in a CSS selector';
     this.enterBtn = generateDomElement('div', 'Enter', inputWrapper, 'enter-btn');
-    generateDomElement('pre', EDITOR_INFO_TEXT, editorInfoField, 'editor-info__pre');
+    const editorInfoPre = generateDomElement('div', '', editorInfoField, 'editor-info__pre');
+    editorInfoPre.innerHTML = EDITOR_INFO_TEXT;
+    // generateDomElement('pre', EDITOR_INFO_TEXT, editorInfoField, 'editor-info__pre');
 
     editors.append(editorWrap);
   }
