@@ -633,7 +633,8 @@ export class Playground {
     this.sideLearnSelector = generateDomElement('h3', this.level.learnSelector, learnWrapper, 'side-learn-selector');
     this.sideLearnTitle = generateDomElement('h2', this.level.learnTitle, learnWrapper, 'side-learn-title');
     this.sideLearnSintaxis = generateDomElement('h3', this.level.learnSelector, learnWrapper, 'side-learn-sintaxis');
-    this.sideLearnDescription = generateDomElement('div', this.level.promptText, learnWrapper, 'side-learn-descr');
+    this.sideLearnDescription = generateDomElement('div', '', learnWrapper, 'side-learn-descr');
+    this.sideLearnDescription.innerHTML = this.level.promptText;
 
     this.appendExamples();
     if (this.examplesWrapper) {
