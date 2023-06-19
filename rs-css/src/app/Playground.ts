@@ -629,7 +629,6 @@ export class Playground {
     this.enterBtn = generateDomElement('div', 'Enter', inputWrapper, 'enter-btn');
     const editorInfoPre = generateDomElement('div', '', editorInfoField, 'editor-info__pre');
     editorInfoPre.innerHTML = EDITOR_INFO_TEXT;
-    // generateDomElement('pre', EDITOR_INFO_TEXT, editorInfoField, 'editor-info__pre');
 
     this.editors.append(editorWrap);
   }
@@ -678,9 +677,9 @@ export class Playground {
     }
 
     const viewerInfoField = generateDomElement('div', '', viewerField, 'viewer-info');
-    const viewerInfoPre = generateDomElement('pre', '', viewerInfoField);
+    // const viewerInfoPre = generateDomElement('pre', '', viewerInfoField);
 
-    this.viewerPre = generateDomElement('div', '', viewerInfoPre, 'viewer-pre');
+    this.viewerPre = generateDomElement('div', '', viewerInfoField, 'viewer-pre');
 
     // const tableElmts = [...this.playgroundElement.children] as HTMLElement[];
 
