@@ -22,6 +22,7 @@ h3 {
   text-align: center;
 }
 h1 {
+  color: #ffffff;
   font-size: 4vw;
 }
 h2 {
@@ -62,27 +63,27 @@ body {
 
 header {
   // @include fontColor($keyColorYellow);
-  padding: 0 2vh;
+  padding: 0 3vw;
   display: flex;
   align-items: center;
   gap: 2%;
-  height: 10vh;
-  border-bottom: 5px groove rgb(188, 188, 188);
+  min-height: 8vw;
+  border-bottom: 0.5vw groove rgb(188, 188, 188);
 
   @media (orientation: portrait) {
-    padding: 0 2vw;
-    height: 10vw;
+    padding: 0 2vh;
+    min-height: 8vh;
   }
 
   .logo {
+    color: #ffffff;
     font-family: "Alexander";
-    // font-size: 7vh;
     font-size: 5vw;
     font-weight: 800;
     white-space: nowrap;
-    // @media (orientation: portrait) {
-    //   font-size: 7vw;
-    // }
+    @media (orientation: portrait) {
+      font-size: 5vh;
+    }
   }
 
   .swu-img {
@@ -114,12 +115,30 @@ main {
 
   .learn-side {
     font-size: 2vw;
+    line-height: 150%;
     padding: 2vw;
     background-color: #999;
 
     @media (orientation: portrait) {
       font-size: 2vh;
-    }  
+    }
+
+    strong,
+    tag {
+      color: rgb(102, 25, 25);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.3vw 0.6vw 0.3vw 0.6vw;
+      margin: 0 0.2vw;
+      font-weight: normal;
+    }
+
+    .side-learn-sintaxis {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.5vw 0.8vw;
+      border-bottom: solid 0.2vw rgba(255, 255, 255, 0.1);
+      margin: 1.3vw auto;
+      width: fit-content;
+    }
   }
 }
 
@@ -219,8 +238,7 @@ footer {
   // same width for children
   & > * {
     // flex: 1 0;
-    // font-size: 2.5vh;
-    font-size: 1.5vw;
+    font-size: 2vw;
     line-height: 150%;
     width: 50%;
     height: 100%;
@@ -312,13 +330,13 @@ footer {
             font-size: 1vw;
             cursor: pointer;
             z-index: 999999;
-            box-shadow: 0.1vw 0.4vw 0.7vw rgba(0, 0, 0, 0.3);
+            box-shadow: 0.1vw 0.4vw 0.7vw rgba(77, 244, 249, 0.469);
             transform: perspective(5vw) rotateX(20deg);
             transition: all 0.3s ease;
 
             &.pressed {
               transform: translateY(0.5vw);
-              box-shadow: 0.1vw 0.1vw 0.7vw rgb(156, 247, 250);
+              box-shadow: 0.1vw 0.1vw 0.7vw rgb(193, 248, 250);
             }
           }
         }
@@ -373,6 +391,9 @@ footer {
   }
 
   .table-wrapper {
+    transform: perspective(200vw) rotateX(20deg);
+    transform-origin: bottom;
+
     .wrong-answer {
       animation: wrong-answer 0.5s infinite both;
 
@@ -493,18 +514,9 @@ plate {
   }
 }
 
-.clean {
-  animation: cleanme 0.2s 1;
-  transform: translateY(-600px);
-}
-
-@keyframes cleanme {
-  0% {
-    transform: translateY(0px) rotate3d(0, 0, 0, 0deg);
-  }
-  100% {
-    transform: translateY(-600px) rotate3d(0, 0, 0, 0deg);
-  }
+.win {
+  transform: scale(0) translateY(-200vh);
+  transition: transform 0.7s;
 }
 
 bento,

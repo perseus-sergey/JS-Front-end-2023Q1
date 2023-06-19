@@ -57,11 +57,12 @@ export class Playground {
     this.enterPressedHandler = this.enterPressedHandler.bind(this);
     this.inputCheckValue = this.inputCheckValue.bind(this);
     // this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
-    this.appendH1();
+    // this.appendH1();
     this.appendPlayground();
     this.appendEditor();
     this.appendViewer();
     this.appendRightAside();
+    this.setNewLevel();
     this.startListners();
   }
 
@@ -97,9 +98,13 @@ export class Playground {
 
   private sideLearnDescription!: HTMLInputElement;
 
+  private learnWrapper!: HTMLInputElement;
+
   private examplesWrapper!: HTMLInputElement;
 
   private isFinish = false;
+
+  private levelNumber = 0;
   //   cells = [];
 
   //   mines = [];
@@ -184,33 +189,7 @@ export class Playground {
     document.addEventListener('mouseout', this.playghMousOutHandler);
     this.editorInput.addEventListener('keypress', this.enterPressedHandler);
     this.enterBtn.addEventListener('click', this.inputCheckValue);
-
-    // document.addEventListener('contextmenu', this.cellClickHandler);
-    // document.oncontextmenu = () => false;
-    // ============== MEDIAQUERY ======== start ====
-    // [
-    //   window.matchMedia('(max-width: 1250px)'),
-    //   window.matchMedia('(max-width: 767px)'),
-    //   window.matchMedia('(orientation: portrait)'),
-    //   window.matchMedia('(orientation: landscape)'),
-    // ].forEach((mq) => mq.addEventListener('change', this.mediaQueryHandler));
-
-    // ______________ MEDIAQUERY ______ end _______
   }
-
-  //   mediaQueryHandler() {
-  //     const cellSizeNumb = this.getCellSize().numb;
-  //     const cellSizeExt = this.getCellSize().ext;
-
-  //     for (let x = 0; x < this.ROW_NUM; x += 1) {
-  //       for (let y = 0; y < this.COL_NUM; y += 1) {
-  //         const cell = this.cells[x][y];
-  //         cell.style.width = cellSizeNumb + cellSizeExt;
-  //         cell.style.height = cellSizeNumb + cellSizeExt;
-  //         cell.style.fontSize = cellSizeNumb * Cell.FONT_RATIO + cellSizeExt;
-  //       }
-  //     }
-  //   }
 
   //   endListners() {
   //     document.removeEventListener('click', this.cellClickHandler);
@@ -264,27 +243,20 @@ export class Playground {
     return isWin;
   }
 
-  private winLevel(): void {
-    this.rightElements.forEach((ansEl) => {
+  private async winLevel(): Promise<void> {
+    this.rightElements.forEach(async (ansEl) => {
       ansEl.removeAttribute('twist');
+      await new Promise((resolve) => { setTimeout(resolve, 30); });
       ansEl.classList.add('win');
     });
 
-    // $(".input-wrapper").css("opacity",.2);
-    // updateProgressUI(currentLevel, true);
-    // currentLevel++;
-
-    // if(currentLevel >= levels.length) {
-    //   winGame();
-    // } else {
-    //   setTimeout(function(){
-    //     loadLevel();
-    //   },levelTimeout);
-    // }
-  }
-
-  private setNewLevel(): void {
-    this.editorInput.value = '';
+    this.levelNumber += 1;
+    if (this.levelNumber >= gameLevels.length) {
+      this.gameOver();
+      return;
+    }
+    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    this.setNewLevel();
   }
 
   private async loose(answerElems: HTMLElement | null): Promise<void> {
@@ -538,29 +510,75 @@ export class Playground {
   //     return { numb: Math.min(w, h).toFixed(2), ext: rat < 1 ? 'vw' : 'vh' };
   //   }
 
-  private appendH1(): void {
-    this.h1 = document.body.querySelector('h1') as HTMLElement;
+  private setNewLevel(): void {
+    this.cleanPage();
+    if (this.levelNumber < 0 || this.levelNumber >= gameLevels.length) {
+      this.levelNumber = 0;
+    }
+    // hideTooltip();
+    this.level = gameLevels[this.levelNumber];
+    // $(".level-menu .current").removeClass("current");
+    // $(".level-menu div a").eq(this.levelNumber).addClass("current");
+    // var percent = (this.levelNumber+1)/gameLevels.length * 100;
+    // $(".progress").css("width",percent + "%");
+    localStorage.setItem('levelNumber', `${this.levelNumber}`);
+    // loadBoard();
+    // resetTable();
     this.h1.textContent = this.level.levelH1;
+    this.playgroundElement.insertAdjacentHTML('afterbegin', this.level.levelTask);
+    this.rightElements = [...this.playgroundElement
+      .querySelectorAll(this.level.levelRightAnswer)] as HTMLElement[];
+    this.sideTitle.textContent = `Level ${this.levelNumber + 1} of ${gameLevels.length}`;
+    this.sideLearnSelector.textContent = this.level.levelDescr;
+    this.sideLearnTitle.textContent = this.level.learnTitle;
+    this.sideLearnSintaxis.innerHTML = this.level.learnSelector;
+    this.sideLearnDescription.innerHTML = this.level.promptText;
+    this.appendExamples();
+    const tableElmts = [...this.playgroundElement.children] as HTMLElement[];
+    tableElmts.forEach((el) => {
+      const divWrapped = this.wrapToDiv(el);
+      this.viewerPre.append(divWrapped);
+    });
+    this.rightElements.forEach((el) => el.setAttribute('twist', ''));
+    // updateProgressUI(this.levelNumber, checkCompleted(this.levelNumber));
+    // $('.input-wrapper').css('opacity', 1);
+    // $('.result').text('');
+    // Strobe what's supposed to be selected
+    // setTimeout(() => {
+    //   $(`.table ${level.selector}`).addClass('strobe');
+    //   $('.pop').removeClass('pop');
+    // }, 200);
+  }
+
+  private cleanPage(): void {
+    this.editorInput.value = '';
+    this.editorInput.focus();
+    this.playgroundElement.innerHTML = '';
+    this.sideLearnDescription.innerHTML = '';
+    this.sideLearnSintaxis.innerHTML = '';
+    if (this.examplesWrapper) this.examplesWrapper.innerHTML = '';
+    this.viewerPre.innerHTML = '';
   }
 
   private appendPlayground(): void {
     const domPlayground = document.querySelector(`.${PLAYGROUND_CLASS}`);
     if (domPlayground) domPlayground.remove();
 
+    this.h1 = document.body.querySelector('h1') as HTMLElement;
+    // this.h1.textContent = this.level.levelH1;
+
     const playgrElem = generateDomElement('div', '', null, PLAYGROUND_CLASS);
 
     this.playgroundElement = this.savingData
       ? this.makePlaygrFromSavingData(playgrElem) : playgrElem;
 
-    const main = document.querySelector(`.${MAIN_CLASS}`);
-    if (main) {
-      main.append(this.playgroundElement);
-      this.playgroundElement.insertAdjacentHTML('afterbegin', this.level.levelTask);
-    }
+    const main = document.querySelector(`.${MAIN_CLASS}`) as HTMLElement;
+    main.append(this.playgroundElement);
+    // this.playgroundElement.insertAdjacentHTML('afterbegin', this.level.levelTask);
     this.playgroundHint = generateDomElement('div', '', document.body, 'playground-hint');
 
-    this.rightElements = [...this.playgroundElement
-      .querySelectorAll(this.level.levelRightAnswer)] as HTMLElement[];
+    // this.rightElements = [...this.playgroundElement
+    //   .querySelectorAll(this.level.levelRightAnswer)] as HTMLElement[];
   }
 
   private makePlayground(): void {
@@ -620,7 +638,7 @@ export class Playground {
     const rightAside = document.querySelector('.learn-side') as HTMLElement;
 
     const sideHeader = generateDomElement('div', '', rightAside, 'side-header');
-    this.sideTitle = generateDomElement('h2', this.level.levelDescr, sideHeader, 'side-title');
+    this.sideTitle = generateDomElement('h2', '', sideHeader, 'side-title');
     const sideNav = generateDomElement('nav', '', sideHeader, 'side-header__nav');
 
     this.sideNavPrev = generateDomElement('div', '', sideNav, 'nav-prev');
@@ -629,24 +647,24 @@ export class Playground {
     const progressWrapper = generateDomElement('div', '', rightAside, 'side-progress-wrap');
     this.sideProgress = generateDomElement('div', '', progressWrapper, 'side-progress');
 
-    const learnWrapper = generateDomElement('div', '', rightAside, 'side-learn-wrap');
-    this.sideLearnSelector = generateDomElement('h3', this.level.learnSelector, learnWrapper, 'side-learn-selector');
-    this.sideLearnTitle = generateDomElement('h2', this.level.learnTitle, learnWrapper, 'side-learn-title');
-    this.sideLearnSintaxis = generateDomElement('h3', this.level.learnSelector, learnWrapper, 'side-learn-sintaxis');
-    this.sideLearnDescription = generateDomElement('div', '', learnWrapper, 'side-learn-descr');
-    this.sideLearnDescription.innerHTML = this.level.promptText;
-
-    this.appendExamples();
-    if (this.examplesWrapper) {
-      generateDomElement('h3', 'Examples', learnWrapper, 'side-examples-title');
-      learnWrapper.append(this.examplesWrapper);
-    }
+    this.learnWrapper = generateDomElement('div', '', rightAside, 'side-learn-wrap');
+    this.sideLearnSelector = generateDomElement('h3', '', this.learnWrapper, 'side-learn-selector');
+    this.sideLearnTitle = generateDomElement('h2', '', this.learnWrapper, 'side-learn-title');
+    this.sideLearnSintaxis = generateDomElement('h3', '', this.learnWrapper, 'side-learn-sintaxis');
+    this.sideLearnDescription = generateDomElement('div', '', this.learnWrapper, 'side-learn-descr');
   }
 
   private appendExamples(): void {
     if (!this.level.examples || !this.level.examples.length) return;
     this.examplesWrapper = generateDomElement('div', '', null);
-    this.level.examples.forEach((exmpl) => { this.examplesWrapper.innerHTML += exmpl; });
+    if (this.examplesWrapper) {
+      generateDomElement('h3', 'Examples', this.examplesWrapper, 'side-examples-title');
+      this.level.examples.forEach((exmpl) => {
+        const ex = generateDomElement('p', '', this.examplesWrapper);
+        ex.innerHTML = exmpl;
+      });
+      this.learnWrapper.append(this.examplesWrapper);
+    }
   }
 
   private appendViewer(): void {
@@ -662,14 +680,15 @@ export class Playground {
     const viewerInfoField = generateDomElement('div', '', viewerField, 'viewer-info');
     const viewerInfoPre = generateDomElement('pre', '', viewerInfoField);
 
-    const tableElmts = [...this.playgroundElement.children] as HTMLElement[];
     this.viewerPre = generateDomElement('div', '', viewerInfoPre, 'viewer-pre');
 
-    tableElmts.forEach((el) => {
-      const divWrapped = this.wrapToDiv(el);
-      this.viewerPre.append(divWrapped);
-    });
-    this.rightElements.forEach((el) => el.setAttribute('twist', ''));
+    // const tableElmts = [...this.playgroundElement.children] as HTMLElement[];
+
+    // tableElmts.forEach((el) => {
+    //   const divWrapped = this.wrapToDiv(el);
+    //   this.viewerPre.append(divWrapped);
+    // });
+    // this.rightElements.forEach((el) => el.setAttribute('twist', ''));
   }
 
   private wrapToDiv(elem: HTMLElement): HTMLElement {
