@@ -43,5 +43,8 @@
     "watch": "webpack --watch",
     "serve": "webpack serve",
     "deploy": "npm run build && npx gh-pages -d dist -e "
+  },
+  "dependencies": {
+    "highlight.js": "^11.8.0"
   }
 }

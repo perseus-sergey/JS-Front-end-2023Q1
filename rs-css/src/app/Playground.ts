@@ -56,6 +56,7 @@ export class Playground {
     this.playghMousOutHandler = this.playghMousOutHandler.bind(this);
     this.enterPressedHandler = this.enterPressedHandler.bind(this);
     this.inputCheckValue = this.inputCheckValue.bind(this);
+    this.inputKeyUpHendler = this.inputKeyUpHendler.bind(this);
     // this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
     // this.appendH1();
     this.appendPlayground();
@@ -104,7 +105,7 @@ export class Playground {
 
   private isFinish = false;
 
-  private levelNumber = 0;
+  private levelNumber = 5;
   //   cells = [];
 
   //   mines = [];
@@ -188,6 +189,7 @@ export class Playground {
     document.addEventListener('mouseover', this.playgrMousOverHandler);
     document.addEventListener('mouseout', this.playghMousOutHandler);
     this.editorInput.addEventListener('keypress', this.enterPressedHandler);
+    this.editorInput.addEventListener('keyup', this.inputKeyUpHendler);
     this.enterBtn.addEventListener('click', this.inputCheckValue);
   }
 
@@ -195,6 +197,11 @@ export class Playground {
   //     document.removeEventListener('click', this.cellClickHandler);
   //     document.removeEventListener('contextmenu', this.cellClickHandler);
   //   }
+
+  private inputKeyUpHendler(event: KeyboardEvent): void {
+    if (this.editorInput.value.length > 0) this.editorInput.classList.remove('input-want');
+    else this.editorInput.classList.add('input-want');
+  }
 
   private enterPressedHandler(event: KeyboardEvent): void {
     if (event.code === 'Enter') this.inputCheckValue();
@@ -268,11 +275,11 @@ export class Playground {
   }
 
   private playgrMousOverHandler(event: Event):void {
-    const el = event.target as HTMLElement;
+    let el = event.target as HTMLElement;
     if (el === this.playgroundElement || (!el.closest(`.${PLAYGROUND_CLASS}`) && !el.closest('.viewer-pre'))) return;
 
     const playgrElmnts = [...this.playgroundElement.querySelectorAll('*')] as HTMLElement[];
-    const viewElements = [...this.viewerPre.querySelectorAll('*')] as HTMLElement[];
+    const viewElements = [...this.viewerPre.querySelectorAll('div')] as HTMLElement[];
     let indx: number;
     let playEl: HTMLElement;
     let equalEl: HTMLElement;
@@ -281,7 +288,9 @@ export class Playground {
       indx = playgrElmnts.indexOf(el);
       equalEl = viewElements[indx];
     } else if (el.closest('.viewer-pre')) {
+      el = el.closest('div') as HTMLElement;
       indx = viewElements.indexOf(el);
+      // indx = viewElements.indexOf(el);
       equalEl = playgrElmnts[indx];
       playEl = equalEl;
     } else return;
@@ -616,7 +625,9 @@ export class Playground {
     this.editors = document.querySelector('.editors') as HTMLDivElement;
     if (!this.editors) return;
     const editorWrap = this.editors.querySelector(`.${EDITOR_CLASS}`) as HTMLDivElement;
-    generateDomElement('div', '', editorWrap, 'editor-header');
+    const editorHeader = generateDomElement('div', '', editorWrap, 'editor-header');
+    generateDomElement('span', 'CSS Editor', editorHeader);
+    generateDomElement('span', 'style.css', editorHeader);
     const editorField = generateDomElement('div', '', editorWrap, 'editor-field');
     const lefNumbers = generateDomElement('div', '', editorField, 'editor-numbers');
     for (let i = 1; i < 21; i += 1) {
@@ -624,7 +635,7 @@ export class Playground {
     }
     const editorInfoField = generateDomElement('div', '', editorField, 'editor-info');
     const inputWrapper = generateDomElement('div', '', editorInfoField, 'input-wrapper');
-    this.editorInput = generateDomElement('input', '', inputWrapper, 'editor-input');
+    this.editorInput = generateDomElement('input', '', inputWrapper, 'editor-input', 'input-want');
     this.editorInput.placeholder = 'Tipe in a CSS selector';
     this.enterBtn = generateDomElement('div', 'Enter', inputWrapper, 'enter-btn');
     const editorInfoPre = generateDomElement('div', '', editorInfoField, 'editor-info__pre');
@@ -668,7 +679,10 @@ export class Playground {
 
   private appendViewer(): void {
     const viewerWrap = document.querySelector('.html-viewer') as HTMLElement;
-    generateDomElement('div', '', viewerWrap, 'viewer-header');
+    const viewerHeader = generateDomElement('div', '', viewerWrap, 'viewer-header');
+    generateDomElement('span', 'HTML Viewer', viewerHeader);
+    generateDomElement('span', 'index.html', viewerHeader);
+
     const viewerField = generateDomElement('div', '', viewerWrap, 'viewer-field');
 
     const viewerNumbers = generateDomElement('div', '', viewerField, 'viewer-numbers');
@@ -694,26 +708,31 @@ export class Playground {
     const tagName = elem.localName;
     const wrapDiv = generateDomElement('div', '', null);
     let attrStr = '';
-    const attrs = elem.attributes;
-    for (let k = 0; k < attrs.length; k += 1) {
-      attrStr = `${attrStr} ${attrs[k].name}="${attrs[k].value}"`;
-    }
+    const attrs = [...elem.attributes];
+    attrs.forEach((attr) => {
+      attrStr += `${this.spanWrap('hl-attr-name', ` ${attr.name}=`)}"${this.spanWrap('hl-attr-value', `${attr.value}`)}"`;
+    });
 
-    const separ = attrStr ? '' : '';
+    // const separ = attrStr ? '' : '';
     const childLen = elem.children.length;
-    const wrapStartDivText = `<${tagName}${separ}${attrStr}>`;
+    const wrapStartDivText = this.spanWrap('hl-tag', '&lt;') + this.spanWrap('hl-tag-name', tagName) + attrStr + this.spanWrap('hl-tag', '&gt;');
+    const wrapEndDivText = this.spanWrap('hl-tag', '&lt;/') + this.spanWrap('hl-tag-name', tagName) + this.spanWrap('hl-tag', '&gt;');
 
     if (childLen > 0) {
-      wrapDiv.textContent = wrapStartDivText;
+      wrapDiv.innerHTML += wrapStartDivText;
 
       const elChildren = [...elem.children] as HTMLElement[];
       elChildren.forEach((el: HTMLElement) => wrapDiv.append(this.wrapToDiv(el)));
 
-      wrapDiv.append(`</${tagName}>`);
+      wrapDiv.innerHTML += wrapEndDivText;
     } else {
-      wrapDiv.textContent = `${wrapStartDivText}</${tagName}>`;
+      wrapDiv.innerHTML = `${wrapStartDivText}${wrapEndDivText}`;
     }
     return wrapDiv;
+  }
+
+  private spanWrap(className: string, str: string): string {
+    return `<span class="${className}">${str}</span>`;
   }
 
   // https://stackoverflow.com/questions/1787322/what-is-the-htmlspecialchars-equivalent-in-javascript

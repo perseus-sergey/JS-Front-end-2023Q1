@@ -15,33 +15,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-h1,
-h2,
-h3 {
-  font-weight: 800;
-  text-align: center;
-}
-h1 {
-  color: #ffffff;
-  font-size: 4vw;
-}
-h2 {
-  font-size: 2.5vw;
-}
-h3 {
-  font-size: 2vw;
-}
-@media (orientation: portrait) {
-  h1 {
-    font-size: 4vh;
-  }
-  h2 {
-    font-size: 2.5vh;
-  }
-  h3 {
-    font-size: 2vh;
-  }
-}
 
 main {
   flex: 1 0 auto;
@@ -55,11 +28,39 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  font-family: Blogger Sans;
   // max-width: 1500px;
   background-color: $bodyBgColor;
   // background-image: $bodyBgImg;
   // background-attachment: fixed;
 }
+  h1,
+  h2,
+  h3 {
+    font-weight: 800;
+    text-align: center;
+  }
+  h1 {
+    color: #ffffff;
+    font-size: 4vw;
+  }
+  h2 {
+    font-size: 2.5vw;
+  }
+  h3 {
+    font-size: 2vw;
+  }
+  @media (orientation: portrait) {
+    h1 {
+      font-size: 4vh;
+    }
+    h2 {
+      font-size: 2.5vh;
+    }
+    h3 {
+      font-size: 2vh;
+    }
+  }
 
 header {
   // @include fontColor($keyColorYellow);
@@ -77,7 +78,7 @@ header {
 
   .logo {
     color: #ffffff;
-    font-family: "Alexander";
+    // font-family: "Alexander";
     font-size: 5vw;
     font-weight: 800;
     white-space: nowrap;
@@ -209,6 +210,18 @@ footer {
   color: #ccc;
   cursor: default;
 
+  .viewer-header,
+  .editor-header {
+    line-height: 200%;
+    background: rgb(34 33 34);
+    display: flex;
+    justify-content: space-around;
+
+    & *:first-child {
+      color: #9a9898;
+    }
+  }
+
   &.wrong-answer {
     animation: wrong-answer 0.5s infinite both;
 
@@ -252,7 +265,7 @@ footer {
     background-color: #777;
 
     [highlight] {
-      color: #ffffff;
+      filter: contrast(200%) brightness(150%);
     }
     [twist] {
       color: #ffffff;
@@ -264,14 +277,6 @@ footer {
 
       & > * {
         padding: 3%;
-      }
-
-      .viewer-numbers {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        background-color: #19011a;
-        color: #ffffff;
       }
 
       .viewer-pre {
@@ -286,6 +291,15 @@ footer {
     }
   }
 
+  .viewer-numbers,
+  .editor-numbers {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    background-color: #363237;
+    color: rgb(255 255 255 / 73%);
+  }
+
   .css-editor {
     background-color: #ddd;
 
@@ -297,14 +311,6 @@ footer {
         padding: 3%;
       }
 
-      .editor-numbers {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        background-color: #19011a;
-        color: #ffffff;
-      }
-
       .editor-info {
         width: 100%;
 
@@ -314,10 +320,21 @@ footer {
 
           .editor-input {
             // font-size: 3vh;
+            background: transparent;
             font-size: inherit;
             flex-grow: 2;
             border: none;
-            background: none;
+            
+            &.input-want{
+              background: #91f20076;
+              animation: input-want 0.5s infinite;
+            }
+
+            @keyframes input-want {
+              50% {
+                background: none;
+              }
+            }
 
             // @media (orientation: portrait) {
             //   font-size: 3vw;
@@ -329,15 +346,15 @@ footer {
           }
 
           .enter-btn {
-            height: 2vw;
+            height: 3vw;
             background: #ddd;
             border-radius: 0.3vw;
-            padding: 0.2vw 1vw;
+            padding: 0.5vw 1vw;
             color: #666;
             line-height: 100%;
             border: solid 0.3vw #999;
             border-width: 0.1vw 0.1vw 0.4vw 0.1vw;
-            font-size: 1vw;
+            font-size: 1.5vw;
             cursor: pointer;
             z-index: 999999;
             box-shadow: 0.1vw 0.4vw 0.7vw rgba(77, 244, 249, 0.469);
@@ -774,4 +791,20 @@ plate apple:nth-last-child(4),
 plate orange:nth-last-child(4) {
   top: -10.5vw;
   z-index: 600;
+}
+
+.hl-tag-name{
+  color: #f2b500;
+}
+.hl-tag{
+  color: #009ff2;
+}
+.hl-quot{
+  color: #f26d00;
+}
+.hl-attr-name{
+  color: #d3d1da;
+}
+.hl-attr-value{
+  color: #00f20c;
 }
