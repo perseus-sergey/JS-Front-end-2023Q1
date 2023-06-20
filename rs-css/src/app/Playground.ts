@@ -5,7 +5,7 @@
 // import { generateDomElement } from './utilities';
 
 import { constants } from './auxiliary/constants';
-import { ILevel } from './auxiliary/types';
+import { ILevel, IUserStatus } from './auxiliary/types';
 import { generateDomElement } from './auxiliary/utilites';
 import { gameLevels } from './Levels';
 
@@ -26,6 +26,8 @@ const {
   END_GAME_TEXT_WIN,
   END_GAME_TEXT_LOSE,
   FONT_RATIO,
+  STORAGE_LEVEL_NUMBER,
+  STORAGE_GAME_STATUS,
   WRONG_ANSWER_CLASS,
   LAST_WINS_KEY,
   LOCAL_DATA_KEY,
@@ -58,13 +60,7 @@ export class Playground {
     this.inputCheckValue = this.inputCheckValue.bind(this);
     this.inputKeyUpHendler = this.inputKeyUpHendler.bind(this);
     // this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
-    // this.appendH1();
-    this.appendPlayground();
-    this.appendEditor();
-    this.appendViewer();
-    this.appendRightAside();
-    this.setNewLevel();
-    this.startListners();
+    this.start();
   }
 
   private h1!: HTMLElement;
@@ -106,6 +102,11 @@ export class Playground {
   private isFinish = false;
 
   private levelNumber = 5;
+
+  private gameStatus!: Partial<IUserStatus>;
+
+  private isCheat = false;
+
   //   cells = [];
 
   //   mines = [];
@@ -125,6 +126,26 @@ export class Playground {
   //   clicks = 0;
 
   //   opened = 0;
+
+  private start(): void {
+    this.appendPlayground();
+    this.appendEditor();
+    this.appendViewer();
+    this.appendRightAside();
+    this.setGameStatus();
+    this.setNewLevel();
+    this.startListners();
+  }
+
+  private setGameStatus(): void {
+    const storData = localStorage.getItem(STORAGE_GAME_STATUS);
+    this.gameStatus = storData ? JSON.parse(storData) : {};
+    try {
+      this.levelNumber = Number(localStorage.getItem(STORAGE_LEVEL_NUMBER));
+    } catch (error) {
+      this.levelNumber = 0;
+    }
+  }
 
   //   getSavingData(data) {
   //     if (!data) return;
@@ -198,7 +219,7 @@ export class Playground {
   //     document.removeEventListener('contextmenu', this.cellClickHandler);
   //   }
 
-  private inputKeyUpHendler(event: KeyboardEvent): void {
+  private inputKeyUpHendler(): void {
     if (this.editorInput.value.length > 0) this.editorInput.classList.remove('input-want');
     else this.editorInput.classList.add('input-want');
   }
@@ -225,16 +246,73 @@ export class Playground {
     }
     if (!answerElems || answerElems.length === 0) {
       this.editors.classList.add(WRONG_ANSWER_CLASS);
+      this.saveAnswerToStorage(false);
     } else if (
       answerElems.length
       && answerElems.length === this.rightElements.length
       && this.isRightAnswer(answerElems)
-    ) this.winLevel();
-    else {
+    ) {
+      this.saveAnswerToStorage(true);
+      this.winLevel();
+    } else {
+      this.saveAnswerToStorage(false);
       answerElems.forEach((ansEl) => ansEl.classList.add(WRONG_ANSWER_CLASS));
     }
     this.removeWrongAnswerClass();
   }
+
+  private saveAnswerToStorage(isCorrectAnswer: boolean): void {
+    if (!this.gameStatus[this.levelNumber]) {
+      this.gameStatus[this.levelNumber] = {
+        levelFinished: false,
+        cheat: false,
+        mistakeCount: 0,
+      };
+    }
+
+    const levelStatus = this.gameStatus[this.levelNumber];
+
+    if (!isCorrectAnswer) {
+      if (!levelStatus.levelFinished) levelStatus.mistakeCount += 1;
+    } else {
+      levelStatus.cheat = this.isCheat;
+      levelStatus.levelFinished = true;
+    }
+
+    localStorage.setItem(STORAGE_GAME_STATUS, JSON.stringify(this.gameStatus));
+  }
+
+  private resetAllStorage(): void {
+
+  }
+
+  // private saveDataToLocalStorage(): void {
+  //   // const oStorageHistory = {
+  //   //   0: {
+  //   //     finished: true,
+  //   //     cheat: false,
+  //   //     mistakes: 5,
+  //   //   },
+  //   // };
+  //   const storCells = [];
+  //   for (let x = 0; x < this.ROW_NUM; x += 1) {
+  //     storCells[x] = [];
+  //   }
+  //   const chbTheme = document.getElementById(THEME_SLIDER).checked;
+  //   const data = {
+  //     isSound: this.isSound,
+  //     isDarkTheme: chbTheme,
+  //     timer: gameTimer.timer,
+  //     ROW_NUM: this.ROW_NUM,
+  //     COL_NUM: this.COL_NUM,
+  //     MINE_NUM: this.MINE_NUM,
+  //     cells: storCells,
+  //     mines: this.mines,
+  //     flags: this.flags,
+  //     clicks: this.clicks,
+  //   };
+  //   localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(data));
+  // }
 
   private async removeWrongAnswerClass(): Promise<void> {
     await new Promise((resolve) => { setTimeout(resolve, 300); });
@@ -366,40 +444,6 @@ export class Playground {
   //     this.saveDataToLocalStorage();
   //   }
 
-  //   saveDataToLocalStorage() {
-  //     const storCells = [];
-  //     for (let x = 0; x < this.ROW_NUM; x += 1) {
-  //       storCells[x] = [];
-  //       for (let y = 0; y < this.COL_NUM; y += 1) {
-  //         const oCell = this.cells[x][y];
-  //         const strCell = {};
-  //         strCell.x = oCell.x;
-  //         strCell.y = oCell.y;
-  //         strCell.VALUE = oCell.VALUE;
-  //         strCell.isOpened = oCell.isOpened;
-  //         strCell.isMine = oCell.isMine;
-  //         strCell.isFlag = oCell.isFlag;
-  //         strCell.textContent = oCell.textContent;
-
-  //         storCells[x].push(strCell);
-  //       }
-  //     }
-  //     const chbTheme = document.getElementById(THEME_SLIDER).checked;
-  //     const data = {
-  //       isSound: this.isSound,
-  //       isDarkTheme: chbTheme,
-  //       timer: gameTimer.timer,
-  //       ROW_NUM: this.ROW_NUM,
-  //       COL_NUM: this.COL_NUM,
-  //       MINE_NUM: this.MINE_NUM,
-  //       cells: storCells,
-  //       mines: this.mines,
-  //       flags: this.flags,
-  //       clicks: this.clicks,
-  //     };
-  //     localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(data));
-  //   }
-
   //   async firstClick(x, y) {
   //     this.isFirstClick = false;
   //     if (this.savingData) return true;
@@ -521,16 +565,17 @@ export class Playground {
 
   private setNewLevel(): void {
     this.cleanPage();
+    this.isCheat = false;
     if (this.levelNumber < 0 || this.levelNumber >= gameLevels.length) {
       this.levelNumber = 0;
     }
     // hideTooltip();
     this.level = gameLevels[this.levelNumber];
+    localStorage.setItem(STORAGE_LEVEL_NUMBER, `${this.levelNumber}`);
     // $(".level-menu .current").removeClass("current");
     // $(".level-menu div a").eq(this.levelNumber).addClass("current");
     // var percent = (this.levelNumber+1)/gameLevels.length * 100;
     // $(".progress").css("width",percent + "%");
-    localStorage.setItem('levelNumber', `${this.levelNumber}`);
     // loadBoard();
     // resetTable();
     this.h1.textContent = this.level.levelH1;
@@ -746,69 +791,4 @@ export class Playground {
   //   };
   //   return text.replace(/[&<>"']/g, (m) => map[m]);
   // }
-
-  //   insertMines() {
-  //     let counter = 0;
-  //     this.mines = [];
-
-  //     while (counter < this.MINE_NUM) {
-  //       const randX = Math.floor(Math.random() * this.ROW_NUM);
-  //       const randY = Math.floor(Math.random() * this.COL_NUM);
-
-  //       if (!this.cells[randX][randY].isMine) {
-  //         this.cells[randX][randY].isMine = 1;
-  //         this.mines.push(this.cells[randX][randY].cellID);
-  //         counter += 1;
-  //       }
-  //     }
-  //   }
-
-  //   calcMinesAround(x, y) {
-  //     if (this.outBounds(x, y)) return 0;
-
-  //     let counter = 0;
-  //     for (let aroundX = -1; aroundX <= 1; aroundX += 1) {
-  //       for (let aroundY = -1; aroundY <= 1; aroundY += 1) {
-  //         const calcX = aroundX + x;
-  //         const calcY = aroundY + y;
-  //         if (!this.outBounds(calcX, calcY)) {
-  //           counter += this.cells[calcX][calcY].isMine;
-  //         }
-  //       }
-  //     }
-  //     return counter;
-  //   }
-
-  //   async openCell(x, y) {
-  //     if (this.outBounds(x, y)) return false;
-  //     const oCell = this.cells[x][y];
-  //     if (oCell.isOpened) return false;
-
-  //     oCell.openCell();
-  //     this.removeFlag(oCell.cellID);
-  //     await new Promise((resolve) => {
-  //       setTimeout(resolve, 10);
-  //     });
-  //     this.opened += 1;
-
-  //     if (this.opened === this.ROW_NUM * this.COL_NUM - this.MINE_NUM) {
-  //       this.winClick(oCell);
-  //       return true;
-  //     }
-
-  //     if (oCell.VALUE !== 0) return false;
-
-  //     await this.openCell(x, y - 1);
-  //     await this.openCell(x, y + 1);
-  //     await this.openCell(x - 1, y);
-  //     await this.openCell(x + 1, y);
-  //     await this.openCell(x - 1, y - 1);
-  //     await this.openCell(x - 1, y + 1);
-  //     await this.openCell(x + 1, y - 1);
-  //     await this.openCell(x + 1, y + 1);
-  //   }
-
-//   outBounds(x, y) {
-//     return x < 0 || y < 0 || x >= this.ROW_NUM || y >= this.COL_NUM;
-//   }
 }

@@ -28,39 +28,38 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  font-family: Blogger Sans;
-  // max-width: 1500px;
+  font-family: "Jura";
   background-color: $bodyBgColor;
   // background-image: $bodyBgImg;
-  // background-attachment: fixed;
 }
-  h1,
-  h2,
-  h3 {
-    font-weight: 800;
-    text-align: center;
-  }
+h1,
+h2,
+h3 {
+  font-weight: 800;
+  text-align: center;
+}
+h1 {
+  // font-family: "Blogger Sans";
+  color: #ffffff;
+  font-size: 4vw;
+}
+h2 {
+  font-size: 2.5vw;
+}
+h3 {
+  font-size: 2vw;
+}
+@media (orientation: portrait) {
   h1 {
-    color: #ffffff;
-    font-size: 4vw;
+    font-size: 4vh;
   }
   h2 {
-    font-size: 2.5vw;
+    font-size: 2.5vh;
   }
   h3 {
-    font-size: 2vw;
+    font-size: 2vh;
   }
-  @media (orientation: portrait) {
-    h1 {
-      font-size: 4vh;
-    }
-    h2 {
-      font-size: 2.5vh;
-    }
-    h3 {
-      font-size: 2vh;
-    }
-  }
+}
 
 header {
   // @include fontColor($keyColorYellow);
@@ -115,6 +114,7 @@ main {
   }
 
   .learn-side {
+    font-family: "Blogger Sans";
     font-size: 2vw;
     line-height: 150%;
     padding: 2vw;
@@ -319,13 +319,13 @@ footer {
           gap: 1vw;
 
           .editor-input {
-            // font-size: 3vh;
+            font-family: "Jura";
             background: transparent;
             font-size: inherit;
             flex-grow: 2;
             border: none;
-            
-            &.input-want{
+
+            &.input-want {
               background: #91f20076;
               animation: input-want 0.5s infinite;
             }
@@ -793,18 +793,18 @@ plate orange:nth-last-child(4) {
   z-index: 600;
 }
 
-.hl-tag-name{
+.hl-tag-name {
   color: #f2b500;
 }
-.hl-tag{
+.hl-tag {
   color: #009ff2;
 }
-.hl-quot{
+.hl-quot {
   color: #f26d00;
 }
-.hl-attr-name{
+.hl-attr-name {
   color: #d3d1da;
 }
-.hl-attr-value{
+.hl-attr-value {
   color: #00f20c;
 }

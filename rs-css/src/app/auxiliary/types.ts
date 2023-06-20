@@ -1,3 +1,12 @@
+interface ILevelInfo {
+  levelFinished: boolean,
+  cheat: boolean,
+  mistakeCount: number,
+}
+export interface IUserStatus {
+  [levelNumb: number]: ILevelInfo
+}
+
 export interface ILevel {
   levelH1: string;
   levelDescr: string;

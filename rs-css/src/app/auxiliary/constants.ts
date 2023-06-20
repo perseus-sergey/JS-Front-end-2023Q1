@@ -12,6 +12,8 @@ export const constants = {
   END_GAME_TEXT_WIN: 'YOU WIN! :)',
   END_GAME_TEXT_LOSE: 'YOU LOSE! :(',
   FONT_RATIO: 0.8,
+  STORAGE_LEVEL_NUMBER: 'levelNumber',
+  STORAGE_GAME_STATUS: 'gameStatus',
   WRONG_ANSWER_CLASS: 'wrong-answer',
   INFO_SECTION_CLASS: 'info-section',
   LAST_WINS_KEY: 'lastWins',
