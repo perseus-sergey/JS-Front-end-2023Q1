@@ -181,6 +181,7 @@ export class Playground {
     console.log('target', target);
     // console.log('curtarget', event.currentTarget);
     if (target.closest(`.${LEVEL_MENU_WRAPPER_CLASS}`)) this.levelMenuClickHandler(target);
+    else if (target.closest(`.${LEVEL_RESET_BTN_CLASS}`)) this.resetGameStatus();
     else if (!target.closest(`.${LEVEL_SIDE_WRAPPER_CLASS}`) && this.levelsSideWrapper.classList.contains(ACTIVE_CLASS)) this.closeLevelsMenu();
     else if (target.closest(`.${ENTER_BTN_CLASS}`)) this.inputCheckValue();
     else if (target.closest(`.${EDITORS_CLASS}`)) this.editorInput.focus();
@@ -582,7 +583,7 @@ export class Playground {
     this.levelsSideWrapper = generateDomElement('aside', '', this.mainSection, LEVEL_SIDE_WRAPPER_CLASS);
     generateDomElement('h2', 'Choose a level', this.levelsSideWrapper);
     this.levelsMenuWrapper = generateDomElement('div', '', this.levelsSideWrapper, LEVEL_MENU_WRAPPER_CLASS);
-    this.levelsResetBtn = generateDomElement('div', '', this.levelsSideWrapper, LEVEL_RESET_BTN_CLASS);
+    this.levelsResetBtn = generateDomElement('div', 'RESET', this.levelsSideWrapper, LEVEL_RESET_BTN_CLASS);
     this.levelsMenuBtn = generateDomElement('div', '', header, LEVELS_MENU_BTN_CLASS);
     generateDomElement('div', '', this.levelsMenuBtn, LEVELS_MENU_BTN_IMG_CLASS);
     this.makeLevelsList();

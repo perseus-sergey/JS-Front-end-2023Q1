@@ -13,18 +13,6 @@ export const gameLevels: ILevel[] = [
       '<strong>p</strong> selects all <tag>p</tag> elements.',
     ],
     levelRightAnswer: 'plate',
-    // levelTask: `
-    // <bento>
-    // <orange></orange>
-    // </bento>
-    // <plate id="fancy">
-    //   <pickle></pickle>
-    // </plate>
-    // <plate>
-    //   <pickle></pickle>
-    // </plate>
-    // `,
-
     levelTask: `
       <plate></plate>
       <plate></plate>
