@@ -17,6 +17,21 @@ import { gameLevels } from './Levels';
 // import shortBell from '../assets/sounds/upali-dengi-na-igrovoy-schet.wav';
 
 const {
+  ACTIVE_CLASS,
+  ACTIVE_MENU_CLASS,
+  ACTIVE_LEVEL_CLASS,
+  SIDE_LEVEL_CHECK_CLASS,
+  SIDE_LEVEL_NUMBER_CLASS,
+  ENTER_BTN_CLASS,
+  EDITORS_CLASS,
+  LEVEL_MENU_WRAPPER_CLASS,
+  LEVELS_MENU_BTN_IMG_CLASS,
+  ATTR_LEVEL_NUMBER,
+  LEVEL_SIDE_WRAPPER_CLASS,
+  LEVEL_RESET_BTN_CLASS,
+  LEVEL_FINISHED_CLASS,
+  GAME_WRAPPER_CLASS,
+  LEVELS_MENU_BTN_CLASS,
   COUNTER_CLASS,
   CLICK_CLASS,
   CELL_ROW_TAG,
@@ -46,26 +61,26 @@ const {
 
 export class Playground {
   constructor(private level: ILevel = gameLevels[11], private savingData = '', public isSound = true) {
-    // this.ROW_NUM = level.rowNum;
-    // this.COL_NUM = level.colNum;
-    // this.MINE_NUM = level.mineNum;
     // this.savingData = savingData;
     // this.isSound = isSound;
     // this.setSounds();
     // this.getSavingData(savingData);
-    // this.flagCount();
     this.playgrMousOverHandler = this.playgrMousOverHandler.bind(this);
-    this.playghMousOutHandler = this.playghMousOutHandler.bind(this);
+    this.playgrMousOutHandler = this.playgrMousOutHandler.bind(this);
     this.enterPressedHandler = this.enterPressedHandler.bind(this);
-    this.inputCheckValue = this.inputCheckValue.bind(this);
     this.inputKeyUpHendler = this.inputKeyUpHendler.bind(this);
+    this.clickHandler = this.clickHandler.bind(this);
     // this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
     this.start();
   }
 
   private h1!: HTMLElement;
 
+  private mainSection!: HTMLElement;
+
   private enterBtn!: HTMLElement;
+
+  private levelsMenuBtn!: HTMLElement;
 
   private playgroundElement!: HTMLElement;
 
@@ -81,7 +96,15 @@ export class Playground {
 
   private sideTitle!: HTMLInputElement;
 
+  private sideTitleCompleteMark!: HTMLInputElement;
+
   private sideNavPrev!: HTMLInputElement;
+
+  private levelsSideWrapper!: HTMLInputElement;
+
+  private levelsMenuWrapper!: HTMLInputElement;
+
+  private levelsResetBtn!: HTMLInputElement;
 
   private sideNavNext!: HTMLInputElement;
 
@@ -99,33 +122,17 @@ export class Playground {
 
   private examplesWrapper!: HTMLInputElement;
 
-  private isFinish = false;
-
-  private levelNumber = 5;
+  private levelNumber = 0;
 
   private gameStatus!: Partial<IUserStatus>;
 
   private isCheat = false;
 
-  //   cells = [];
-
-  //   mines = [];
-
-  //   flags = [];
+  private isGameFinished = false;
 
   //   isSound = true;
 
   //   isDarkTheme = true;
-
-  //   isFirstClick = true;
-
-  //   isGameFinished = false;
-
-  //   timer = 0;
-
-  //   clicks = 0;
-
-  //   opened = 0;
 
   private start(): void {
     this.appendPlayground();
@@ -133,7 +140,8 @@ export class Playground {
     this.appendViewer();
     this.appendRightAside();
     this.setGameStatus();
-    this.setNewLevel();
+    this.makeLevelsMenu();
+    this.setNewLevel(this.levelNumber);
     this.startListners();
   }
 
@@ -147,81 +155,53 @@ export class Playground {
     }
   }
 
-  //   getSavingData(data) {
-  //     if (!data) return;
-
-  //     const oSavingData = JSON.parse(data);
-
-  //     this.isSound = oSavingData.isSound;
-  //     this.isDarkTheme = oSavingData.isDarkTheme;
-  //     this.timer = oSavingData.timer;
-  //     this.ROW_NUM = oSavingData.ROW_NUM;
-  //     this.COL_NUM = oSavingData.COL_NUM;
-  //     this.MINE_NUM = oSavingData.MINE_NUM;
-  //     this.mines = oSavingData.mines;
-  //     this.flags = oSavingData.flags;
-  //     this.clicks = oSavingData.clicks;
-
-  //     if (!customElements.get(CELL_TAG)) customElements.define(CELL_TAG, Cell);
-
-  //     this.cells = [];
-  //     for (let x = 0; x < this.ROW_NUM; x += 1) {
-  //       this.cells[x] = [];
-  //       for (let y = 0; y < this.COL_NUM; y += 1) {
-  //         const sCell = oSavingData.cells[x][y];
-  //         const cell = new Cell(sCell.x, sCell.y, sCell.isOpened, sCell.VALUE);
-  //         if (sCell.isOpened) this.opened += 1;
-  //         cell.isMine = sCell.isMine;
-  //         cell.isFlag = sCell.isFlag;
-  //         cell.textContent = sCell.textContent;
-
-  //         this.cells[x].push(cell);
-  //       }
-  //     }
-  //     const chbSound = document.getElementById(SOUND_SLIDER);
-  //     chbSound.checked = !this.isSound;
-  //     this.setTimeValues();
-  //     gameTimer.startTimer(this.timer);
-  //     document.querySelector(`.${CLICK_CLASS}`).textContent = this.clicks;
-  //   }
-
-  //   setTimeValues() {
-  //     const msec = Math.floor((this.timer - Math.floor(this.timer)) * 100);
-  //     const sec = Math.floor(this.timer) - Math.floor(this.timer / 60) * 60;
-  //     const min = Math.floor(this.timer / 60);
-  //     document.querySelector(`.${TIMER_MS_CLASS}`).
-  // textContent = msec < 10 ? `0${msec.toString()}` : msec;
-  //     document.querySelector(`.${TIMER_SEC_CLASS}`).
-  // textContent = sec < 10 ? `0${sec.toString()}` : sec;
-  //     document.querySelector(`.${TIMER_MIN_CLASS}`).
-  // textContent = min < 10 ? `0${min.toString()}` : min;
-  //   }
-
-  //   setSounds() {
-  //     this.audioBoom = new Audio(boom);
-  //     this.audioRemoveFlag = new Audio(deleteSound);
-  //     this.audioRightAnsw = new Audio(shortBell);
-  //     this.audioFlagged = new Audio(keyboard);
-  //     this.audioFirstClick = new Audio(choise);
-  //     this.audioWin = new Audio(audioEndLev);
-  //   }
-
   private startListners(): void {
     document.addEventListener('mouseover', this.playgrMousOverHandler);
-    document.addEventListener('mouseout', this.playghMousOutHandler);
-    this.editorInput.addEventListener('keypress', this.enterPressedHandler);
+    document.addEventListener('mouseout', this.playgrMousOutHandler);
     this.editorInput.addEventListener('keyup', this.inputKeyUpHendler);
-    this.enterBtn.addEventListener('click', this.inputCheckValue);
+    this.editorInput.addEventListener('keypress', this.enterPressedHandler);
+    document.addEventListener('click', this.clickHandler);
   }
 
-  //   endListners() {
-  //     document.removeEventListener('click', this.cellClickHandler);
-  //     document.removeEventListener('contextmenu', this.cellClickHandler);
-  //   }
+  private endListners(): void {
+    document.removeEventListener('mouseover', this.playgrMousOverHandler);
+    document.removeEventListener('mouseout', this.playgrMousOutHandler);
+    this.editorInput.removeEventListener('keyup', this.inputKeyUpHendler);
+    this.editorInput.removeEventListener('keypress', this.enterPressedHandler);
+    document.removeEventListener('click', this.clickHandler);
+  }
 
   private inputKeyUpHendler(): void {
     if (this.editorInput.value.length > 0) this.editorInput.classList.remove('input-want');
     else this.editorInput.classList.add('input-want');
+  }
+
+  private clickHandler(event: Event): void {
+    const target = event.target as HTMLElement;
+    console.log('target', target);
+    // console.log('curtarget', event.currentTarget);
+    if (target.closest(`.${LEVEL_MENU_WRAPPER_CLASS}`)) this.levelMenuClickHandler(target);
+    else if (!target.closest(`.${LEVEL_SIDE_WRAPPER_CLASS}`) && this.levelsSideWrapper.classList.contains(ACTIVE_CLASS)) this.closeLevelsMenu();
+    else if (target.closest(`.${ENTER_BTN_CLASS}`)) this.inputCheckValue();
+    else if (target.closest(`.${EDITORS_CLASS}`)) this.editorInput.focus();
+    else if (target.closest(`.${LEVELS_MENU_BTN_CLASS}`)) this.levelsMenuBtnClickHandler();
+  }
+
+  private levelsMenuBtnClickHandler(): void {
+    if (this.levelsSideWrapper.classList.contains(ACTIVE_CLASS)) {
+      this.closeLevelsMenu();
+    } else {
+      this.openLevelsMenu();
+    }
+  }
+
+  private async levelMenuClickHandler(target: HTMLElement): Promise<void> {
+    const chosenLevelNum = Number(target.closest(`[${ATTR_LEVEL_NUMBER}]`)?.getAttribute(ATTR_LEVEL_NUMBER)) || 0;
+    if (chosenLevelNum === this.levelNumber) return;
+    this.isGameFinished = false;
+    this.closeLevelsMenu();
+    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    this.setNewLevel(chosenLevelNum);
   }
 
   private enterPressedHandler(event: KeyboardEvent): void {
@@ -229,6 +209,8 @@ export class Playground {
   }
 
   private async inputCheckValue(): Promise<void> {
+    this.editorInput.focus();
+    if (this.isGameFinished) return;
     const { value } = this.editorInput;
     let answerElems: HTMLElement[] | null;
 
@@ -271,6 +253,7 @@ export class Playground {
     }
 
     const levelStatus = this.gameStatus[this.levelNumber];
+    if (!levelStatus) return;
 
     if (!isCorrectAnswer) {
       if (!levelStatus.levelFinished) levelStatus.mistakeCount += 1;
@@ -282,37 +265,16 @@ export class Playground {
     localStorage.setItem(STORAGE_GAME_STATUS, JSON.stringify(this.gameStatus));
   }
 
-  private resetAllStorage(): void {
+  private resetGameStatus(): void {
+    this.levelNumber = 0;
+    this.gameStatus = {};
+    localStorage.removeItem(STORAGE_GAME_STATUS);
+    this.isGameFinished = false;
 
+    [...document.body.querySelectorAll(`.${LEVEL_FINISHED_CLASS}`)].forEach((el) => el.classList.remove(LEVEL_FINISHED_CLASS));
+    this.setNewLevel(0);
+    this.closeLevelsMenu();
   }
-
-  // private saveDataToLocalStorage(): void {
-  //   // const oStorageHistory = {
-  //   //   0: {
-  //   //     finished: true,
-  //   //     cheat: false,
-  //   //     mistakes: 5,
-  //   //   },
-  //   // };
-  //   const storCells = [];
-  //   for (let x = 0; x < this.ROW_NUM; x += 1) {
-  //     storCells[x] = [];
-  //   }
-  //   const chbTheme = document.getElementById(THEME_SLIDER).checked;
-  //   const data = {
-  //     isSound: this.isSound,
-  //     isDarkTheme: chbTheme,
-  //     timer: gameTimer.timer,
-  //     ROW_NUM: this.ROW_NUM,
-  //     COL_NUM: this.COL_NUM,
-  //     MINE_NUM: this.MINE_NUM,
-  //     cells: storCells,
-  //     mines: this.mines,
-  //     flags: this.flags,
-  //     clicks: this.clicks,
-  //   };
-  //   localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(data));
-  // }
 
   private async removeWrongAnswerClass(): Promise<void> {
     await new Promise((resolve) => { setTimeout(resolve, 300); });
@@ -335,13 +297,14 @@ export class Playground {
       ansEl.classList.add('win');
     });
 
-    this.levelNumber += 1;
-    if (this.levelNumber >= gameLevels.length) {
-      this.gameOver();
-      return;
-    }
+    // this.levelNumber += 1;
+    // if (this.levelNumber >= gameLevels.length) {
+    //   this.finishGame();
+    //   return;
+    // }
     await new Promise((resolve) => { setTimeout(resolve, 300); });
-    this.setNewLevel();
+    this.updateLevelMenu(true);
+    this.setNewLevel(this.levelNumber + 1);
   }
 
   private async loose(answerElems: HTMLElement | null): Promise<void> {
@@ -353,6 +316,7 @@ export class Playground {
   }
 
   private playgrMousOverHandler(event: Event):void {
+    if (this.isGameFinished) return;
     let el = event.target as HTMLElement;
     if (el === this.playgroundElement || (!el.closest(`.${PLAYGROUND_CLASS}`) && !el.closest('.viewer-pre'))) return;
 
@@ -377,7 +341,8 @@ export class Playground {
     this.showHint(playEl);
   }
 
-  private playghMousOutHandler(event: Event):void {
+  private playgrMousOutHandler(event: Event):void {
+    if (this.isGameFinished) return;
     const elem = event.target as HTMLElement;
 
     if (elem === this.playgroundElement || (!elem.closest(`.${PLAYGROUND_CLASS}`) && !elem.closest('.html-viewer'))) return;
@@ -403,186 +368,39 @@ export class Playground {
     return tag.replace(regex, '');
   }
 
-  //   async cellClickHandler(event) {
-  //     const domCell = event.target.closest(CELL_TAG);
+  private finishGame(): void {
+    // this.cleanCurrentStatusData();
+    // this.endListners();
+    // gameTimer.stopTimer();
+    this.isGameFinished = true;
+  }
 
-  //     if (this.isGameFinished || !domCell || domCell.isOpened) return;
-
-  //     // if it's RIGHT CLICK:
-  //     if (event.type === 'contextmenu') {
-  //       event.preventDefault();
-  //       this.flagMarkClick(domCell);
-  //       this.saveDataToLocalStorage();
-  //       return;
-  //     }
-
-  //     if (domCell.isFlag) return;
-
-  //     const { x, y } = domCell;
-
-  //     document.querySelector(`.${CLICK_CLASS}`).textContent = ++this.clicks;
-
-  //     // to insert mines after FIRST CLICK
-  //     if (this.isFirstClick) {
-  //       if (this.isSound) this.audioFirstClick.play();
-  //       const isSaved = await this.firstClick(x, y);
-  //       this.saveDataToLocalStorage();
-  //       if (!isSaved) return;
-  //     }
-
-  //     // if it's MINE:
-  //     if (domCell.isMine) {
-  //       this.mineClick(domCell);
-  //       return;
-  //     }
-
-  //     const isWin = await this.openCell(x, y);
-  //     if (isWin) return;
-
-  //     if (this.isSound) this.audioRightAnsw.play();
-  //     this.flagCount();
-  //     this.saveDataToLocalStorage();
-  //   }
-
-  //   async firstClick(x, y) {
-  //     this.isFirstClick = false;
-  //     if (this.savingData) return true;
-  //     do {
-  //       this.appendPlayground();
-  //     } while (this.calcMinesAround(x, y) !== 0);
-
-  //     document.addEventListener('contextmenu', this.cellClickHandler);
-
-  //     this.flagCount();
-  //     await this.openCell(x, y);
-  //     gameTimer.startTimer(this.timer);
-  //     return false;
-  //   }
-
-  //   getLocalSavedWins() {
-  //     localStorage.getItem(LAST_WINS_KEY);
-  //   }
-
-  //   winClick(winCell) {
-  //     winCell.isWin();
-
-  //     const oSavingData = JSON.parse(localStorage.getItem(LAST_WINS_KEY)) || '';
-  //     let arrSavingData = Array.from(oSavingData);
-
-  //     const data = {
-  //       date: new Date(),
-  //       timer: gameTimer.timer.toFixed(1),
-  //       ROW_NUM: this.ROW_NUM,
-  //       COL_NUM: this.COL_NUM,
-  //       MINE_NUM: this.MINE_NUM,
-  //       clicks: this.clicks,
-  //     };
-  //     arrSavingData.push(data);
-  //     if (arrSavingData.length > 10) arrSavingData = arrSavingData.slice(-10);
-  //     localStorage.setItem(LAST_WINS_KEY, JSON.stringify(arrSavingData));
-
-  //     if (this.isSound) this.audioWin.play();
-  //     this.finishGame();
-  //     this.showEndText(true);
-  //   }
-
-  //   showEndText(isWin) {
-  //     const endTextDiv = generateDomElement(
-  //       'div',
-  //       isWin ? END_GAME_TEXT_WIN : END_GAME_TEXT_LOSE,
-  //       END_GAME_TEXT_CLASS,
-  //     );
-  //     document.body.append(endTextDiv);
-  //     document.addEventListener('click', () => endTextDiv.remove(), { once: true });
-  //   }
-
-  //   mineClick(cell) {
-  //     if (this.isSound) this.audioBoom.play();
-
-  //     cell.isBoom();
-  //     this.mines = this.mines.filter((id) => id !== cell.cellID);
-  //     this.finishGame();
-  //     this.showEndText(false);
-  //   }
-
-  //   flagMarkClick(cell) {
-  //     cell.changeFlag();
-  //     if (cell.isFlag) {
-  //       if (this.isSound) this.audioFlagged.play();
-  //       this.flags.push(cell.cellID);
-  //     } else {
-  //       if (this.isSound) this.audioRemoveFlag.play();
-  //       this.removeFlag(cell.cellID);
-  //     }
-  //     this.flagCount();
-  //   }
-
-  //   flagCount() {
-  //     document.querySelector(`.${COUNTER_CLASS}`)
-  // .textContent = this.MINE_NUM - this.flags.length;
-  //   }
-
-  //   removeFlag(flagId) {
-  //     this.flags = this.flags.filter((el) => el !== flagId);
-  //   }
-
-  //   cleanCurrentStatusData() {
-  //     localStorage.removeItem(LOCAL_DATA_KEY);
-  //   }
-
-  //   finishGame() {
-  //     this.cleanCurrentStatusData();
-  //     this.endListners();
-  //     gameTimer.stopTimer();
-  //     this.isGameFinished = true;
-
-  //     // show all mines except boom one
-  //     this.mines.forEach((id) => {
-  //       const [x, y] = id.split('-');
-  //       const domCell = this.cells[x][y];
-  //       domCell.showMine();
-
-  //       // if cell marked with correct flag
-  //       if (this.flags.indexOf(id) !== -1) {
-  //         this.removeFlag(id);
-  //         domCell.isCorrectFlag(true);
-  //       }
-  //     });
-  //     // show incorrect flags
-  //     this.flags.forEach((id) => {
-  //       const [x, y] = id.split('-');
-  //       this.cells[x][y].isCorrectFlag(false);
-  //     });
-  //   }
-
-  //   getCellSize() {
-  //     const w = 90 / this.COL_NUM;
-  //     const h = 70 / this.ROW_NUM;
-  //     const rat = window.innerWidth / window.innerHeight;
-
-  //     return { numb: Math.min(w, h).toFixed(2), ext: rat < 1 ? 'vw' : 'vh' };
-  //   }
-
-  private setNewLevel(): void {
+  private async setNewLevel(levelNumber: number): Promise<void> {
+    let levNumber = levelNumber;
     this.cleanPage();
     this.isCheat = false;
-    if (this.levelNumber < 0 || this.levelNumber >= gameLevels.length) {
-      this.levelNumber = 0;
+    if (levNumber >= gameLevels.length) {
+      this.finishGame();
+      return;
     }
-    // hideTooltip();
-    this.level = gameLevels[this.levelNumber];
-    localStorage.setItem(STORAGE_LEVEL_NUMBER, `${this.levelNumber}`);
-    // $(".level-menu .current").removeClass("current");
-    // $(".level-menu div a").eq(this.levelNumber).addClass("current");
-    // var percent = (this.levelNumber+1)/gameLevels.length * 100;
+    if (levNumber < 0) levNumber = 0;
+    this.level = gameLevels[levNumber];
+    localStorage.setItem(STORAGE_LEVEL_NUMBER, `${levNumber}`);
+    [...this.levelsMenuWrapper.querySelectorAll(`.${ACTIVE_LEVEL_CLASS}`)].forEach((el) => el.classList.remove(ACTIVE_LEVEL_CLASS));
+    const selector = `[${ATTR_LEVEL_NUMBER}="${levNumber}"]`;
+    const e = this.levelsMenuWrapper.querySelector(selector);
+    this.levelsMenuWrapper.querySelector(`[${ATTR_LEVEL_NUMBER}="${levNumber}"]`)?.classList.add(ACTIVE_LEVEL_CLASS);
+    // var percent = (levNumber+1)/gameLevels.length * 100;
     // $(".progress").css("width",percent + "%");
     // loadBoard();
     // resetTable();
+    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    this.levelNumber = levNumber;
     this.h1.textContent = this.level.levelH1;
     this.playgroundElement.insertAdjacentHTML('afterbegin', this.level.levelTask);
     this.rightElements = [...this.playgroundElement
       .querySelectorAll(this.level.levelRightAnswer)] as HTMLElement[];
-    this.sideTitle.textContent = `Level ${this.levelNumber + 1} of ${gameLevels.length}`;
+    this.sideTitle.textContent = `Level ${levNumber + 1} of ${gameLevels.length}`;
     this.sideLearnSelector.textContent = this.level.levelDescr;
     this.sideLearnTitle.textContent = this.level.learnTitle;
     this.sideLearnSintaxis.innerHTML = this.level.learnSelector;
@@ -594,14 +412,12 @@ export class Playground {
       this.viewerPre.append(divWrapped);
     });
     this.rightElements.forEach((el) => el.setAttribute('twist', ''));
-    // updateProgressUI(this.levelNumber, checkCompleted(this.levelNumber));
-    // $('.input-wrapper').css('opacity', 1);
-    // $('.result').text('');
-    // Strobe what's supposed to be selected
-    // setTimeout(() => {
-    //   $(`.table ${level.selector}`).addClass('strobe');
-    //   $('.pop').removeClass('pop');
-    // }, 200);
+    this.updateLevelMenu(this.isLevelFinished(levNumber));
+  }
+
+  private isLevelFinished(levelNumb = this.levelNumber): boolean {
+    return !!((this.gameStatus[levelNumb] && this.gameStatus[levelNumb]?.levelFinished));
+    // return !((this.gameStatus[levelNumb] && this.gameStatus[levelNumb]?.levelFinished));
   }
 
   private cleanPage(): void {
@@ -621,13 +437,10 @@ export class Playground {
     this.h1 = document.body.querySelector('h1') as HTMLElement;
     // this.h1.textContent = this.level.levelH1;
 
-    const playgrElem = generateDomElement('div', '', null, PLAYGROUND_CLASS);
+    this.playgroundElement = generateDomElement('div', '', null, PLAYGROUND_CLASS);
 
-    this.playgroundElement = this.savingData
-      ? this.makePlaygrFromSavingData(playgrElem) : playgrElem;
-
-    const main = document.querySelector(`.${MAIN_CLASS}`) as HTMLElement;
-    main.append(this.playgroundElement);
+    this.mainSection = document.querySelector(`.${MAIN_CLASS}`) as HTMLElement;
+    document.querySelector(`.${GAME_WRAPPER_CLASS}`)?.append(this.playgroundElement);
     // this.playgroundElement.insertAdjacentHTML('afterbegin', this.level.levelTask);
     this.playgroundHint = generateDomElement('div', '', document.body, 'playground-hint');
 
@@ -635,39 +448,8 @@ export class Playground {
     //   .querySelectorAll(this.level.levelRightAnswer)] as HTMLElement[];
   }
 
-  private makePlayground(): void {
-    // const playgrElem = generateDomElement('div', '', PLAYGROUND_CLASS);
-
-    // if saving data alredy exists in local storage
-    // if (this.savingData) {
-    //   this.playgroundElement = this.makePlaygrFromSavingData(playgrElem);
-    // }
-    // this.playgroundElement = playgrElem;
-    // this.playgroundElement.append('beforebegin', this.level.levelTask);
-    // return playgrElem;
-  }
-
-  private makePlaygrFromSavingData(playgrElem: HTMLElement): HTMLElement {
-    // const oCellSize = this.getCellSize();
-
-    // for (let x = 0; x < this.ROW_NUM; x += 1) {
-    //   const cellRow = generateDomElement(CELL_ROW_TAG, '', CELL_ROW_CLASS);
-
-    //   for (let y = 0; y < this.COL_NUM; y += 1) {
-    //     const cell = this.cells[x][y];
-    //     cell.style.width = oCellSize.numb + oCellSize.ext;
-    //     cell.style.height = oCellSize.numb + oCellSize.ext;
-    //     cell.style.fontSize = oCellSize.numb * FONT_RATIO + oCellSize.ext;
-
-    //     cellRow.append(this.cells[x][y]);
-    //   }
-    //   playgrElem.append(cellRow);
-    // }
-    return playgrElem;
-  }
-
   private appendEditor(): void {
-    this.editors = document.querySelector('.editors') as HTMLDivElement;
+    this.editors = document.querySelector(`.${EDITORS_CLASS}`) as HTMLDivElement;
     if (!this.editors) return;
     const editorWrap = this.editors.querySelector(`.${EDITOR_CLASS}`) as HTMLDivElement;
     const editorHeader = generateDomElement('div', '', editorWrap, 'editor-header');
@@ -682,7 +464,7 @@ export class Playground {
     const inputWrapper = generateDomElement('div', '', editorInfoField, 'input-wrapper');
     this.editorInput = generateDomElement('input', '', inputWrapper, 'editor-input', 'input-want');
     this.editorInput.placeholder = 'Tipe in a CSS selector';
-    this.enterBtn = generateDomElement('div', 'Enter', inputWrapper, 'enter-btn');
+    this.enterBtn = generateDomElement('div', 'Enter', inputWrapper, ENTER_BTN_CLASS);
     const editorInfoPre = generateDomElement('div', '', editorInfoField, 'editor-info__pre');
     editorInfoPre.innerHTML = EDITOR_INFO_TEXT;
 
@@ -694,6 +476,7 @@ export class Playground {
 
     const sideHeader = generateDomElement('div', '', rightAside, 'side-header');
     this.sideTitle = generateDomElement('h2', '', sideHeader, 'side-title');
+    this.sideTitleCompleteMark = generateDomElement('span', '', sideHeader, 'title-finish-mark');
     const sideNav = generateDomElement('nav', '', sideHeader, 'side-header__nav');
 
     this.sideNavPrev = generateDomElement('div', '', sideNav, 'nav-prev');
@@ -791,4 +574,80 @@ export class Playground {
   //   };
   //   return text.replace(/[&<>"']/g, (m) => map[m]);
   // }
+
+  // --------------===========LEVELS RIGHT MENU =========-----------
+
+  private makeLevelsMenu(): void {
+    const header = document.body.querySelector('header');
+    this.levelsSideWrapper = generateDomElement('aside', '', this.mainSection, LEVEL_SIDE_WRAPPER_CLASS);
+    generateDomElement('h2', 'Choose a level', this.levelsSideWrapper);
+    this.levelsMenuWrapper = generateDomElement('div', '', this.levelsSideWrapper, LEVEL_MENU_WRAPPER_CLASS);
+    this.levelsResetBtn = generateDomElement('div', '', this.levelsSideWrapper, LEVEL_RESET_BTN_CLASS);
+    this.levelsMenuBtn = generateDomElement('div', '', header, LEVELS_MENU_BTN_CLASS);
+    generateDomElement('div', '', this.levelsMenuBtn, LEVELS_MENU_BTN_IMG_CLASS);
+    this.makeLevelsList();
+  }
+
+  private updateLevelMenu(isLevelFinished: boolean): void {
+    if (isLevelFinished) {
+      this.levelsMenuWrapper.querySelector(`div:nth-child(${this.levelNumber + 1})`)?.classList.add(LEVEL_FINISHED_CLASS);
+      this.sideTitleCompleteMark.classList.add(LEVEL_FINISHED_CLASS);
+    } else {
+      this.sideTitleCompleteMark.classList.remove(LEVEL_FINISHED_CLASS);
+    }
+  }
+
+  private makeLevelsList(): void {
+    for (let n = 0; n < gameLevels.length; n += 1) {
+      const wrapper = generateDomElement('div', '', this.levelsMenuWrapper);
+      wrapper.setAttribute(ATTR_LEVEL_NUMBER, `${n}`);
+      generateDomElement('span', '', wrapper, SIDE_LEVEL_CHECK_CLASS);
+      generateDomElement('span', `${n + 1}`, wrapper, SIDE_LEVEL_NUMBER_CLASS);
+      generateDomElement('span', gameLevels[n].learnSelector, wrapper);
+
+      if (this.isLevelFinished(n)) wrapper.classList.add(LEVEL_FINISHED_CLASS);
+    }
+  }
+
+  private closeLevelsMenu(): void {
+    document.body.classList.remove(ACTIVE_MENU_CLASS);
+    this.levelsMenuBtn.classList.remove(ACTIVE_CLASS);
+    this.levelsSideWrapper.classList.remove(ACTIVE_CLASS);
+  }
+
+  private openLevelsMenu(): void {
+    document.body.classList.add(ACTIVE_MENU_CLASS);
+    this.levelsMenuBtn.classList.add(ACTIVE_CLASS);
+    this.levelsSideWrapper.classList.add(ACTIVE_CLASS);
+  }
+
+  // $(".level-nav").on("click","a",function(){
+
+  //   var direction;
+  //   if($(this).hasClass("next")) {
+  //     direction = "next";
+  //   }
+
+  //   addAnimation($(this),"link-jiggle");
+
+  //   if(direction == "next") {
+  //     currentLevel++;
+  //     if(currentLevel >= levels.length) {
+  //       currentLevel = levels.length - 1;
+  //     }
+  //   } else {
+  //     currentLevel--;
+  //     if(currentLevel < 0) {
+  //       currentLevel = 0;
+  //     }
+  //   }
+
+  //   this.setNewLevel();
+  //   return false;
+  // });
+  // $(window).on("keydown",function(e){
+  //   if(e.keyCode == 27) {
+  //     closeLevelsMenu();
+  //   }
+  // });
 }

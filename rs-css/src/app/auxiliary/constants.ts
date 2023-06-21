@@ -1,4 +1,20 @@
 export const constants = {
+  ACTIVE_CLASS: 'active',
+  ACTIVE_MENU_CLASS: 'active-menu',
+  ACTIVE_LEVEL_CLASS: 'active-level',
+  SIDE_LEVEL_CHECK_CLASS: 'level-check',
+  SIDE_LEVEL_NUMBER_CLASS: 'level-number',
+
+  LEVEL_MENU_WRAPPER_CLASS: 'level-menu-wrapper',
+  LEVEL_SIDE_WRAPPER_CLASS: 'level-side-wrapper',
+  LEVEL_RESET_BTN_CLASS: 'level-reset-btn',
+  LEVELS_MENU_BTN_CLASS: 'level-menu-btn',
+  LEVELS_MENU_BTN_IMG_CLASS: 'level-menu-btn-img',
+  LEVEL_FINISHED_CLASS: 'finished',
+  ENTER_BTN_CLASS: 'enter-btn',
+  EDITORS_CLASS: 'editors',
+  ATTR_LEVEL_NUMBER: 'data-level-number',
+
   COUNTER_WRAPPER_CLASS: 'info-section__counter-wrapper',
   COUNTER_TITLE_CLASS: 'counter-wrapper__title',
   COUNTER_CLASS: 'info-section__counter',
@@ -31,7 +47,8 @@ export const constants = {
     Ex &rarr; "5" for level 5<br>
   */
 `,
-  MAIN_CLASS: 'game-wrapper',
+  GAME_WRAPPER_CLASS: 'game-wrapper',
+  MAIN_CLASS: 'main',
   PLAYGROUND_TAG: 'div',
   PLAYGROUND_CLASS: 'table-wrapper',
   SETTINGS_BTN_CLASS: 'info-section__settings-btn',

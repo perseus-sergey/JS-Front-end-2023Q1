@@ -1,4 +1,4 @@
-interface ILevelInfo {
+export interface ILevelInfo {
   levelFinished: boolean,
   cheat: boolean,
   mistakeCount: number,
