@@ -1,20 +1,7 @@
-// import Cell from './Cell';
-// import { constants, menuClasses } from './constants';
-// import { gameTimer } from './gameTimer';
-// import { gameLevel } from './Level';
-// import { generateDomElement } from './utilities';
-
 import { constants } from './auxiliary/constants';
 import { ILevel, IUserStatus } from './auxiliary/types';
 import { generateDomElement } from './auxiliary/utilites';
 import { gameLevels } from './Levels';
-
-// import boom from '../assets/sounds/boom.wav';
-// import audioEndLev from '../assets/sounds/end-level.wav';
-// import deleteSound from '../assets/sounds/delete.wav';
-// import choise from '../assets/sounds/choise.wav';
-// import keyboard from '../assets/sounds/keyboard.wav';
-// import shortBell from '../assets/sounds/upali-dengi-na-igrovoy-schet.wav';
 
 const {
   ACTIVE_CLASS,
@@ -24,7 +11,7 @@ const {
   SIDE_LEVEL_NUMBER_CLASS,
   ENTER_BTN_CLASS,
   CHEAT_BTN_CLASS,
-  TYPING_INPUT,
+  LEVEL_CHEATED_CLASS,
   BLINKING_INPUT,
   EDITORS_CLASS,
   LEVEL_MENU_WRAPPER_CLASS,
@@ -35,47 +22,26 @@ const {
   LEVEL_FINISHED_CLASS,
   GAME_WRAPPER_CLASS,
   LEVELS_MENU_BTN_CLASS,
-  COUNTER_CLASS,
-  CLICK_CLASS,
-  CELL_ROW_TAG,
-  CELL_ROW_CLASS,
-  CELL_TAG,
-  END_GAME_TEXT_CLASS,
-  END_GAME_TEXT_WIN,
-  END_GAME_TEXT_LOSE,
-  FONT_RATIO,
   STORAGE_LEVEL_NUMBER,
   STORAGE_GAME_STATUS,
   WRONG_ANSWER_CLASS,
-  LAST_WINS_KEY,
-  LOCAL_DATA_KEY,
   EDITOR_INFO_TEXT,
   MAIN_CLASS,
   EDITOR_CLASS,
-  VIEWER_CLASS,
-  PLAYGROUND_TAG,
   PLAYGROUND_CLASS,
-  // TIMER_MS_CLASS,
-  // TIMER_SEC_CLASS,
-  // TIMER_MIN_CLASS,
 } = constants;
 
-// const { SOUND_SLIDER, THEME_SLIDER } = menuClasses;
-
 export class Playground {
-  constructor(private level: ILevel = gameLevels[11], private savingData = '', public isSound = true) {
-    // this.savingData = savingData;
-    // this.isSound = isSound;
-    // this.setSounds();
-    // this.getSavingData(savingData);
+  constructor() {
     this.playgrMousOverHandler = this.playgrMousOverHandler.bind(this);
     this.playgrMousOutHandler = this.playgrMousOutHandler.bind(this);
     this.enterPressedHandler = this.enterPressedHandler.bind(this);
     this.inputKeyUpHendler = this.inputKeyUpHendler.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
-    // this.mediaQueryHandler = this.mediaQueryHandler.bind(this);
-    this.start();
+    // this.start();
   }
+
+  private level!: ILevel;
 
   private h1!: HTMLElement;
 
@@ -103,17 +69,9 @@ export class Playground {
 
   private sideTitleCompleteMark!: HTMLInputElement;
 
-  private sideNavPrev!: HTMLInputElement;
-
   private levelsSideWrapper!: HTMLInputElement;
 
   private levelsMenuWrapper!: HTMLInputElement;
-
-  private levelsResetBtn!: HTMLInputElement;
-
-  private sideNavNext!: HTMLInputElement;
-
-  private sideProgress!: HTMLInputElement;
 
   private sideLearnSelector!: HTMLInputElement;
 
@@ -135,11 +93,7 @@ export class Playground {
 
   private isGameFinished = false;
 
-  //   isSound = true;
-
-  //   isDarkTheme = true;
-
-  private start(): void {
+  public start(): void {
     this.appendPlayground();
     this.appendEditor();
     this.appendViewer();
@@ -184,7 +138,6 @@ export class Playground {
   private clickHandler(event: Event): void {
     const target = event.target as HTMLElement;
     console.log('target', target);
-    // console.log('curtarget', event.currentTarget);
     if (target.closest(`.${LEVEL_MENU_WRAPPER_CLASS}`)) this.levelMenuClickHandler(target);
     else if (target.closest(`.${LEVEL_RESET_BTN_CLASS}`)) this.resetGameStatus();
     else if (!target.closest(`.${LEVEL_SIDE_WRAPPER_CLASS}`) && this.levelsSideWrapper.classList.contains(ACTIVE_CLASS)) this.closeLevelsMenu();
@@ -300,8 +253,12 @@ export class Playground {
     this.gameStatus = {};
     localStorage.removeItem(STORAGE_GAME_STATUS);
     this.isGameFinished = false;
+    this.isCheat = false;
 
-    [...document.body.querySelectorAll(`.${LEVEL_FINISHED_CLASS}`)].forEach((el) => el.classList.remove(LEVEL_FINISHED_CLASS));
+    [...document.body.querySelectorAll(`.${LEVEL_FINISHED_CLASS},.${LEVEL_CHEATED_CLASS}`)].forEach((el) => {
+      el.classList.remove(LEVEL_FINISHED_CLASS);
+      el.classList.remove(LEVEL_CHEATED_CLASS);
+    });
     this.setNewLevel(0);
     this.closeLevelsMenu();
   }
@@ -326,14 +283,8 @@ export class Playground {
       await new Promise((resolve) => { setTimeout(resolve, 30); });
       ansEl.classList.add('win');
     });
-
-    // this.levelNumber += 1;
-    // if (this.levelNumber >= gameLevels.length) {
-    //   this.finishGame();
-    //   return;
-    // }
     await new Promise((resolve) => { setTimeout(resolve, 300); });
-    this.updateLevelMenu(true);
+    this.updateLevelMenu(true, this.isCheat);
     this.setNewLevel(this.levelNumber + 1);
   }
 
@@ -362,7 +313,6 @@ export class Playground {
     } else if (el.closest('.viewer-pre')) {
       el = el.closest('div') as Element;
       indx = viewElements.indexOf(el);
-      // indx = viewElements.indexOf(el);
       equalEl = playgrElmnts[indx];
       playEl = equalEl;
     } else return;
@@ -399,16 +349,12 @@ export class Playground {
   }
 
   private finishGame(): void {
-    // this.cleanCurrentStatusData();
-    // this.endListners();
-    // gameTimer.stopTimer();
     this.isGameFinished = true;
   }
 
   private async setNewLevel(levelNumber: number): Promise<void> {
     let levNumber = levelNumber;
     this.cleanPage();
-    // this.isCheat = false;
     if (levNumber >= gameLevels.length) {
       this.finishGame();
       return;
@@ -417,13 +363,9 @@ export class Playground {
     this.level = gameLevels[levNumber];
     localStorage.setItem(STORAGE_LEVEL_NUMBER, `${levNumber}`);
     [...this.levelsMenuWrapper.querySelectorAll(`.${ACTIVE_LEVEL_CLASS}`)].forEach((el) => el.classList.remove(ACTIVE_LEVEL_CLASS));
-    const selector = `[${ATTR_LEVEL_NUMBER}="${levNumber}"]`;
-    const e = this.levelsMenuWrapper.querySelector(selector);
     this.levelsMenuWrapper.querySelector(`[${ATTR_LEVEL_NUMBER}="${levNumber}"]`)?.classList.add(ACTIVE_LEVEL_CLASS);
-    // var percent = (levNumber+1)/gameLevels.length * 100;
-    // $(".progress").css("width",percent + "%");
-    // loadBoard();
-    // resetTable();
+    // const attrEl = this.levelsMenuWrapper.querySelector(`[${ATTR_LEVEL_NUMBER}="${levNumber}"]`);
+    // if(attributedEl) attributedEl.closest('div')?.classList.add(ACTIVE_LEVEL_CLASS);
     await new Promise((resolve) => { setTimeout(resolve, 300); });
     this.levelNumber = levNumber;
     this.h1.textContent = this.level.levelH1;
@@ -442,12 +384,15 @@ export class Playground {
       this.viewerPre.append(divWrapped);
     });
     this.rightElements.forEach((el) => el.setAttribute('twist', ''));
-    this.updateLevelMenu(this.isLevelFinished(levNumber));
+    this.updateLevelMenu(this.isLevelFinished(levNumber), this.isLevelCheated(levNumber));
   }
 
   private isLevelFinished(levelNumb = this.levelNumber): boolean {
     return !!((this.gameStatus[levelNumb] && this.gameStatus[levelNumb]?.levelFinished));
-    // return !((this.gameStatus[levelNumb] && this.gameStatus[levelNumb]?.levelFinished));
+  }
+
+  private isLevelCheated(levelNumb = this.levelNumber): boolean {
+    return !!((this.gameStatus[levelNumb] && this.gameStatus[levelNumb]?.cheat));
   }
 
   private cleanPage(): void {
@@ -465,17 +410,12 @@ export class Playground {
     if (domPlayground) domPlayground.remove();
 
     this.h1 = document.body.querySelector('h1') as HTMLElement;
-    // this.h1.textContent = this.level.levelH1;
 
     this.playgroundElement = generateDomElement('div', '', null, PLAYGROUND_CLASS);
 
     this.mainSection = document.querySelector(`.${MAIN_CLASS}`) as HTMLElement;
     document.querySelector(`.${GAME_WRAPPER_CLASS}`)?.append(this.playgroundElement);
-    // this.playgroundElement.insertAdjacentHTML('afterbegin', this.level.levelTask);
     this.playgroundHint = generateDomElement('div', '', document.body, 'playground-hint');
-
-    // this.rightElements = [...this.playgroundElement
-    //   .querySelectorAll(this.level.levelRightAnswer)] as HTMLElement[];
   }
 
   private appendEditor(): void {
@@ -510,11 +450,11 @@ export class Playground {
     this.sideTitleCompleteMark = generateDomElement('span', '', sideHeader, 'title-finish-mark');
     const sideNav = generateDomElement('nav', '', sideHeader, 'side-header__nav');
 
-    this.sideNavPrev = generateDomElement('div', '', sideNav, 'nav-prev');
-    this.sideNavNext = generateDomElement('div', '', sideNav, 'nav-next');
+    generateDomElement('div', '', sideNav, 'nav-prev');
+    generateDomElement('div', '', sideNav, 'nav-next');
 
     const progressWrapper = generateDomElement('div', '', rightAside, 'side-progress-wrap');
-    this.sideProgress = generateDomElement('div', '', progressWrapper, 'side-progress');
+    generateDomElement('div', '', progressWrapper, 'side-progress');
 
     this.learnWrapper = generateDomElement('div', '', rightAside, 'side-learn-wrap');
     this.sideLearnSelector = generateDomElement('h3', '', this.learnWrapper, 'side-learn-selector');
@@ -550,17 +490,8 @@ export class Playground {
     }
 
     const viewerInfoField = generateDomElement('div', '', viewerField, 'viewer-info');
-    // const viewerInfoPre = generateDomElement('pre', '', viewerInfoField);
 
     this.viewerPre = generateDomElement('div', '', viewerInfoField, 'viewer-pre');
-
-    // const tableElmts = [...this.playgroundElement.children] as HTMLElement[];
-
-    // tableElmts.forEach((el) => {
-    //   const divWrapped = this.wrapToDiv(el);
-    //   this.viewerPre.append(divWrapped);
-    // });
-    // this.rightElements.forEach((el) => el.setAttribute('twist', ''));
   }
 
   private wrapToDiv(elem: HTMLElement): HTMLElement {
@@ -572,7 +503,6 @@ export class Playground {
       attrStr += `${this.spanWrap('hl-attr-name', ` ${attr.name}=`)}"${this.spanWrap('hl-attr-value', `${attr.value}`)}"`;
     });
 
-    // const separ = attrStr ? '' : '';
     const childLen = elem.children.length;
     const wrapStartDivText = this.spanWrap('hl-tag', '&lt;') + this.spanWrap('hl-tag-name', tagName) + attrStr + this.spanWrap('hl-tag', '&gt;');
     const wrapEndDivText = this.spanWrap('hl-tag', '&lt;/') + this.spanWrap('hl-tag-name', tagName) + this.spanWrap('hl-tag', '&gt;');
@@ -594,18 +524,6 @@ export class Playground {
     return `<span class="${className}">${str}</span>`;
   }
 
-  // https://stackoverflow.com/questions/1787322/what-is-the-htmlspecialchars-equivalent-in-javascript
-  // private escapeHtml(text:string): string {
-  //   const map: { [key: string]: string } = {
-  //     '&': '&amp;',
-  //     '<': '&lt;',
-  //     '>': '&gt;',
-  //     '"': '&quot;',
-  //     "'": '&#039;',
-  //   };
-  //   return text.replace(/[&<>"']/g, (m) => map[m]);
-  // }
-
   // --------------===========LEVELS RIGHT MENU =========-----------
 
   private makeLevelsMenu(): void {
@@ -613,15 +531,23 @@ export class Playground {
     this.levelsSideWrapper = generateDomElement('aside', '', this.mainSection, LEVEL_SIDE_WRAPPER_CLASS);
     generateDomElement('h2', 'Choose a level', this.levelsSideWrapper);
     this.levelsMenuWrapper = generateDomElement('div', '', this.levelsSideWrapper, LEVEL_MENU_WRAPPER_CLASS);
-    this.levelsResetBtn = generateDomElement('button', 'RESET', this.levelsSideWrapper, LEVEL_RESET_BTN_CLASS);
+    generateDomElement('button', 'RESET', this.levelsSideWrapper, LEVEL_RESET_BTN_CLASS);
     this.levelsMenuBtn = generateDomElement('div', '', header, LEVELS_MENU_BTN_CLASS);
     generateDomElement('div', '', this.levelsMenuBtn, LEVELS_MENU_BTN_IMG_CLASS);
     this.makeLevelsList();
   }
 
-  private updateLevelMenu(isLevelFinished: boolean): void {
+  private updateLevelMenu(isLevelFinished: boolean, isCheated: boolean): void {
+    const selector = `div:nth-child(${this.levelNumber + 1}) .${SIDE_LEVEL_CHECK_CLASS}`;
+    if (isCheated) {
+      this.levelsMenuWrapper.querySelector(selector)?.classList.add(LEVEL_CHEATED_CLASS);
+      this.sideTitleCompleteMark.classList.add(LEVEL_CHEATED_CLASS);
+      return;
+    }
+    this.sideTitleCompleteMark.classList.remove(LEVEL_CHEATED_CLASS);
+
     if (isLevelFinished) {
-      this.levelsMenuWrapper.querySelector(`div:nth-child(${this.levelNumber + 1})`)?.classList.add(LEVEL_FINISHED_CLASS);
+      this.levelsMenuWrapper.querySelector(selector)?.classList.add(LEVEL_FINISHED_CLASS);
       this.sideTitleCompleteMark.classList.add(LEVEL_FINISHED_CLASS);
     } else {
       this.sideTitleCompleteMark.classList.remove(LEVEL_FINISHED_CLASS);
@@ -632,11 +558,12 @@ export class Playground {
     for (let n = 0; n < gameLevels.length; n += 1) {
       const wrapper = generateDomElement('div', '', this.levelsMenuWrapper);
       wrapper.setAttribute(ATTR_LEVEL_NUMBER, `${n}`);
-      generateDomElement('span', '', wrapper, SIDE_LEVEL_CHECK_CLASS);
+      const checkMark = generateDomElement('span', '', wrapper, SIDE_LEVEL_CHECK_CLASS);
       generateDomElement('span', `${n + 1}`, wrapper, SIDE_LEVEL_NUMBER_CLASS);
       generateDomElement('span', gameLevels[n].learnSelector, wrapper);
 
-      if (this.isLevelFinished(n)) wrapper.classList.add(LEVEL_FINISHED_CLASS);
+      if (this.isLevelFinished(n)) checkMark.classList.add(LEVEL_FINISHED_CLASS);
+      if (this.isLevelCheated(n)) checkMark.classList.add(LEVEL_CHEATED_CLASS);
     }
   }
 
@@ -651,34 +578,4 @@ export class Playground {
     this.levelsMenuBtn.classList.add(ACTIVE_CLASS);
     this.levelsSideWrapper.classList.add(ACTIVE_CLASS);
   }
-
-  // $(".level-nav").on("click","a",function(){
-
-  //   var direction;
-  //   if($(this).hasClass("next")) {
-  //     direction = "next";
-  //   }
-
-  //   addAnimation($(this),"link-jiggle");
-
-  //   if(direction == "next") {
-  //     currentLevel++;
-  //     if(currentLevel >= levels.length) {
-  //       currentLevel = levels.length - 1;
-  //     }
-  //   } else {
-  //     currentLevel--;
-  //     if(currentLevel < 0) {
-  //       currentLevel = 0;
-  //     }
-  //   }
-
-  //   this.setNewLevel();
-  //   return false;
-  // });
-  // $(window).on("keydown",function(e){
-  //   if(e.keyCode == 27) {
-  //     closeLevelsMenu();
-  //   }
-  // });
 }

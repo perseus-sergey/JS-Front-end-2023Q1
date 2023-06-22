@@ -29,15 +29,14 @@ enum Things {
 const {
   CARPET,
   PLATE,
-  BREAD,
   CUCUMBER,
   APPLE,
 } = Things;
 
-interface Service {
+interface IService {
   things: Things[][];
 
 }
-const service: Service = {
+const service: IService = {
   things: [[CARPET, PLATE, CUCUMBER], [CARPET, PLATE, APPLE]],
 };

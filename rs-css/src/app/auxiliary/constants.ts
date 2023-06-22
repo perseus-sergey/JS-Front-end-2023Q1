@@ -11,6 +11,7 @@ export const constants = {
   LEVELS_MENU_BTN_CLASS: 'level-menu-btn',
   LEVELS_MENU_BTN_IMG_CLASS: 'level-menu-btn-img',
   LEVEL_FINISHED_CLASS: 'finished',
+  LEVEL_CHEATED_CLASS: 'cheated',
   ENTER_BTN_CLASS: 'enter-btn',
   CHEAT_BTN_CLASS: 'cheat-btn',
   EDITORS_CLASS: 'editors',
@@ -46,8 +47,8 @@ export const constants = {
   }<br>
 <br>
   /*<br>
-    Type a number to skip to a level.<br>
-    Ex &rarr; "5" for level 5<br>
+    If you need help, <br>
+    Click on the button below.<br>
   */
 `,
   GAME_WRAPPER_CLASS: 'game-wrapper',
@@ -58,56 +59,4 @@ export const constants = {
   SETTINGS_BTN: '➠',
   START_BTN_CLASS: 'start-btn',
   THEME_LIGHT: 'theme-light',
-  // TIMER_CLASS: 'info-section__timer',
-  // TIMER_MS_CLASS: 'info-section__timer-ms',
-  // TIMER_SEC_CLASS: 'info-section__timer-sec',
-  // TIMER_MIN_CLASS: 'info-section__timer-min',
-};
-
-export const menuClasses = {
-  NAV_MENU: 'nav-menu',
-  MENU_OVERLAY: 'menu-overlay',
-  NAV_MENU_ACTIVE: 'nav_active',
-  NAV_MENU_WRAPPER: 'nav-menu__wrapper',
-  NAV_CLOSE_BTN: '✖',
-  NAV_CLOSE_BTN_CLASS: 'nav-menu__close-btn',
-  MENU_TITLE: 'nav-menu__title',
-  MENU_TITLE_SCORE: 'title_score',
-  SLIDER_WRAPPER: 'nav-slider-wrapper',
-  WRAPPER_THEME: 'wrapper_theme',
-  WRAPPER_SOUND: 'wrapper_sound',
-  THEME_SLIDER: 'theme-slider',
-  SOUND_SLIDER: 'sound-slider',
-  MENU_LEVEL: 'menu-level',
-  // LEVEL_ID_EASY: 'level-easy',
-  // LEVEL_ID_MEDIUM: 'level-medium',
-  // LEVEL_ID_HARD: 'level-hard',
-  // LEVEL_ID_CUSTOM: 'level-custom',
-  // CUSTOM_LEVEL_WRAP_CLASS: 'level-custom-wrapper',
-  // CUSTOM_COLUMN_VAL: 'custom-column-val',
-  // CUSTOM_ROW_VAL: 'custom-row-val',
-  // CUSTOM_ROW_MAX: 30,
-  // CUSTOM_ROW_MIN: 5,
-  // CUSTOM_COLUMN_MAX: 30,
-  // CUSTOM_COLUMN_MIN: 5,
-  // CUSTOM_MINE_RATIO_MIN: 0.05,
-  // CUSTOM_MINE_RATIO_MAX: 0.5,
-  // CUSTOM_MINES_VAL: 'custom-mines-val',
-  // CUSTOM_DONE_BTN: 'custom-done-btn',
-  // CUSTOM_LEVEL_FORM: 'custom-level-form',
-  WRONG_INPUT: 'wrong-input',
-};
-
-export const modalConst = {
-  MODAL_OVERLAY: 'modal-overlay',
-  MODAL_CLASS: 'modal-score',
-  MODAL_TITLE: 'modal-score-title',
-  MODAL_SCORE_TBL: 'modal-score-tbl',
-  MODAL_RESULT_TITLES: 'score-tbl-titles',
-  // RESULT_TITLE_DATE: 'Date',
-  // RESULT_TITLE_SIZE: 'Size',
-  // RESULT_TITLE_MINES: 'Mines',
-  // RESULT_TITLE_TIME: 'Time',
-  // RESULT_TITLE_CLICKS: 'Clicks',
-  // MODAL_RESULT_ROW: 'score-tbl-results',
 };

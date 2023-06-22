@@ -40,3 +40,14 @@ export class CreateElement<T extends HTMLElement> {
     this.element.textContent = this.innerText;
   }
 }
+// https://stackoverflow.com/questions/1787322/what-is-the-htmlspecialchars-equivalent-in-javascript
+// private escapeHtml(text:string): string {
+//   const map: { [key: string]: string } = {
+//     '&': '&amp;',
+//     '<': '&lt;',
+//     '>': '&gt;',
+//     '"': '&quot;',
+//     "'": '&#039;',
+//   };
+//   return text.replace(/[&<>"']/g, (m) => map[m]);
+// }
