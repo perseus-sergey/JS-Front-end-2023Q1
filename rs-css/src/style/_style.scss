@@ -196,14 +196,22 @@ main {
       .title-finish-mark {
         position: relative;
         display: inline-block;
-        margin-left: 1vw;
-        width: 1.5vw;
+        margin-left: 1.5vw;
+        width: 1.3vw;
         height: 2.5vw;
         border: solid 0.3vw white;
         border-width: 0 0.4vw 0.4vw 0;
         opacity: 0.2;
         top: -0.3vw;
         transform: rotate(40deg);
+
+        @media (orientation: portrait) {
+          margin-left: 1.5vh;
+          width: 1.3vh;
+          height: 2.5vh;
+          border: solid 0.3vh white;
+          border-width: 0 0.4vh 0.4vh 0;
+        }
       }
     }
 
@@ -383,12 +391,12 @@ footer {
             flex-grow: 2;
             border: none;
 
-            &.input-want {
+            &.input_blink {
               background: #91f20076;
-              animation: input-want 0.5s infinite;
+              animation: input_blink 0.5s infinite;
             }
 
-            @keyframes input-want {
+            @keyframes input_blink {
               50% {
                 background: none;
               }
@@ -398,27 +406,33 @@ footer {
               outline: none;
             }
           }
+        }
+        .enter-btn,
+        .cheat-btn {
+          background: #ddd;
+          border-radius: 0.3vw;
+          padding: 0.3vw 1vw;
+          color: #666;
+          line-height: 100%;
+          font-weight: 200;
+          border: solid 0.3vw #999;
+          border-width: 0.1vw 0.1vw 0.4vw 0.1vw;
+          font-size: 1.5vw;
+          cursor: pointer;
+          z-index: 0;
+          box-shadow: 0.1vw 0.4vw 0.7vw rgba(77, 244, 249, 0.469);
+          transform: perspective(25vw) rotateX(20deg);
+          text-align: center;
+          width: fit-content;
+          // transition: all 0.3s ease;
 
-          .enter-btn {
-            height: 3vw;
-            background: #ddd;
-            border-radius: 0.3vw;
-            padding: 0.5vw 1vw;
-            color: #666;
-            line-height: 100%;
-            border: solid 0.3vw #999;
-            border-width: 0.1vw 0.1vw 0.4vw 0.1vw;
-            font-size: 1.5vw;
-            cursor: pointer;
-            z-index: 0;
-            box-shadow: 0.1vw 0.4vw 0.7vw rgba(77, 244, 249, 0.469);
-            transform: perspective(5vw) rotateX(20deg);
-            // transition: all 0.3s ease;
+          &:hover {
+            background: rgba(255, 255, 255, 0.05);
+          }
 
-            &.pressed {
-              transform: translateY(0.5vw);
-              box-shadow: 0.1vw 0.1vw 0.7vw rgb(193, 248, 250);
-            }
+          &.pressed {
+            transform: translateY(0.5vw);
+            box-shadow: 0.1vw 0.1vw 0.7vw rgb(193, 248, 250);
           }
         }
       }
@@ -954,6 +968,7 @@ plate orange:nth-last-child(4) {
   }
 
   .level-reset-btn {
+    background-color: transparent;
     display: block;
     text-align: center;
     border: solid 0.2vw rgba(255, 255, 255, 0.2);
@@ -965,7 +980,7 @@ plate orange:nth-last-child(4) {
     margin-top: 2vw;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(245, 176, 176, 0.395);
     }
   }
 }

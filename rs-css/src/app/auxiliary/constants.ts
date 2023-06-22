@@ -12,8 +12,11 @@ export const constants = {
   LEVELS_MENU_BTN_IMG_CLASS: 'level-menu-btn-img',
   LEVEL_FINISHED_CLASS: 'finished',
   ENTER_BTN_CLASS: 'enter-btn',
+  CHEAT_BTN_CLASS: 'cheat-btn',
   EDITORS_CLASS: 'editors',
   ATTR_LEVEL_NUMBER: 'data-level-number',
+  TYPING_INPUT: 'input_typing',
+  BLINKING_INPUT: 'input_blink',
 
   COUNTER_WRAPPER_CLASS: 'info-section__counter-wrapper',
   COUNTER_TITLE_CLASS: 'counter-wrapper__title',

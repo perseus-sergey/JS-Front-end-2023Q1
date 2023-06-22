@@ -23,6 +23,9 @@ const {
   SIDE_LEVEL_CHECK_CLASS,
   SIDE_LEVEL_NUMBER_CLASS,
   ENTER_BTN_CLASS,
+  CHEAT_BTN_CLASS,
+  TYPING_INPUT,
+  BLINKING_INPUT,
   EDITORS_CLASS,
   LEVEL_MENU_WRAPPER_CLASS,
   LEVELS_MENU_BTN_IMG_CLASS,
@@ -79,6 +82,8 @@ export class Playground {
   private mainSection!: HTMLElement;
 
   private enterBtn!: HTMLElement;
+
+  private cheatBtn!: HTMLElement;
 
   private levelsMenuBtn!: HTMLElement;
 
@@ -184,16 +189,40 @@ export class Playground {
     else if (target.closest(`.${LEVEL_RESET_BTN_CLASS}`)) this.resetGameStatus();
     else if (!target.closest(`.${LEVEL_SIDE_WRAPPER_CLASS}`) && this.levelsSideWrapper.classList.contains(ACTIVE_CLASS)) this.closeLevelsMenu();
     else if (target.closest(`.${ENTER_BTN_CLASS}`)) this.inputCheckValue();
+    else if (target.closest(`.${CHEAT_BTN_CLASS}`)) this.cheatBtnHandler();
     else if (target.closest(`.${EDITORS_CLASS}`)) this.editorInput.focus();
-    else if (target.closest(`.${LEVELS_MENU_BTN_CLASS}`)) this.levelsMenuBtnClickHandler();
+    else if (target.closest(`.${LEVELS_MENU_BTN_CLASS}`)) this.levelsMenuBtnHandler();
   }
 
-  private levelsMenuBtnClickHandler(): void {
+  private levelsMenuBtnHandler(): void {
     if (this.levelsSideWrapper.classList.contains(ACTIVE_CLASS)) {
       this.closeLevelsMenu();
     } else {
       this.openLevelsMenu();
     }
+  }
+
+  private async cheatBtnHandler(): Promise<void> {
+    this.isCheat = true;
+    this.editorInput.classList.remove(BLINKING_INPUT);
+    this.typingText(this.level.levelRightAnswer, this.editorInput);
+    this.editorInput.focus();
+
+    this.cheatBtn.classList.add('pressed');
+    this.cheatBtn.setAttribute('disabled', '');
+
+    await new Promise((resolve) => { setTimeout(resolve, 500); });
+    this.cheatBtn.removeAttribute('disabled');
+    this.cheatBtn.classList.remove('pressed');
+  }
+
+  private typingText(text: string, inputElement: HTMLInputElement): void {
+    const elem = inputElement;
+    elem.value = '';
+    text.split('').forEach(async (letter, indx) => {
+      await new Promise((resolve) => { setTimeout(resolve, indx * 200); });
+      elem.value += letter;
+    });
   }
 
   private async levelMenuClickHandler(target: HTMLElement): Promise<void> {
@@ -318,20 +347,20 @@ export class Playground {
 
   private playgrMousOverHandler(event: Event):void {
     if (this.isGameFinished) return;
-    let el = event.target as HTMLElement;
+    let el = event.target as Element;
     if (el === this.playgroundElement || (!el.closest(`.${PLAYGROUND_CLASS}`) && !el.closest('.viewer-pre'))) return;
 
-    const playgrElmnts = [...this.playgroundElement.querySelectorAll('*')] as HTMLElement[];
-    const viewElements = [...this.viewerPre.querySelectorAll('div')] as HTMLElement[];
+    const playgrElmnts = [...this.playgroundElement.querySelectorAll('*')] as Element[];
+    const viewElements = [...this.viewerPre.querySelectorAll('div')] as Element[];
     let indx: number;
-    let playEl: HTMLElement;
-    let equalEl: HTMLElement;
+    let playEl: Element;
+    let equalEl: Element;
     if (el.closest(`.${PLAYGROUND_CLASS}`)) {
       playEl = el;
       indx = playgrElmnts.indexOf(el);
       equalEl = viewElements[indx];
     } else if (el.closest('.viewer-pre')) {
-      el = el.closest('div') as HTMLElement;
+      el = el.closest('div') as Element;
       indx = viewElements.indexOf(el);
       // indx = viewElements.indexOf(el);
       equalEl = playgrElmnts[indx];
@@ -352,7 +381,7 @@ export class Playground {
     this.playgroundHint.classList.remove('show');
   }
 
-  private showHint(playgrElem: HTMLElement): void {
+  private showHint(playgrElem: Element): void {
     const elPosition = playgrElem.getBoundingClientRect();
     this.playgroundHint.style.top = `${elPosition.top - 65}px`;
     this.playgroundHint.style.left = `${elPosition.left + (elPosition.width / 2)}px`;
@@ -379,7 +408,7 @@ export class Playground {
   private async setNewLevel(levelNumber: number): Promise<void> {
     let levNumber = levelNumber;
     this.cleanPage();
-    this.isCheat = false;
+    // this.isCheat = false;
     if (levNumber >= gameLevels.length) {
       this.finishGame();
       return;
@@ -463,11 +492,12 @@ export class Playground {
     }
     const editorInfoField = generateDomElement('div', '', editorField, 'editor-info');
     const inputWrapper = generateDomElement('div', '', editorInfoField, 'input-wrapper');
-    this.editorInput = generateDomElement('input', '', inputWrapper, 'editor-input', 'input-want');
+    this.editorInput = generateDomElement('input', '', inputWrapper, 'editor-input', BLINKING_INPUT);
     this.editorInput.placeholder = 'Tipe in a CSS selector';
-    this.enterBtn = generateDomElement('div', 'Enter', inputWrapper, ENTER_BTN_CLASS);
+    this.enterBtn = generateDomElement('button', 'Enter', inputWrapper, ENTER_BTN_CLASS);
     const editorInfoPre = generateDomElement('div', '', editorInfoField, 'editor-info__pre');
     editorInfoPre.innerHTML = EDITOR_INFO_TEXT;
+    this.cheatBtn = generateDomElement('button', 'Help', editorInfoField, CHEAT_BTN_CLASS);
 
     this.editors.append(editorWrap);
   }
@@ -583,7 +613,7 @@ export class Playground {
     this.levelsSideWrapper = generateDomElement('aside', '', this.mainSection, LEVEL_SIDE_WRAPPER_CLASS);
     generateDomElement('h2', 'Choose a level', this.levelsSideWrapper);
     this.levelsMenuWrapper = generateDomElement('div', '', this.levelsSideWrapper, LEVEL_MENU_WRAPPER_CLASS);
-    this.levelsResetBtn = generateDomElement('div', 'RESET', this.levelsSideWrapper, LEVEL_RESET_BTN_CLASS);
+    this.levelsResetBtn = generateDomElement('button', 'RESET', this.levelsSideWrapper, LEVEL_RESET_BTN_CLASS);
     this.levelsMenuBtn = generateDomElement('div', '', header, LEVELS_MENU_BTN_CLASS);
     generateDomElement('div', '', this.levelsMenuBtn, LEVELS_MENU_BTN_IMG_CLASS);
     this.makeLevelsList();
