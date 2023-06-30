@@ -910,3 +910,29 @@ plate orange:nth-last-child(4) {
     }
   }
 }
+
+.end-game-text {
+  position: absolute;
+    top: 30%;
+    right: 10%;
+  margin: auto;
+  font-size: 10vw;
+  font-weight: bold;
+  text-shadow: 0 -1px 0 #fff, 0 7px 0 rgba(34, 34, 34, 0.32),
+    0 8px 0 rgba(32, 32, 32, 0.31), 0 9px 0 rgba(31, 31, 31, 0.35),
+    0 10px 0 rgba(28, 28, 28, 0.28), 0 11px 0 rgba(25, 25, 25, 0.28),
+    0 22px 30px rgba(0, 0, 0, 0.38);
+  color: #c7d1da;
+  z-index: 999;
+  animation: anim_end_lev 1.5s linear;
+}
+@keyframes anim_end_lev {
+  0% {
+    transform: rotate(720deg) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}

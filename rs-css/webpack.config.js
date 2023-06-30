@@ -53,23 +53,6 @@ module.exports = {
     watchFiles: path.join(__dirname, 'src'),
     port: 8090,
   },
-  optimization: {
-    minimizer: [
-      new ImageMinimizerPlugin({
-        minimizer: {
-          implementation: ImageMinimizerPlugin.imageminMinify,
-          options: {
-            plugins: [
-              ['gifsicle', { interlaced: true }],
-              ['jpegtran', { progressive: true }],
-              ['optipng', { optimizationLevel: 5 }],
-              ['svgo', { name: 'preset-default' }],
-            ],
-          },
-        },
-      }),
-    ],
-  },
   module: {
     rules: [
       {
