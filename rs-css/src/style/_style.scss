@@ -885,6 +885,7 @@ plate orange:nth-last-child(4) {
     .level-number {
       opacity: 0.6;
       min-width: 2.4vw;
+      padding-right: 1vw;
       display: inline-block;
 
       @media (orientation: portrait) {

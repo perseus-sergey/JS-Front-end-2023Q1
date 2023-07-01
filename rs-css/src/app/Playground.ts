@@ -54,6 +54,8 @@ const {
   EDITOR_WRAPPER,
   EDITOR_INPUT,
   EDITOR_INFO_PRE,
+  HIGHLIGHT_TAG,
+  HIGHLIGHT_TAG_NAME,
   VIEWER_HEADER,
   VIEWER_FIELD,
   VIEWER_NUMBERS,
@@ -383,11 +385,11 @@ export class Playground {
     this.playgroundHint.style.top = `${elPosition.top - 65}px`;
     this.playgroundHint.style.left = `${elPosition.left + (elPosition.width / 2)}px`;
 
-    this.playgroundHint.textContent = this.getTagText(playgrElem.outerHTML);
+    this.playgroundHint.textContent = this.removeChildrenFromTag(playgrElem.outerHTML);
     this.playgroundHint.classList.add(HINT_SHOW);
   }
 
-  private getTagText(outerHTML: string): string {
+  public removeChildrenFromTag(outerHTML: string): string {
     const tag = outerHTML.replace(/^(<[^>]*>).*(<\/[^>]*>)$/si, '$1$2');
     const regex = new RegExp(`( ${HIGHLIGHT}| ${TWIST})=".*"`);
     return tag.replace(regex, '');
@@ -418,7 +420,7 @@ export class Playground {
     this.appendExamples();
     const tableElmts = [...this.playgroundElement.children] as HTMLElement[];
     tableElmts.forEach((el) => {
-      const divWrapped = this.wrapToDiv(el);
+      const divWrapped = this.highlightHtmlElement(el);
       this.viewerPre.append(divWrapped);
     });
     this.rightElements.forEach((el) => el.setAttribute(TWIST, ''));
@@ -525,7 +527,7 @@ export class Playground {
     this.viewerPre = generateDomElement('div', '', viewerInfoField, VIEWER_PRE);
   }
 
-  private wrapToDiv(elem: HTMLElement): HTMLElement {
+  private highlightHtmlElement(elem: HTMLElement): HTMLElement {
     const tagName = elem.localName;
     const wrapDiv = generateDomElement('div', '', null);
     let attrStr = '';
@@ -535,14 +537,14 @@ export class Playground {
     });
 
     const childLen = elem.children.length;
-    const wrapStartDivText = this.spanWrap('hl-tag', '&lt;') + this.spanWrap('hl-tag-name', tagName) + attrStr + this.spanWrap('hl-tag', '&gt;');
-    const wrapEndDivText = this.spanWrap('hl-tag', '&lt;/') + this.spanWrap('hl-tag-name', tagName) + this.spanWrap('hl-tag', '&gt;');
+    const wrapStartDivText = this.spanWrap(HIGHLIGHT_TAG, '&lt;') + this.spanWrap(HIGHLIGHT_TAG_NAME, tagName) + attrStr + this.spanWrap(HIGHLIGHT_TAG, '&gt;');
+    const wrapEndDivText = this.spanWrap(HIGHLIGHT_TAG, '&lt;/') + this.spanWrap(HIGHLIGHT_TAG_NAME, tagName) + this.spanWrap(HIGHLIGHT_TAG, '&gt;');
 
     if (childLen > 0) {
       wrapDiv.innerHTML += wrapStartDivText;
 
       const elChildren = [...elem.children] as HTMLElement[];
-      elChildren.forEach((el: HTMLElement) => wrapDiv.append(this.wrapToDiv(el)));
+      elChildren.forEach((el: HTMLElement) => wrapDiv.append(this.highlightHtmlElement(el)));
 
       wrapDiv.innerHTML += wrapEndDivText;
     } else {

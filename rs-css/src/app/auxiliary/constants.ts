@@ -58,6 +58,8 @@ export const constantsClasses = {
   EDITOR_INPUT: 'editor-input',
   EDITOR_INFO_PRE: 'editor-info__pre',
   EDITOR_HEADER: 'editor-header',
+  HIGHLIGHT_TAG: 'hl-tag',
+  HIGHLIGHT_TAG_NAME: 'hl-tag-name',
   PLAYGROUND_HINT: 'playground-hint',
   BLINKING_INPUT: 'input_blink',
   END_GAME_TITLE: 'end-game-text',
