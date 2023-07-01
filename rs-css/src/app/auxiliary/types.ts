@@ -16,27 +16,26 @@ export interface ILevel {
   examples?: string[];
   levelRightAnswer: string;
   levelTask: string;
-  // taskElements?: string[][];
 }
-enum Things {
-  CARPET,
-  PLATE,
-  BREAD,
-  CUCUMBER,
-  APPLE,
-}
+// enum Things {
+//   CARPET,
+//   PLATE,
+//   BREAD,
+//   CUCUMBER,
+//   APPLE,
+// }
 
-const {
-  CARPET,
-  PLATE,
-  CUCUMBER,
-  APPLE,
-} = Things;
+// const {
+//   CARPET,
+//   PLATE,
+//   CUCUMBER,
+//   APPLE,
+// } = Things;
 
-interface IService {
-  things: Things[][];
+// interface IService {
+//   things: Things[][];
 
-}
-const service: IService = {
-  things: [[CARPET, PLATE, CUCUMBER], [CARPET, PLATE, APPLE]],
-};
+// }
+// const service: IService = {
+//   things: [[CARPET, PLATE, CUCUMBER], [CARPET, PLATE, APPLE]],
+// };
