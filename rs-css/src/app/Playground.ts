@@ -139,13 +139,13 @@ export class Playground {
 
   private endTextDiv!: HTMLInputElement;
 
-  private levelNumber = 0;
+  public levelNumber = 0;
 
-  private gameStatus!: Partial<IUserStatus>;
+  public gameStatus!: Partial<IUserStatus>;
 
-  private isCheat = false;
+  public isCheat = false;
 
-  private isGameFinished = false;
+  public isGameFinished = false;
 
   public start(): void {
     this.appendPlayground();
@@ -303,14 +303,18 @@ export class Playground {
     localStorage.setItem(GAME_STATUS, JSON.stringify(this.gameStatus));
   }
 
-  private resetGameStatus(): void {
-    this.levelNumber = 0;
-    this.gameStatus = {};
+  public resetGameStatus(): void {
+    this.resetProperties();
     localStorage.removeItem(GAME_STATUS);
-    this.isGameFinished = false;
-    this.isCheat = false;
     this.setNewLevel(0);
     this.closeLevelsMenu();
+  }
+
+  public resetProperties(): void {
+    this.levelNumber = 0;
+    this.gameStatus = {};
+    this.isGameFinished = false;
+    this.isCheat = false;
   }
 
   private async removeWrongAnswerClass(): Promise<void> {
@@ -610,7 +614,7 @@ export class Playground {
     }
   }
 
-  private closeLevelsMenu(): void {
+  public closeLevelsMenu(): void {
     document.body.classList.remove(ACTIVE_MENU);
     this.levelsMenuBtn.classList.remove(ACTIVE);
     this.levelsSideWrapper.classList.remove(ACTIVE);

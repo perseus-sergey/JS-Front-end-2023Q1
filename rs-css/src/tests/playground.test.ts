@@ -6,10 +6,10 @@ const {
   TWIST,
 } = constantsAttributes;
 
-describe('playground: ', () => {
-  const playgrd = new Playground();
+const playgrd = new Playground();
 
-  describe(`removeChildrenFromTag should return pure tag without children and attributus  ${TWIST} and  ${HIGHLIGHT}`, () => {
+describe('removeChildrenFromTag: ', () => {
+  describe(`Should return pure tag without children and attributus  ${TWIST} and  ${HIGHLIGHT}`, () => {
     it(`Should remove attribute ${TWIST} and any children`, () => {
       const tag = `<apple ${TWIST}="true"><div class="some-class"><span>Some Text</span></div></apple>`;
       expect(playgrd.removeChildrenFromTag(tag)).toBe('<apple></apple>');
@@ -24,5 +24,32 @@ describe('playground: ', () => {
     </plate>`;
       expect(playgrd.removeChildrenFromTag(tag)).toBe('<plate></plate>');
     });
+  });
+});
+
+describe('resetProperties: ', () => {
+  beforeEach(() => {
+    playgrd.levelNumber = 5;
+    playgrd.gameStatus = {
+      3: { levelFinished: true, cheat: false, mistakeCount: 0 },
+      4: { levelFinished: true, cheat: true, mistakeCount: 0 },
+    };
+    playgrd.isGameFinished = true;
+    playgrd.isCheat = true;
+
+    playgrd.resetProperties();
+  });
+
+  it('levelNumber Should be 0', () => {
+    expect(playgrd.levelNumber).toBe(0);
+  });
+  it('gameStatus Should be empty {}', () => {
+    expect(playgrd.gameStatus).toEqual({});
+  });
+  it('isCheat Should be false', () => {
+    expect(playgrd.isCheat).toEqual(false);
+  });
+  it('isGameFinished Should be false', () => {
+    expect(playgrd.isGameFinished).toEqual(false);
   });
 });
