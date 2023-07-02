@@ -77,6 +77,10 @@ const {
   LEVELS_MENU_BTN,
   WRONG_ANSWER,
   PLAYGROUND_HINT,
+  TABLE_WRAPPER,
+  TABLE_SURFACE,
+  TABLE_EDGE,
+  TABLE_LEG,
   VIEWER_PRE,
   WIN,
   MAIN,
@@ -451,10 +455,16 @@ export class Playground {
 
     this.h1 = document.body.querySelector('h1') as HTMLElement;
 
-    this.playgroundElement = generateDomElement('div', '', null, PLAYGROUND);
+    const gameWrapper = document.querySelector(`.${GAME_WRAPPER}`) as HTMLElement;
+    const tableWrapper = generateDomElement('div', '', gameWrapper, TABLE_WRAPPER);
+    generateDomElement('div', '', tableWrapper, TABLE_SURFACE);
+    const tableEdge = generateDomElement('div', '', gameWrapper, TABLE_EDGE);
+    generateDomElement('div', '', tableEdge, TABLE_LEG);
+    generateDomElement('div', '', tableEdge, TABLE_LEG);
+
+    this.playgroundElement = generateDomElement('div', '', tableWrapper, PLAYGROUND);
 
     this.mainSection = document.querySelector(`.${MAIN}`) as HTMLElement;
-    document.querySelector(`.${GAME_WRAPPER}`)?.append(this.playgroundElement);
     this.playgroundHint = generateDomElement('div', '', document.body, PLAYGROUND_HINT);
   }
 

@@ -70,7 +70,11 @@ export const constantsClasses = {
   MAIN: 'main',
   KEY_PRESSED: 'pressed',
   KEY_DISABLED: 'disabled',
-  PLAYGROUND: 'table-wrapper',
+  PLAYGROUND: 'table',
+  TABLE_WRAPPER: 'table-wrapper',
+  TABLE_SURFACE: 'table-surface',
+  TABLE_EDGE: 'table-edge',
+  TABLE_LEG: 'table-leg',
   VIEWER_PRE: 'viewer-pre',
   WIN: 'win',
 };
