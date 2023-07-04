@@ -414,7 +414,7 @@ export class Playground {
     if (levNumber < 0) levNumber = 0;
     this.level = gameLevels[levNumber];
     localStorage.setItem(LEVEL_NUMBER, `${levNumber}`);
-    await delay(300);
+    // await delay(300);
     this.levelNumber = levNumber;
     this.h1.textContent = this.level.levelH1;
     this.playgroundElement.insertAdjacentHTML('afterbegin', this.level.levelTask);
