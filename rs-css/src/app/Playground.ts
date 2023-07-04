@@ -5,7 +5,7 @@ import {
   constantsClasses,
 } from './auxiliary/constants';
 import { ILevel, IUserStatus } from './auxiliary/types';
-import { generateDomElement } from './auxiliary/utilites';
+import { generateDomElement, delay } from './auxiliary/utilites';
 import { gameLevels } from './Levels';
 
 const {
@@ -219,7 +219,7 @@ export class Playground {
     this.cheatBtn.classList.add(KEY_PRESSED);
     this.cheatBtn.setAttribute(KEY_DISABLED, '');
 
-    await new Promise((resolve) => { setTimeout(resolve, 500); });
+    await delay(500);
     this.cheatBtn.removeAttribute(KEY_DISABLED);
     this.cheatBtn.classList.remove(KEY_PRESSED);
   }
@@ -228,7 +228,7 @@ export class Playground {
     const elem = inputElement;
     elem.value = '';
     text.split('').forEach(async (letter, indx) => {
-      await new Promise((resolve) => { setTimeout(resolve, indx * 200); });
+      await delay(indx * 200);
       elem.value += letter;
     });
   }
@@ -238,7 +238,7 @@ export class Playground {
     if (chosenLevelNum === this.levelNumber) return;
     this.isGameFinished = false;
     this.closeLevelsMenu();
-    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    await delay(300);
     this.setNewLevel(chosenLevelNum);
   }
 
@@ -255,7 +255,7 @@ export class Playground {
     this.enterBtn.classList.add(KEY_PRESSED);
     this.enterBtn.setAttribute(KEY_DISABLED, '');
 
-    await new Promise((resolve) => { setTimeout(resolve, 100); });
+    await delay(100);
     this.enterBtn.removeAttribute(KEY_DISABLED);
     this.enterBtn.classList.remove(KEY_PRESSED);
     if (!value) return;
@@ -318,7 +318,7 @@ export class Playground {
   }
 
   private async removeWrongAnswerClass(): Promise<void> {
-    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    await delay(300);
     [...document.body.querySelectorAll(`.${WRONG_ANSWER}`)]
       .forEach((el) => el.classList.remove(WRONG_ANSWER));
   }
@@ -334,10 +334,10 @@ export class Playground {
   private async winLevel(): Promise<void> {
     this.rightElements.forEach(async (ansEl) => {
       ansEl.removeAttribute(TWIST);
-      await new Promise((resolve) => { setTimeout(resolve, 30); });
+      await delay(30);
       ansEl.classList.add(WIN);
     });
-    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    await delay(300);
     this.setNewLevel(this.levelNumber + 1);
   }
 
@@ -414,7 +414,7 @@ export class Playground {
     if (levNumber < 0) levNumber = 0;
     this.level = gameLevels[levNumber];
     localStorage.setItem(LEVEL_NUMBER, `${levNumber}`);
-    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    await delay(300);
     this.levelNumber = levNumber;
     this.h1.textContent = this.level.levelH1;
     this.playgroundElement.insertAdjacentHTML('afterbegin', this.level.levelTask);

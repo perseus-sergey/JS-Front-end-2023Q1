@@ -77,6 +77,7 @@ export const constantsClasses = {
   TABLE_LEG: 'table-leg',
   VIEWER_PRE: 'viewer-pre',
   WIN: 'win',
+  WIN_TABLE: 'table-win',
 };
 export const constantsAttributes = {
   LEVEL_NUMB: 'data-level-number',

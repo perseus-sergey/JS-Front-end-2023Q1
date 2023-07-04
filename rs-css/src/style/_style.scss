@@ -451,6 +451,10 @@ footer {
     animation-delay: 0s, 0.5s;
   }
 
+  &.table-win {
+    transform: scale(0);
+  }
+
   @keyframes twistStart {
     0% {
       transform: skew(0deg, 0deg) scaleY(1);
@@ -732,7 +736,7 @@ icecream::before {
 bento > icecream:only-child, 
 plate > icecream:only-child {
   top: calc(50% - 4vw);
-  left: calc(50% - 1vw);
+  left: calc(50% - 2vw);
   z-index: 99999;
   margin: 0;
   position: absolute;
@@ -1067,7 +1071,7 @@ plate orange:nth-last-child(4) {
     0 10px 0 rgba(28, 28, 28, 0.28), 0 11px 0 rgba(25, 25, 25, 0.28),
     0 22px 30px rgba(0, 0, 0, 0.38);
   color: #c7d1da;
-  z-index: 999;
+  z-index: 99999;
   animation: anim_end_lev 1.5s linear;
 }
 @keyframes anim_end_lev {

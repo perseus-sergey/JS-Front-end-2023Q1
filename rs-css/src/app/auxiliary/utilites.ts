@@ -16,6 +16,8 @@ export const generateDomElement = <T extends HTMLElement>(
   return element;
 };
 
+export const delay = (ms = 1000): Promise<void> => new Promise((res) => { setTimeout(res, ms); });
+
 export class CreateElement<T extends HTMLElement> {
   // const inp = new CreateElement<HTMLInputElement>('input', '', 'editor-input')
   // inp.element.placeholder = ''
