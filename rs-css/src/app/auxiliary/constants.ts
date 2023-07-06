@@ -61,7 +61,7 @@ export const constantsClasses = {
   HIGHLIGHT_TAG: 'hl-tag',
   HIGHLIGHT_TAG_NAME: 'hl-tag-name',
   PLAYGROUND_HINT: 'playground-hint',
-  BLINKING_INPUT: 'input_blink',
+  BLINKING_INPUT: 'input-want',
   END_GAME_TITLE: 'end-game-text',
   HINT_SHOW: 'show',
   WRONG_ANSWER: 'wrong-answer',

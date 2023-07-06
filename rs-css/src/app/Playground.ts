@@ -172,7 +172,7 @@ export class Playground {
     this.playgrMousOverHandler = this.playgrMousOverHandler.bind(this);
     this.playgrMousOutHandler = this.playgrMousOutHandler.bind(this);
     this.enterPressedHandler = this.enterPressedHandler.bind(this);
-    this.inputKeyUpHendler = this.inputKeyUpHendler.bind(this);
+    this.inputBlinkHendler = this.inputBlinkHendler.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
     this.removeFinishedText = this.removeFinishedText.bind(this);
   }
@@ -180,17 +180,18 @@ export class Playground {
   private startListners(): void {
     document.addEventListener('mouseover', this.playgrMousOverHandler);
     document.addEventListener('mouseout', this.playgrMousOutHandler);
-    this.editorInput.addEventListener('keyup', this.inputKeyUpHendler);
+    this.editorInput.addEventListener('keyup', this.inputBlinkHendler);
     this.editorInput.addEventListener('keypress', this.enterPressedHandler);
     document.addEventListener('click', this.clickHandler);
   }
 
-  private inputKeyUpHendler(): void {
-    if (this.editorInput.value.length > 0) this.editorInput.classList.remove('input-want');
-    else this.editorInput.classList.add('input-want');
+  private inputBlinkHendler(): void {
+    if (this.editorInput.value.length > 0) this.editorInput.classList.remove(BLINKING_INPUT);
+    else this.editorInput.classList.add(BLINKING_INPUT);
   }
 
   private clickHandler(event: Event): void {
+    this.inputBlinkHendler();
     const target = event.target as HTMLElement;
 
     if (target.closest(`.${LEVEL_MENU_WRAPPER}`)) this.levelMenuClickHandler(target);
@@ -212,14 +213,16 @@ export class Playground {
 
   private async cheatBtnHandler(): Promise<void> {
     this.isCheat = true;
-    this.editorInput.classList.remove(BLINKING_INPUT);
-    this.typingText(this.level.levelRightAnswer, this.editorInput);
-    this.editorInput.focus();
-
+    const input = this.editorInput;
+    this.inputBlinkHendler();
+    input.value = '';
     this.cheatBtn.classList.add(KEY_PRESSED);
     this.cheatBtn.setAttribute(KEY_DISABLED, '');
 
-    await delay(500);
+    this.typingText(this.level.levelRightAnswer, input);
+    input.focus();
+
+    await delay(5000);
     this.cheatBtn.removeAttribute(KEY_DISABLED);
     this.cheatBtn.classList.remove(KEY_PRESSED);
   }
@@ -238,7 +241,6 @@ export class Playground {
     if (chosenLevelNum === this.levelNumber) return;
     this.isGameFinished = false;
     this.closeLevelsMenu();
-    await delay(300);
     this.setNewLevel(chosenLevelNum);
   }
 
@@ -414,8 +416,9 @@ export class Playground {
     if (levNumber < 0) levNumber = 0;
     this.level = gameLevels[levNumber];
     localStorage.setItem(LEVEL_NUMBER, `${levNumber}`);
-    // await delay(300);
     this.levelNumber = levNumber;
+
+    this.inputBlinkHendler();
     this.h1.textContent = this.level.levelH1;
     this.playgroundElement.insertAdjacentHTML('afterbegin', this.level.levelTask);
     this.rightElements = [...this.playgroundElement
