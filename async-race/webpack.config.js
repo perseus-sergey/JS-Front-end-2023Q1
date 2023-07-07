@@ -93,7 +93,7 @@ module.exports = {
         test: /\.(png|jpg|jpeg|gif)$/i,
         type: 'asset/resource',
         generator: {
-          filename: `${imgDistDir}[name][ext]`,
+          filename: path.join(imgDistDir, '[name][ext]'),
         },
       },
       {

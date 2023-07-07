@@ -46,6 +46,7 @@ header {
   }
   .swu-img {
     height: 5.5vh;
+    width: auto;
 
     @media (orientation: portrait) {
       height: 5.5vw;
@@ -54,12 +55,15 @@ header {
 }
 
 h1 {
-  font-family: "Alexander";
+  color: #f4f4f4;
+  text-shadow: 0.2vh 0.5vh 0.5vh rgba(0, 0, 0, 0.8);
+  font-family: 'Alexander';
   font-size: 7vh;
   font-weight: 800;
   white-space: nowrap;
   @media (orientation: portrait) {
     font-size: 7vw;
+    text-shadow: 0.2vw 0.5vw 0.5vw rgba(0, 0, 0, 0.8);
   }
 }
 
@@ -109,15 +113,51 @@ footer {
     color: #999;
   }
   .copyright:before {
-    content: "©";
+    content: '©';
   }
+
   .rss-ref__img,
   .git-ref__img {
     height: 6vh;
+    width: auto;
     fill: #777;
 
     @media (orientation: portrait) {
       height: 6vw;
+    }
+  }
+}
+
+main {
+  &:hover {
+    car-tag {
+      transform: translateX(500px);
+      // transition: translateX(500px);
+    }
+  }
+
+  car-tag {
+    display: inline-block;
+    transition: transform 3s linear;
+
+    svg {
+      transform: scaleX(-1);
+      height: 5vh;
+
+      .str0 {
+        stroke: #373435;
+        stroke-width: 6.94488;
+      }
+      .fil0 {
+        fill: rgb(184, 62, 62);
+      }
+      .str1 {
+        // stroke: #373435;
+        stroke-width: 6.94488;
+      }
+      .fil1 {
+        fill: rgb(89 233 248 / 59%);
+      }
     }
   }
 }
