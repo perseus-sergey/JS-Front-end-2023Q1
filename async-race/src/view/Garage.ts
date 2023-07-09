@@ -70,7 +70,7 @@ export class Garage {
   private generateTrack(): void {
     const track = generateDomElement(TRACK_TAG, null, this.garage);
     track.setAttribute(ATTR_CAR_NAME, 'Toyota');
-    track.setAttribute(ATTR_CAR_COLOR, '#dddddd');
+    track.setAttribute(ATTR_CAR_COLOR, '#000000');
   }
 
   private generateControlPanel(): void {

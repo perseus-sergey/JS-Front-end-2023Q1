@@ -42,6 +42,7 @@ export const constantsClasses = {
   INP_CREATE_CAR_COLOR: 'create-car__color',
   INP_UPDATE_CAR_NAME: 'update-car__name',
   INP_UPDATE_CAR_COLOR: 'update-car__color',
+  BTN_ANIMATION: 'button-hit',
 };
 export const constantsAttributes = {
   ATTR_CAR_NAME: 'data-car-name',

@@ -128,14 +128,38 @@ footer {
   }
 }
 
+button {
+  font-size: 2vh;
+  padding: 0.4vh 1vh;
+  margin-right: 0.5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+  border-radius: 0.5vh;
+  color: #666;
+  border: solid 0.3vh #999;
+  border-width: 0.1vh 0.1vh 0.6vh 0.1vh;
+  cursor: pointer;
+  transition: transform 0.15s;
+  transform-style: preserve-3d;
+
+  &:active {
+    transform: translateY(0.2vh);
+    border-width: 0.1vh 0.1vh 0.5vh 0.1vh;
+  }
+}
+
 main {
   padding: 0 1vw;
 
-  // &:hover {
-  //   .car {
-  //     transform: translateX(500px);
-  //   }
-  // }
+  .control-panel {
+    & > form {
+      display: flex;
+      gap: 1vw;
+      padding-bottom: 1vh;
+    }
+  }
 
   car-track {
     padding-top: 2vh;
@@ -147,21 +171,24 @@ main {
 
     .track-btns-wrapper {
       padding: 1vh 0;
+      display: flex;
+      gap: 1vw;
+
+      .track__car-name {
+        font-size: 3vh;
+        color: #ffffff;
+        padding-left: 2vw;
+        text-shadow: 0.1vh 0.1vh 0.2vh #000000;
+      }
     }
 
     .engine-btns-wrapper {
-      // padding-right: 0.4vw;
       display: flex;
 
       & > * {
-        font-size: 2vh;
         border-radius: 25%;
-        width: 3vh;
-        height: 3vh;
+        padding: 0.1vh 0.8vh;
         margin-right: 0.5vw;
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
     }
 
@@ -177,15 +204,12 @@ main {
           stroke: #373435;
           stroke-width: 6.94488;
         }
-        .fil0 {
-          fill: rgb(184, 62, 62);
-        }
         .str1 {
-          // stroke: #373435;
+          stroke: #373435;
           stroke-width: 6.94488;
         }
         .fil1 {
-          fill: rgb(89 233 248 / 59%);
+          fill: rgb(231 246 248);
         }
       }
     }

@@ -3,17 +3,19 @@ import { generateDomElement } from '../utilites';
 import { Garage } from './Garage';
 
 const {
-  TRACK, TRACK_BTNS_WRAPPER, TRACK_CAR_NAME, ENGINE_BTNS_WRAPPER, CAR, CAR_SVG_FILL_COLOR,
+  TRACK,
+  TRACK_BTNS_WRAPPER,
+  TRACK_CAR_NAME,
+  ENGINE_BTNS_WRAPPER,
+  CAR,
+  CAR_SVG_FILL_COLOR,
 } = constantsClasses;
 
 const {
   BTN_TRACK_SELECT_CAR, BTN_TRACK_REMOVE_CAR, BTN_TRACK_STOP_CAR, BTN_TRACK_START_CAR,
 } = constantsTexts;
 
-const {
-  ATTR_CAR_NAME,
-  ATTR_CAR_COLOR,
-} = constantsAttributes;
+const { ATTR_CAR_NAME, ATTR_CAR_COLOR } = constantsAttributes;
 
 export class Track extends HTMLElement {
   private car!: HTMLElement;
@@ -43,7 +45,7 @@ export class Track extends HTMLElement {
   private distance!: number;
 
   public static get observedAttributes(): string[] {
-    return [ATTR_CAR_NAME];
+    return [ATTR_CAR_NAME, ATTR_CAR_COLOR];
   }
 
   private attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
@@ -78,7 +80,7 @@ export class Track extends HTMLElement {
     return track;
   }
 
-  private callbackBinding():void {
+  private callbackBinding(): void {
     this.stopBtnHandler = this.stopBtnHandler.bind(this);
     this.startBtnHandler = this.startBtnHandler.bind(this);
     this.selectBtnkHandler = this.selectBtnkHandler.bind(this);
@@ -86,7 +88,7 @@ export class Track extends HTMLElement {
     this.step = this.step.bind(this);
   }
 
-  private setListners():void {
+  private setListners(): void {
     this.selectBtn.addEventListener('click', this.selectBtnkHandler);
     // this.removeBtn.addEventListener('click', this.clickHandler);
     this.engineStopBtn.addEventListener('click', this.stopBtnHandler);
@@ -95,8 +97,10 @@ export class Track extends HTMLElement {
 
   private selectBtnkHandler(): void {
     Garage.isDisableUpdateForm(false);
+    Garage.inputUpdateCarName.focus();
     Garage.inputUpdateCarName.value = this.carName || '';
-    Garage.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler);
+    Garage.inputUpdateCarColor.value = this.carColor || '#ffffff';
+    Garage.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
   }
 
   private updateCarSubmitHandler(event: Event): void {
@@ -123,7 +127,7 @@ export class Track extends HTMLElement {
     this.engineStartBtn.disabled = false;
   }
 
-  private step(timestamp: number):void {
+  private step(timestamp: number): void {
     if (!this.start || this.progress > this.distance) this.start = timestamp;
     this.progress = (timestamp - this.start) / 3 + 25;
     this.car.style.transform = `translateX(${Math.min(this.progress, this.distance)}px)`;
@@ -154,6 +158,7 @@ export class Track extends HTMLElement {
     `;
     const car = generateDomElement('div', carSvg, track, CAR);
     this.carSvgFillLayer = car.querySelector(`.${CAR_SVG_FILL_COLOR}`) as HTMLElement;
+    if (this.carColor) this.carSvgFillLayer.style.fill = this.carColor;
     return car;
   }
 }
