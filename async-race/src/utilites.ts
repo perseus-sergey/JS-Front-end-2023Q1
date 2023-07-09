@@ -1,19 +1,40 @@
 export const generateDomElement = <T extends HTMLElement>(
   tag: string,
-  text: string,
+  innerHTML: string | null,
   parent: HTMLElement | null,
   ...classes: string[]
 ): T => {
   const element = <T>document.createElement(tag);
   const arrClasses: string[] = [];
-  classes.forEach((el) => {
-    if (Array.isArray(el)) el.forEach((i) => arrClasses.push(i));
-    else if (el) el.split(' ').forEach((e) => arrClasses.push(e));
+  classes.forEach((className) => {
+    if (Array.isArray(className)) className.forEach((classInside) => arrClasses.push(classInside));
+    else if (className) className.split(' ').forEach((splittedClass) => arrClasses.push(splittedClass));
   });
   if (arrClasses.length) element.classList.add(...arrClasses);
-  element.textContent = text;
+  if (innerHTML) element.innerHTML = innerHTML;
   if (parent) parent.append(element);
   return element;
 };
+
+// https:// learn.javascript.ru/js-animation
+
+// export const animate = ({ timing, draw, duration }):void => {
+//   const start = performance.now();
+
+//   requestAnimationFrame(function step(time) {
+//     // timeFraction can change from 0 to 1
+//     let timeFraction = (time - start) / duration;
+//     if (timeFraction > 1) timeFraction = 1;
+
+//     // calculate the current animation state
+//     const progress = timing(timeFraction);
+
+//     draw(progress); // draw it
+
+//     if (timeFraction < 1) {
+//       requestAnimationFrame(step);
+//     }
+//   });
+// };
 
 export const delay = (ms = 1000): Promise<void> => new Promise((res) => { setTimeout(res, ms); });

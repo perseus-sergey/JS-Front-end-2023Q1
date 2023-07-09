@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  transition: all 0.4s ease-in-out;
+  // transition: all 0.4s ease-in-out;
 }
 // *************************
 // Put Footer Down to Page
@@ -129,34 +129,64 @@ footer {
 }
 
 main {
-  &:hover {
-    car-tag {
-      transform: translateX(500px);
-      // transition: translateX(500px);
+  padding: 0 1vw;
+
+  // &:hover {
+  //   .car {
+  //     transform: translateX(500px);
+  //   }
+  // }
+
+  car-track {
+    padding-top: 2vh;
+    display: block;
+    background-image: linear-gradient(to right, #f6f6f6 33%, rgba(255, 255, 255, 0) 0%);
+    background-position: bottom;
+    background-size: 1.5vh 0.2vh;
+    background-repeat: repeat-x;
+
+    .track-btns-wrapper {
+      padding: 1vh 0;
     }
-  }
 
-  car-tag {
-    display: inline-block;
-    transition: transform 3s linear;
+    .engine-btns-wrapper {
+      // padding-right: 0.4vw;
+      display: flex;
 
-    svg {
-      transform: scaleX(-1);
-      height: 5vh;
+      & > * {
+        font-size: 2vh;
+        border-radius: 25%;
+        width: 3vh;
+        height: 3vh;
+        margin-right: 0.5vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
 
-      .str0 {
-        stroke: #373435;
-        stroke-width: 6.94488;
-      }
-      .fil0 {
-        fill: rgb(184, 62, 62);
-      }
-      .str1 {
-        // stroke: #373435;
-        stroke-width: 6.94488;
-      }
-      .fil1 {
-        fill: rgb(89 233 248 / 59%);
+    .car {
+      display: inline-block;
+      // transition: transform 3s linear;
+
+      svg {
+        transform: scaleX(-1);
+        height: 4vh;
+
+        .str0 {
+          stroke: #373435;
+          stroke-width: 6.94488;
+        }
+        .fil0 {
+          fill: rgb(184, 62, 62);
+        }
+        .str1 {
+          // stroke: #373435;
+          stroke-width: 6.94488;
+        }
+        .fil1 {
+          fill: rgb(89 233 248 / 59%);
+        }
       }
     }
   }

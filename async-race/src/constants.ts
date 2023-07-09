@@ -1,5 +1,8 @@
 export const constantsStorage = {
 };
+export const constantsTagName = {
+  TRACK_TAG: 'car-track',
+};
 export const constantsLinks = {
   SWU_IMG_PATH: './assets/images/ukraine_stand.png',
   GIT_LINK: 'https://github.com/perseus-sergey',
@@ -11,6 +14,12 @@ export const constantsTexts = {
   SWU_IMG_ALT: 'Stand With Ukraine',
   RSS_IMG_ALT: 'Rss School reference',
   COPYRIGHT_TEXT: 'Created 2023',
+  CREATE_CAR_SUBMIT: 'CREATE',
+  UPDATE_CAR_SUBMIT: 'UPDATE',
+  BTN_TRACK_SELECT_CAR: 'SELECT',
+  BTN_TRACK_REMOVE_CAR: 'REMOVE',
+  BTN_TRACK_STOP_CAR: '◾',
+  BTN_TRACK_START_CAR: '▶',
 };
 export const constantsClasses = {
   ACTIVE: 'active',
@@ -21,8 +30,22 @@ export const constantsClasses = {
   RSS_LINK_CLASS: 'rss-ref',
   RSS_LINK_IMG: 'rss-ref__img',
   COPYRIGHT: 'copyright',
+  TRACK: 'track',
+  TRACK_BTNS_WRAPPER: 'track-btns-wrapper',
+  TRACK_CAR_NAME: 'track__car-name',
+  ENGINE_BTNS_WRAPPER: 'engine-btns-wrapper',
+  CAR: 'car',
+  CAR_SVG_FILL_COLOR: 'car-svg-fill',
+  GARAGE: 'garage',
+  CONTROL_PANEL: 'control-panel',
+  INP_CREATE_CAR_NAME: 'create-car__name',
+  INP_CREATE_CAR_COLOR: 'create-car__color',
+  INP_UPDATE_CAR_NAME: 'update-car__name',
+  INP_UPDATE_CAR_COLOR: 'update-car__color',
 };
 export const constantsAttributes = {
+  ATTR_CAR_NAME: 'data-car-name',
+  ATTR_CAR_COLOR: 'data-car-color',
 };
 export const constantsSVGs = {
   GIT_SVG: `

@@ -1,8 +1,8 @@
-import { CarTag } from '../common/CarTag';
 import {
   constantsClasses, constantsTexts, constantsLinks, constantsSVGs,
 } from '../constants';
 import { generateDomElement } from '../utilites';
+import { Garage } from './Garage';
 
 const {
   HEADER,
@@ -57,8 +57,8 @@ export class Page {
 
   private generateMainTag(): void {
     this.main = generateDomElement('main', '', document.body, MAIN);
-    const carTag = new CarTag();
-    this.main.append(carTag);
+    const garage = new Garage();
+    this.main.append(garage.garage);
   }
 
   private generateFooter(): void {

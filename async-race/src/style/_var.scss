@@ -37,3 +37,20 @@ $keyBgColorDefault: $keyBgColorBlue;
   color: $color;
   text-shadow: 1.5px 1.5px 0 darker($color, 8), 0.5px -0.5px 0.5px #fff;
 }
+
+@mixin fontSuperSize($number) {
+  @media (min-aspect-ratio: 2/1) {
+    & {
+      font-size: $number * 2vh;
+    }
+  }
+  @media (max-aspect-ratio: 2/1) {
+    & {
+      font-size: $number * 1vw;
+    }
+  }
+}
+ 
+.someWhere {
+  @include fontSuperSize(2);
+}
