@@ -37,4 +37,11 @@ export const generateDomElement = <T extends HTMLElement>(
 //   });
 // };
 
+export const isFormValidate = (value: string | null | undefined): boolean => !!value;
+
 export const delay = (ms = 1000): Promise<void> => new Promise((res) => { setTimeout(res, ms); });
+
+export const getRandomIntBetween = (min = 0, max = 10): number => {
+  const minInteger = Math.ceil(min);
+  return Math.floor(Math.random() * (Math.floor(max) - minInteger + 1)) + minInteger;
+};

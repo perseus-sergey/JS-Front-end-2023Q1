@@ -36,7 +36,7 @@ header {
   align-items: center;
   gap: 2%;
   height: 10vh;
-  margin-bottom: 5vh;
+  margin-bottom: 2vh;
   border-bottom: 5px groove rgb(188, 188, 188);
 
   @media (orientation: portrait) {
@@ -129,8 +129,8 @@ footer {
 }
 
 button {
-  font-size: 2vh;
-  padding: 0.4vh 1vh;
+  font-size: 1.5vh;
+  padding: 0.2vh 1vh;
   margin-right: 0.5vw;
   display: flex;
   align-items: center;
@@ -192,13 +192,24 @@ main {
       }
     }
 
+    .finish-flag {
+      display: inline-block;
+      position: relative;
+      padding-left: 80vw;
+      z-index: 1;
+
+      svg {
+        height: 5vh;
+      }
+    }
+
     .car {
       display: inline-block;
       // transition: transform 3s linear;
 
       svg {
         transform: scaleX(-1);
-        height: 4vh;
+        height: 3.5vh;
 
         .str0 {
           stroke: #373435;

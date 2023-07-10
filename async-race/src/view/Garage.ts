@@ -1,7 +1,7 @@
 import {
   constantsClasses, constantsTexts, constantsTagName,
 } from '../constants';
-import { generateDomElement } from '../utilites';
+import { generateDomElement, getRandomIntBetween, isFormValidate } from '../utilites';
 import { Car } from './Car';
 import { Track } from './Track';
 
@@ -40,7 +40,7 @@ export class Garage {
 
   public static cars: Car[] = [];
 
-  private garage!: HTMLElement;
+  public garage!: HTMLElement;
 
   private trackWrapper!: HTMLElement;
 
@@ -75,17 +75,37 @@ export class Garage {
 
   private startEventListners(): void {
     this.createCarSubmitHandler = this.createCarSubmitHandler.bind(this);
+    this.formCreateCarFocusHandler = this.formCreateCarFocusHandler.bind(this);
     this.formCreateCar.addEventListener('submit', this.createCarSubmitHandler);
+    this.formCreateCar.addEventListener('focus', this.formCreateCarFocusHandler, true);
+    // Garage.formUpdateCar.addEventListener('blur', this.formUpdateBlurHandler, true);
+  }
+
+  private formCreateCarFocusHandler(): void {
+    Garage.isDisableUpdateForm();
+  }
+
+  private resetCreateForm(): void {
+    this.inputCreateCarColor.value = '#06a6f6';
+    this.inputCreateCarName.value = '';
   }
 
   private createCarSubmitHandler(event: Event): void {
-    const createdName = this.inputCreateCarName.value;
-    const createdColor = this.inputCreateCarColor.value;
-    const car = new Car(createdColor, createdName, 5);
-    const track: Track = generateDomElement(TRACK_TAG, null, this.garage);
-    track.setCar(car);
-    Garage.cars.push(car);
     event.preventDefault();
+    if (!isFormValidate(this.inputCreateCarName.value)) {
+      this.inputCreateCarName.focus();
+      return;
+    }
+    const car = new Car(
+      this.inputCreateCarColor.value,
+      this.inputCreateCarName.value,
+      getRandomIntBetween(),
+    );
+    const track: Track = generateDomElement(TRACK_TAG, null, this.garage);
+    track.generateCar(car);
+    Garage.cars.push(car);
+    this.resetCreateForm();
+    // console.log('cars', Garage.cars);
   }
 
   private generateGarage(): void {
@@ -110,9 +130,9 @@ export class Garage {
     this.inputCreateCarName.type = 'text';
     this.inputCreateCarColor = generateDomElement('input', '', this.formCreateCar, INP_CREATE_CAR_COLOR);
     this.inputCreateCarColor.type = 'color';
-    this.inputCreateCarColor.value = '#06a6f6';
     this.inputCreateCarSubmit = generateDomElement('button', CREATE_CAR_SUBMIT, this.formCreateCar);
     this.inputCreateCarSubmit.type = 'submit';
+    this.resetCreateForm();
   }
 
   private generateFormUpdateCar(): void {
