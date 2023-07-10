@@ -35,7 +35,7 @@ export const constantsClasses = {
   TRACK_CAR_NAME: 'track__car-name',
   ENGINE_BTNS_WRAPPER: 'engine-btns-wrapper',
   CAR: 'car',
-  CAR_SVG_FILL_COLOR: 'car-svg-fill',
+  // CAR_SVG_FILL_COLOR: 'car-svg-fill',
   GARAGE: 'garage',
   CONTROL_PANEL: 'control-panel',
   INP_CREATE_CAR_NAME: 'create-car__name',
