@@ -21,7 +21,7 @@ const {
   BTN_TRACK_SELECT_CAR, BTN_TRACK_REMOVE_CAR, BTN_TRACK_STOP_CAR, BTN_TRACK_START_CAR,
 } = constantsTexts;
 
-const { ATTR_CAR_NAME, ATTR_CAR_COLOR } = constantsAttributes;
+const { ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE } = constantsAttributes;
 
 export class Track extends HTMLElement {
   private car!: Car;
@@ -45,7 +45,7 @@ export class Track extends HTMLElement {
   private distance!: number;
 
   public static get observedAttributes(): string[] {
-    return [ATTR_CAR_NAME, ATTR_CAR_COLOR];
+    return [ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE];
   }
 
   public generateCar(car: Car): void {
@@ -59,11 +59,9 @@ export class Track extends HTMLElement {
     if (name === ATTR_CAR_NAME) {
       this.carTitle = newValue;
       if (this.carTitleTag) this.carTitleTag.innerHTML = newValue;
-    }
-    if (name === ATTR_CAR_COLOR) {
-      // this.carColor = newValue;
+    } else if (name === ATTR_CAR_COLOR) {
       if (this.carElement) this.carElement.innerHTML = this.car.getImage();
-    }
+    } else if (name === MOOVE) this.moove();
   }
 
   private connectedCallback(): void {
@@ -86,27 +84,43 @@ export class Track extends HTMLElement {
   }
 
   private callbackBinding(): void {
-    this.stopBtnHandler = this.stopBtnHandler.bind(this);
-    this.startBtnHandler = this.startBtnHandler.bind(this);
+    // this.stopBtnHandler = this.stopBtnHandler.bind(this);
+    // this.startBtnHandler = this.startBtnHandler.bind(this);
     this.step = this.step.bind(this);
   }
 
   private setListners(): void {
-    this.engineStopBtn.addEventListener('click', this.stopBtnHandler);
-    this.engineStartBtn.addEventListener('click', this.startBtnHandler);
+    this.engineStopBtn.addEventListener('click', () => this.removeAttribute(MOOVE));
+    this.engineStartBtn.addEventListener('click', () => this.setAttribute(MOOVE, ''));
+    // this.engineStopBtn.addEventListener('click', this.stopBtnHandler);
+    // this.engineStartBtn.addEventListener('click', this.startBtnHandler);
   }
 
-  private startBtnHandler(): void {
-    this.engineStartBtn.disabled = true;
-    requestAnimationFrame(this.step);
+  private moove(): void {
+    if (this.hasAttribute(MOOVE)) {
+      this.engineStartBtn.disabled = true;
+      requestAnimationFrame(this.step);
+    } else {
+      cancelAnimationFrame(this.stopId);
+      this.start = 0;
+      this.carElement.style.transform = 'translateX(0)';
+      this.engineStartBtn.disabled = false;
+    }
   }
 
-  private stopBtnHandler(): void {
-    cancelAnimationFrame(this.stopId);
-    this.start = 0;
-    this.carElement.style.transform = 'translateX(0)';
-    this.engineStartBtn.disabled = false;
-  }
+  // private startBtnHandler(): void {
+  //   this.setAttribute(MOOVE);
+  //   this.engineStartBtn.disabled = true;
+  //   requestAnimationFrame(this.step);
+  // }
+
+  // private stopBtnHandler(): void {
+  //   this.removeAttribute(MOOVE);
+  //   cancelAnimationFrame(this.stopId);
+  //   this.start = 0;
+  //   this.carElement.style.transform = 'translateX(0)';
+  //   this.engineStartBtn.disabled = false;
+  // }
 
   private step(timestamp: number): void {
     this.distance = this.clientWidth - this.carElement.clientWidth;

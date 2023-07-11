@@ -1,4 +1,8 @@
+/* eslint-disable max-len */
 import { ICar } from './app/tipes';
+import { constantsTagName } from './constants';
+
+const { TRACK_TAG } = constantsTagName;
 
 export const generateDomElement = <T extends HTMLElement>(
   tag: string,
@@ -51,3 +55,5 @@ export const getRandomIntBetween = (min = 1, max = 10): number => {
 export const freeIdSearche = (
   cars: ICar[],
 ): number => (cars.length ? Math.max(...cars.map((car) => car.id)) + 1 : 0);
+
+export const getTrackTags = (): HTMLElement[] => [...document.querySelectorAll(TRACK_TAG)] as HTMLElement[];

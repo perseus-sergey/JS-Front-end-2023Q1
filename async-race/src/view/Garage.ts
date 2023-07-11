@@ -3,7 +3,7 @@ import {
   constantsClasses, constantsTexts, constantsTagName, constantsAttributes,
 } from '../constants';
 import {
-  freeIdSearche, generateDomElement, getRandomIntBetween, isFormValidate,
+  freeIdSearche, generateDomElement, getRandomIntBetween, getTrackTags, isFormValidate,
 } from '../utilites';
 import { Car } from './Car';
 import { Track } from './Track';
@@ -19,17 +19,27 @@ const {
   INP_UPDATE_CAR_NAME,
   INP_UPDATE_CAR_COLOR,
   BTN_TRACK_SELECT_CAR_STYLE,
+  WRAP_RACE_BUTTONS,
+  BTN_STOP_RACE,
+  BTN_START_RACE,
+  BTN_CREATE_CARS,
 } = constantsClasses;
 
 const {
   CREATE_CAR_SUBMIT,
   UPDATE_CAR_SUBMIT,
+  DEFAULT_UPDATE_COLOR,
+  DEFAULT_CREATE_COLOR,
+  BTN_STOP_RACE_TEXT,
+  BTN_START_RACE_TEXT,
+  BTN_CREATE_CARS_TEXT,
 } = constantsTexts;
 
 const {
   ATTR_CAR_NAME,
   ATTR_CAR_ID,
   ATTR_CAR_COLOR,
+  MOOVE,
 } = constantsAttributes;
 
 const { TRACK_TAG } = constantsTagName;
@@ -69,7 +79,7 @@ export class Garage {
   }
 
   private disableUpdateForm(isDisable = true): void {
-    this.inputUpdateCarColor.value = '#ffe942';
+    this.inputUpdateCarColor.value = DEFAULT_UPDATE_COLOR;
     this.inputUpdateCarName.value = '';
     this.inputUpdateCarName.disabled = isDisable;
     this.inputUpdateCarColor.disabled = isDisable;
@@ -92,6 +102,9 @@ export class Garage {
   private documentClickHandler(event: Event): void {
     const targ = event.target as HTMLElement;
     if (targ.closest(`.${BTN_TRACK_SELECT_CAR_STYLE}`)) this.updateCarFormHandler(targ);
+    else if (targ.closest(`.${BTN_STOP_RACE}`)) this.stopRaceHandler();
+    else if (targ.closest(`.${BTN_START_RACE}`)) this.startRaceHandler();
+    else if (targ.closest(`.${BTN_CREATE_CARS}`)) this.createCarsHandler();
   }
 
   private updateCarFormHandler(target: HTMLElement): void {
@@ -104,7 +117,7 @@ export class Garage {
     this.disableUpdateForm(false);
     this.inputUpdateCarName.focus();
     this.inputUpdateCarName.value = chosenCar.name || '';
-    this.inputUpdateCarColor.value = chosenCar.color || '#ffffff';
+    this.inputUpdateCarColor.value = chosenCar.color || DEFAULT_CREATE_COLOR;
     this.chosenTrack = chosenTrack;
     this.chosenCar = chosenCar;
     this.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
@@ -130,8 +143,21 @@ export class Garage {
     this.disableUpdateForm();
   }
 
+  private stopRaceHandler(): void {
+    const tracks = getTrackTags();
+    if (tracks.length) tracks.forEach((track) => track.removeAttribute(MOOVE));
+  }
+
+  private startRaceHandler(): void {
+    const tracks = getTrackTags();
+    if (tracks.length) tracks.forEach((track) => track.setAttribute(MOOVE, ''));
+  }
+
+  private createCarsHandler(): void {
+  }
+
   private resetCreateForm(): void {
-    this.inputCreateCarColor.value = '#06a6f6';
+    this.inputCreateCarColor.value = DEFAULT_CREATE_COLOR;
     this.inputCreateCarName.value = '';
   }
 
@@ -173,6 +199,14 @@ export class Garage {
     this.controlPanel = generateDomElement('div', null, this.garage, CONTROL_PANEL);
     this.generateFormCreateCar();
     this.generateFormUpdateCar();
+    this.generateFormRace();
+  }
+
+  private generateFormRace(): void {
+    const raceBtnsWrapper = generateDomElement('div', null, this.controlPanel, WRAP_RACE_BUTTONS);
+    generateDomElement('button', BTN_STOP_RACE_TEXT, raceBtnsWrapper, BTN_STOP_RACE);
+    generateDomElement('button', BTN_START_RACE_TEXT, raceBtnsWrapper, BTN_START_RACE);
+    generateDomElement('button', BTN_CREATE_CARS_TEXT, raceBtnsWrapper, BTN_CREATE_CARS);
   }
 
   private generateFormCreateCar(): void {
