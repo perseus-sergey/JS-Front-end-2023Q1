@@ -18,12 +18,14 @@ import { Track } from './Track';
 
 const {
   GARAGE,
+  TRACKS_TAG,
   CONTROL_PANEL,
   INP_CREATE_CAR_NAME,
   INP_CREATE_CAR_COLOR,
   INP_UPDATE_CAR_NAME,
   INP_UPDATE_CAR_COLOR,
   BTN_TRACK_SELECT_CAR_STYLE,
+  BTN_TRACK_REMOVE_CAR_STYLE,
   WRAP_RACE_BUTTONS,
   BTN_STOP_RACE,
   BTN_START_RACE,
@@ -63,6 +65,8 @@ export class Garage {
 
   public garage!: HTMLElement;
 
+  public tracksElement!: HTMLElement;
+
   private chosenTrack!: HTMLElement;
 
   private chosenCar!: ICar;
@@ -80,6 +84,7 @@ export class Garage {
   constructor() {
     this.generateGarage();
     this.generateControlPanel();
+    this.generateTracksTag();
     this.bindCallbacks();
     this.startEventListners();
   }
@@ -108,16 +113,29 @@ export class Garage {
   private documentClickHandler(event: Event): void {
     const targ = event.target as HTMLElement;
     if (targ.closest(`.${BTN_TRACK_SELECT_CAR_STYLE}`)) this.updateCarFormHandler(targ);
+    else if (targ.closest(`.${BTN_TRACK_REMOVE_CAR_STYLE}`)) this.removeCarHandler(targ);
     else if (targ.closest(`.${BTN_STOP_RACE}`)) this.stopRaceHandler();
     else if (targ.closest(`.${BTN_START_RACE}`)) this.startRaceHandler();
     else if (targ.closest(`.${BTN_CREATE_CARS}`)) this.createCarsHandler();
   }
 
+  private removeCarHandler(target: HTMLElement): void {
+    const chosenTrack = target.closest(TRACK_TAG) as Track;
+    if (!chosenTrack) return;
+    const chosenCarID = this.cars
+      .findIndex((eachCar) => eachCar.id === chosenTrack.car.id);
+
+    if (chosenCarID === undefined || chosenCarID === -1) return;
+    this.cars.splice(chosenCarID, 1);
+    this.fillTracksHtml();
+    // console.log('cars remove', this.cars);
+  }
+
   private updateCarFormHandler(target: HTMLElement): void {
-    const chosenTrack = target.closest(TRACK_TAG) as HTMLElement;
+    const chosenTrack = target.closest(TRACK_TAG) as Track;
     if (!chosenTrack) return;
     const chosenCar = this.cars
-      .find((eachCar) => `${eachCar.id}` === chosenTrack.getAttribute(ATTR_CAR_ID));
+      .find((eachCar) => eachCar.id === chosenTrack.car.id);
 
     if (!chosenCar) return;
     this.disableUpdateForm(false);
@@ -142,7 +160,7 @@ export class Garage {
 
     this.setTrackAttributes(this.chosenTrack, chosenCar.id, chosenCar.name, chosenCar.color);
     this.disableUpdateForm(true);
-    console.log('cars', this.cars);
+    // console.log('cars add', this.cars);
   }
 
   private formCreateCarFocusHandler(): void {
@@ -160,15 +178,22 @@ export class Garage {
   }
 
   private createCarsHandler(): void {
-    const randomCars = new Array(NUMBER_RANDOM_CREATED_CAR).fill(null).map((car) => new Car(
-      freeIdSearche(this.cars),
+    const startID = freeIdSearche(this.cars);
+    const randomCars = new Array(NUMBER_RANDOM_CREATED_CAR).fill(null).map((car, index) => new Car(
+      startID + index,
       this.inputCreateCarColor.value,
       carNames[getRandomIntBetween(0, carNames.length - 1)],
       getRandomIntBetween(1, 100),
     ));
     this.cars = [...this.cars, ...randomCars];
+    this.fillTracksHtml();
+    // console.log(this.cars);
+  }
+
+  private fillTracksHtml(): void {
+    this.tracksElement.innerHTML = '';
     this.cars.slice(0, NUMBER_TRACKS_PER_PAGE).forEach((car) => {
-      const track: Track = generateDomElement(TRACK_TAG, null, this.garage);
+      const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
       this.setTrackAttributes(track, car.id, car.name, car.color);
       track.insertCar(car);
     });
@@ -191,17 +216,12 @@ export class Garage {
       this.inputCreateCarName.value,
       getRandomIntBetween(1, 100),
     );
-    const track: Track = generateDomElement(TRACK_TAG, null, this.garage);
+    const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
     this.setTrackAttributes(track, car.id, car.name, car.color);
     track.insertCar(car);
     this.cars.push(car);
     this.resetCreateForm();
   }
-
-  // private putCarToTrack(): void {
-  //   this.setTrackAttributes(track, car.id, car.name, car.color);
-  //   track.insertCar(car);
-  // }
 
   private setTrackAttributes(
     parent: HTMLElement,
@@ -223,6 +243,10 @@ export class Garage {
     this.generateFormCreateCar();
     this.generateFormUpdateCar();
     this.generateFormRace();
+  }
+
+  private generateTracksTag(): void {
+    this.tracksElement = generateDomElement('div', '', this.garage, TRACKS_TAG);
   }
 
   private generateFormRace(): void {

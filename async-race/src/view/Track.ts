@@ -24,7 +24,7 @@ const {
 const { ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE } = constantsAttributes;
 
 export class Track extends HTMLElement {
-  private car!: Car;
+  public car!: Car;
 
   private carElement!: HTMLElement;
 

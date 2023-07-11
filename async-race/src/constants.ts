@@ -44,6 +44,7 @@ export const constantsClasses = {
   CAR: 'car',
   FINISH_FLAG: 'finish-flag',
   GARAGE: 'garage',
+  TRACKS_TAG: 'tracks',
   WRAP_RACE_BUTTONS: 'race-btns-wrapper',
   BTN_STOP_RACE: 'btn-race-stop',
   BTN_START_RACE: 'btn-race-start',
