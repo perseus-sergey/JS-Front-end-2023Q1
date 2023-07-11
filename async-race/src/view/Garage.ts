@@ -1,6 +1,11 @@
 import { ICar } from '../app/tipes';
 import {
-  constantsClasses, constantsTexts, constantsTagName, constantsAttributes,
+  constantsClasses,
+  constantsTexts,
+  constantsTagName,
+  constantsAttributes,
+  constantsNumbers,
+  carNames,
 } from '../constants';
 import {
   freeIdSearche, generateDomElement, getRandomIntBetween, getTrackTags, isFormValidate,
@@ -43,6 +48,7 @@ const {
 } = constantsAttributes;
 
 const { TRACK_TAG } = constantsTagName;
+const { NUMBER_RANDOM_CREATED_CAR, NUMBER_TRACKS_PER_PAGE } = constantsNumbers;
 
 export class Garage {
   private formUpdateCar!: HTMLInputElement;
@@ -154,6 +160,18 @@ export class Garage {
   }
 
   private createCarsHandler(): void {
+    const randomCars = new Array(NUMBER_RANDOM_CREATED_CAR).fill(null).map((car) => new Car(
+      freeIdSearche(this.cars),
+      this.inputCreateCarColor.value,
+      carNames[getRandomIntBetween(0, carNames.length - 1)],
+      getRandomIntBetween(1, 100),
+    ));
+    this.cars = [...this.cars, ...randomCars];
+    this.cars.slice(0, NUMBER_TRACKS_PER_PAGE).forEach((car) => {
+      const track: Track = generateDomElement(TRACK_TAG, null, this.garage);
+      this.setTrackAttributes(track, car.id, car.name, car.color);
+      track.insertCar(car);
+    });
   }
 
   private resetCreateForm(): void {
@@ -171,14 +189,19 @@ export class Garage {
       freeIdSearche(this.cars),
       this.inputCreateCarColor.value,
       this.inputCreateCarName.value,
-      getRandomIntBetween(),
+      getRandomIntBetween(1, 100),
     );
     const track: Track = generateDomElement(TRACK_TAG, null, this.garage);
     this.setTrackAttributes(track, car.id, car.name, car.color);
-    track.generateCar(car);
+    track.insertCar(car);
     this.cars.push(car);
     this.resetCreateForm();
   }
+
+  // private putCarToTrack(): void {
+  //   this.setTrackAttributes(track, car.id, car.name, car.color);
+  //   track.insertCar(car);
+  // }
 
   private setTrackAttributes(
     parent: HTMLElement,

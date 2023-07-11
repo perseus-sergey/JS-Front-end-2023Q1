@@ -1,5 +1,9 @@
 export const constantsStorage = {
 };
+export const constantsNumbers = {
+  NUMBER_RANDOM_CREATED_CAR: 100,
+  NUMBER_TRACKS_PER_PAGE: 7,
+};
 export const constantsTagName = {
   TRACK_TAG: 'car-track',
 };
@@ -77,3 +81,35 @@ export const constantsSVGs = {
 </svg>
   `,
 };
+
+export const carNames: string[] = [
+  'Rolls-Royce',
+  'Aston Martin',
+  'Bentley',
+  'Jaguar',
+  'Land Rover',
+  'Lagonda',
+  'McLaren',
+  'Lotus',
+  'Mini',
+  'MG',
+  'Morgan',
+  'Ferrari',
+  'Alfa Romeo',
+  'Maserati',
+  'Mercedes-Benz',
+  'Ford',
+  'Porsche',
+  'Lotus',
+  'Renault',
+  'Lamborghini',
+  'Peugeot',
+  'Aston Martin',
+  '9ff',
+  'Apollo',
+  'Arash',
+  'Arrinera',
+  'Artega',
+  'Ascari',
+  'Audi',
+];

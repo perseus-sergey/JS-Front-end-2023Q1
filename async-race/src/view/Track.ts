@@ -48,7 +48,7 @@ export class Track extends HTMLElement {
     return [ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE];
   }
 
-  public generateCar(car: Car): void {
+  public insertCar(car: Car): void {
     this.car = car;
     this.carTitleTag.innerHTML = car.name;
     this.carElement = generateDomElement('div', car.getImage(), this, CAR);
