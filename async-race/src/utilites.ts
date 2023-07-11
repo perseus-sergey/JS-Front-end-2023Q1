@@ -57,3 +57,5 @@ export const freeIdSearche = (
 ): number => (cars.length ? Math.max(...cars.map((car) => car.id)) + 1 : 0);
 
 export const getTrackTags = (): HTMLElement[] => [...document.querySelectorAll(TRACK_TAG)] as HTMLElement[];
+
+export const randomColor = (): string => `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')}`;

@@ -8,7 +8,7 @@ import {
   carNames,
 } from '../constants';
 import {
-  freeIdSearche, generateDomElement, getRandomIntBetween, getTrackTags, isFormValidate,
+  freeIdSearche, generateDomElement, getRandomIntBetween, getTrackTags, isFormValidate, randomColor,
 } from '../utilites';
 import { Car } from './Car';
 import { Track } from './Track';
@@ -181,7 +181,7 @@ export class Garage {
     const startID = freeIdSearche(this.cars);
     const randomCars = new Array(NUMBER_RANDOM_CREATED_CAR).fill(null).map((car, index) => new Car(
       startID + index,
-      this.inputCreateCarColor.value,
+      randomColor(),
       carNames[getRandomIntBetween(0, carNames.length - 1)],
       getRandomIntBetween(1, 100),
     ));
