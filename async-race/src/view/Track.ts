@@ -84,16 +84,12 @@ export class Track extends HTMLElement {
   }
 
   private callbackBinding(): void {
-    // this.stopBtnHandler = this.stopBtnHandler.bind(this);
-    // this.startBtnHandler = this.startBtnHandler.bind(this);
     this.step = this.step.bind(this);
   }
 
   private setListners(): void {
     this.engineStopBtn.addEventListener('click', () => this.removeAttribute(MOOVE));
     this.engineStartBtn.addEventListener('click', () => this.setAttribute(MOOVE, ''));
-    // this.engineStopBtn.addEventListener('click', this.stopBtnHandler);
-    // this.engineStartBtn.addEventListener('click', this.startBtnHandler);
   }
 
   private moove(): void {
@@ -108,24 +104,11 @@ export class Track extends HTMLElement {
     }
   }
 
-  // private startBtnHandler(): void {
-  //   this.setAttribute(MOOVE);
-  //   this.engineStartBtn.disabled = true;
-  //   requestAnimationFrame(this.step);
-  // }
-
-  // private stopBtnHandler(): void {
-  //   this.removeAttribute(MOOVE);
-  //   cancelAnimationFrame(this.stopId);
-  //   this.start = 0;
-  //   this.carElement.style.transform = 'translateX(0)';
-  //   this.engineStartBtn.disabled = false;
-  // }
-
   private step(timestamp: number): void {
     this.distance = this.clientWidth - this.carElement.clientWidth;
     if (!this.start || this.progress > this.distance) this.start = timestamp;
-    this.progress = (timestamp - this.start) / this.car.velocity + 25;
+    this.progress = (timestamp - this.start) / (500 / this.car.velocity);
+    // this.progress = (timestamp - this.start) / this.car.velocity + 25;
     this.carElement.style.transform = `translateX(${Math.min(this.progress, this.distance)}px)`;
     if (this.progress < this.distance) {
       this.stopId = requestAnimationFrame(this.step);

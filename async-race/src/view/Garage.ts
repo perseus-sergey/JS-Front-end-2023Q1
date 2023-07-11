@@ -13,8 +13,8 @@ import {
 import { Car } from './Car';
 import { Track } from './Track';
 
-// TO_DO: createCarSubmitHandler clean inputs
-// TO_DO: createCarSubmitHandler resolve Dependency cycle
+// TO_DO: Determine the winner
+// TO_DO: Implement winner page
 
 const {
   GARAGE,
@@ -143,10 +143,10 @@ export class Garage {
     else if (targ.closest(`.${BTN_STOP_RACE}`)) this.stopRace();
     else if (targ.closest(`.${BTN_START_RACE}`)) this.startRace();
     else if (targ.closest(`.${BTN_CREATE_CARS}`)) this.createCars();
-    else if (targ.closest(`.${BTN_PAGIN_FIRST}`)) this.paginFirstClickHandler();
-    else if (targ.closest(`.${BTN_PAGIN_LEFT}`)) this.paginPrevClickHandler();
-    else if (targ.closest(`.${BTN_PAGIN_RIGHT}`)) this.paginNextClickHandler();
-    else if (targ.closest(`.${BTN_PAGIN_LAST}`)) this.paginLastClickHandler();
+    else if (targ.closest(`.${BTN_PAGIN_FIRST}`)) this.paginClickHandler('first');
+    else if (targ.closest(`.${BTN_PAGIN_LAST}`)) this.paginClickHandler('last');
+    else if (targ.closest(`.${BTN_PAGIN_LEFT}`)) this.paginClickHandler('previus');
+    else if (targ.closest(`.${BTN_PAGIN_RIGHT}`)) this.paginClickHandler('next');
   }
 
   private startEventListners(): void {
@@ -228,15 +228,6 @@ export class Garage {
     this.updateGarageTitle();
     // console.log(this.cars);
   }
-
-  // private fillTracksHtml(): void {
-  //   this.tracksElement.innerHTML = '';
-  //   this.cars.slice(0, NUMBER_TRACKS_PER_PAGE).forEach((car) => {
-  //     const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
-  //     this.setTrackAttributes(track, car.id, car.name, car.color);
-  //     track.insertCar(car);
-  //   });
-  // }
 
   private resetCreateForm(): void {
     this.inputCreateCarColor.value = DEFAULT_CREATE_COLOR;
@@ -320,7 +311,6 @@ export class Garage {
 
   private generateGarageTitle(): void {
     this.garageTitle = generateDomElement('h2', null, this.garage);
-    // this.updateGarageTitle();
   }
 
   private updateGarageTitle(): void {
@@ -331,8 +321,6 @@ export class Garage {
   // ============== PAGINATION ======== start ====
 
   private makePagination(): void {
-    // if (this.cars.length <= NUMBER_TRACKS_PER_PAGE) return;
-
     this.paginWrapper = generateDomElement('div', null, this.garage, PAGIN_WRAPPER, HIDE_PAGINATION);
     this.btnPaginFirst = generateDomElement('button', BTN_PAGIN_TEXT_FIRST, this.paginWrapper, BTN_PAGIN_FIRST);
     this.btnPaginPrevius = generateDomElement('button', BTN_PAGIN_TEXT_LEFT, this.paginWrapper, BTN_PAGIN_LEFT);
@@ -344,7 +332,6 @@ export class Garage {
   private updatePagination(): void {
     if (!this.isPaginationVisible()) return;
 
-    // this.paginCurrPage.innerHTML = `${this.currPageNum}`;
     this.maxPage = Math.ceil(this.cars.length / NUMBER_TRACKS_PER_PAGE);
     this.currPageNum = Math.min(this.currPageNum, this.maxPage);
     this.paginCurrPage.innerHTML = `${this.currPageNum}`;
@@ -367,23 +354,11 @@ export class Garage {
     });
   }
 
-  private paginPrevClickHandler(): void {
-    this.currPageNum -= 1;
-    this.updatePagination();
-  }
-
-  private paginNextClickHandler(): void {
-    this.currPageNum += 1;
-    this.updatePagination();
-  }
-
-  private paginLastClickHandler(): void {
-    this.currPageNum = this.maxPage;
-    this.updatePagination();
-  }
-
-  private paginFirstClickHandler(): void {
-    this.currPageNum = 1;
+  private paginClickHandler(btnName: 'first' | 'previus' | 'next' | 'last'): void {
+    if (btnName === 'first') this.currPageNum = 1;
+    else if (btnName === 'previus') this.currPageNum -= 1;
+    else if (btnName === 'next') this.currPageNum += 1;
+    else if (btnName === 'last') this.currPageNum = this.maxPage;
     this.updatePagination();
   }
 
