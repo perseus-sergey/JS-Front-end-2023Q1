@@ -1,3 +1,5 @@
+import { ICar } from './app/tipes';
+
 export const generateDomElement = <T extends HTMLElement>(
   tag: string,
   innerHTML: string | null,
@@ -41,7 +43,11 @@ export const isFormValidate = (value: string | null | undefined): boolean => !!v
 
 export const delay = (ms = 1000): Promise<void> => new Promise((res) => { setTimeout(res, ms); });
 
-export const getRandomIntBetween = (min = 0, max = 10): number => {
+export const getRandomIntBetween = (min = 1, max = 10): number => {
   const minInteger = Math.ceil(min);
   return Math.floor(Math.random() * (Math.floor(max) - minInteger + 1)) + minInteger;
 };
+
+export const freeIdSearche = (
+  cars: ICar[],
+): number => (cars.length ? Math.max(...cars.map((car) => car.id)) + 1 : 0);

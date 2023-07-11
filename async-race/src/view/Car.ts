@@ -1,5 +1,8 @@
-export class Car {
+import { ICar } from '../app/tipes';
+
+export class Car implements ICar {
   constructor(
+    public id: number,
     public color = '#000000',
     public name = '',
     public velocity = 1,
@@ -27,12 +30,4 @@ export class Car {
       </svg>
     `;
   }
-
-  // public setColor(color: string): void {
-  //   this.color = color;
-  // }
-
-  // public setName(name: string): void {
-  //   this.name = name;
-  // }
 }

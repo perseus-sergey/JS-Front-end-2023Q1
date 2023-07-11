@@ -1,17 +1,18 @@
 import {
   constantsAttributes, constantsClasses, constantsSVGs, constantsTexts,
 } from '../constants';
-import { generateDomElement, isFormValidate } from '../utilites';
+import { generateDomElement } from '../utilites';
 import { Car } from './Car';
-import { Garage } from './Garage';
 
 const {
-  TRACK,
   TRACK_BTNS_WRAPPER,
   TRACK_CAR_NAME,
   FINISH_FLAG,
-  ENGINE_BTNS_WRAPPER,
   CAR,
+  BTN_TRACK_SELECT_CAR_STYLE,
+  BTN_TRACK_REMOVE_CAR_STYLE,
+  BTN_TRACK_STOP_CAR_STYLE,
+  BTN_TRACK_START_CAR_STYLE,
 } = constantsClasses;
 
 const { FINISH_FLAG_SVG } = constantsSVGs;
@@ -27,21 +28,13 @@ export class Track extends HTMLElement {
 
   private carElement!: HTMLElement;
 
-  private selectBtn!: HTMLButtonElement;
-
-  private removeBtn!: HTMLButtonElement;
-
   private engineStopBtn!: HTMLButtonElement;
 
   private engineStartBtn!: HTMLButtonElement;
 
   private carTitleTag!: HTMLElement;
 
-  private carSvgFillLayer!: HTMLElement;
-
   private carTitle: string | null | undefined;
-
-  private carColor: string | null | undefined;
 
   private start = 0;
 
@@ -51,45 +44,41 @@ export class Track extends HTMLElement {
 
   private distance!: number;
 
-  // public static get observedAttributes(): string[] {
-  //   return [ATTR_CAR_NAME, ATTR_CAR_COLOR];
-  // }
+  public static get observedAttributes(): string[] {
+    return [ATTR_CAR_NAME, ATTR_CAR_COLOR];
+  }
 
   public generateCar(car: Car): void {
     this.car = car;
     this.carTitleTag.innerHTML = car.name;
-    // this.generateCarElement(car);
     this.carElement = generateDomElement('div', car.getImage(), this, CAR);
     generateDomElement('div', FINISH_FLAG_SVG, this, FINISH_FLAG);
   }
 
-  // private attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-  //   if (name === ATTR_CAR_NAME) {
-  //     this.carTitle = newValue;
-  //     if (this.carTitleTag) this.carTitleTag.innerHTML = newValue;
-  //   }
-  //   if (name === ATTR_CAR_COLOR) {
-  //     this.carColor = newValue;
-  //     if (this.carSvgFillLayer) this.carSvgFillLayer.style.fill = newValue;
-  //   }
-  // }
+  private attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+    if (name === ATTR_CAR_NAME) {
+      this.carTitle = newValue;
+      if (this.carTitleTag) this.carTitleTag.innerHTML = newValue;
+    }
+    if (name === ATTR_CAR_COLOR) {
+      // this.carColor = newValue;
+      if (this.carElement) this.carElement.innerHTML = this.car.getImage();
+    }
+  }
 
   private connectedCallback(): void {
     this.generateTrack();
-    // this.car = this.generateCar();
     this.callbackBinding();
     this.setListners();
   }
 
   private generateTrack(): HTMLElement {
-    // const track = generateDomElement('div', '', this, TRACK);
-
     const trackBtnsWrapper = generateDomElement('div', '', this, TRACK_BTNS_WRAPPER);
-    this.selectBtn = generateDomElement('button', BTN_TRACK_SELECT_CAR, trackBtnsWrapper);
-    this.removeBtn = generateDomElement('button', BTN_TRACK_REMOVE_CAR, trackBtnsWrapper);
+    generateDomElement('button', BTN_TRACK_SELECT_CAR, trackBtnsWrapper, BTN_TRACK_SELECT_CAR_STYLE);
+    generateDomElement('button', BTN_TRACK_REMOVE_CAR, trackBtnsWrapper, BTN_TRACK_REMOVE_CAR_STYLE);
 
-    this.engineStopBtn = generateDomElement('button', BTN_TRACK_STOP_CAR, trackBtnsWrapper);
-    this.engineStartBtn = generateDomElement('button', BTN_TRACK_START_CAR, trackBtnsWrapper);
+    this.engineStopBtn = generateDomElement('button', BTN_TRACK_STOP_CAR, trackBtnsWrapper, BTN_TRACK_STOP_CAR_STYLE);
+    this.engineStartBtn = generateDomElement('button', BTN_TRACK_START_CAR, trackBtnsWrapper, BTN_TRACK_START_CAR_STYLE);
 
     this.carTitleTag = generateDomElement('span', this.carTitle || null, trackBtnsWrapper, TRACK_CAR_NAME);
 
@@ -99,44 +88,12 @@ export class Track extends HTMLElement {
   private callbackBinding(): void {
     this.stopBtnHandler = this.stopBtnHandler.bind(this);
     this.startBtnHandler = this.startBtnHandler.bind(this);
-    this.selectBtnHandler = this.selectBtnHandler.bind(this);
-    this.updateCarSubmitHandler = this.updateCarSubmitHandler.bind(this);
     this.step = this.step.bind(this);
   }
 
   private setListners(): void {
-    this.selectBtn.addEventListener('click', this.selectBtnHandler);
-    // this.removeBtn.addEventListener('click', this.clickHandler);
     this.engineStopBtn.addEventListener('click', this.stopBtnHandler);
     this.engineStartBtn.addEventListener('click', this.startBtnHandler);
-  }
-
-  private selectBtnHandler(): void {
-    Garage.isDisableUpdateForm(false);
-    Garage.inputUpdateCarName.focus();
-    Garage.inputUpdateCarName.value = this.car.name || '';
-    Garage.inputUpdateCarColor.value = this.car.color || '#ffffff';
-    Garage.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
-  }
-
-  private updateCarSubmitHandler(event: Event): void {
-    event.preventDefault();
-    if (!isFormValidate(Garage.inputUpdateCarName.value)) {
-      Garage.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
-      Garage.inputUpdateCarName.focus();
-      return;
-    }
-    const updatedName = Garage.inputUpdateCarName.value;
-    const updatedColor = Garage.inputUpdateCarColor.value;
-    // this.carTitle = updatedName;
-    this.carTitleTag.innerHTML = updatedName;
-    // this.carColor = updatedColor;
-    this.car.name = updatedName;
-    this.car.color = updatedColor;
-    this.carElement.innerHTML = this.car.getImage();
-    // this.carSvgFillLayer.style.fill = updatedColor;
-    Garage.isDisableUpdateForm(true);
-    // console.log(Garage.inputUpdateCarColor.value);
   }
 
   private startBtnHandler(): void {
@@ -160,8 +117,4 @@ export class Track extends HTMLElement {
       this.stopId = requestAnimationFrame(this.step);
     }
   }
-
-  // private generateCarElement(car: Car): HTMLElement {
-  //   return generateDomElement('div', car.getImage(), this, CAR);
-  // }
 }

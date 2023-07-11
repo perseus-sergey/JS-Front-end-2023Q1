@@ -1,7 +1,10 @@
+import { ICar } from '../app/tipes';
 import {
-  constantsClasses, constantsTexts, constantsTagName,
+  constantsClasses, constantsTexts, constantsTagName, constantsAttributes,
 } from '../constants';
-import { generateDomElement, getRandomIntBetween, isFormValidate } from '../utilites';
+import {
+  freeIdSearche, generateDomElement, getRandomIntBetween, isFormValidate,
+} from '../utilites';
 import { Car } from './Car';
 import { Track } from './Track';
 
@@ -15,6 +18,7 @@ const {
   INP_CREATE_CAR_COLOR,
   INP_UPDATE_CAR_NAME,
   INP_UPDATE_CAR_COLOR,
+  BTN_TRACK_SELECT_CAR_STYLE,
 } = constantsClasses;
 
 const {
@@ -22,27 +26,30 @@ const {
   UPDATE_CAR_SUBMIT,
 } = constantsTexts;
 
-// const {
-//   ATTR_CAR_NAME,
-//   ATTR_CAR_COLOR,
-// } = constantsAttributes;
+const {
+  ATTR_CAR_NAME,
+  ATTR_CAR_ID,
+  ATTR_CAR_COLOR,
+} = constantsAttributes;
 
 const { TRACK_TAG } = constantsTagName;
 
 export class Garage {
-  public static formUpdateCar: HTMLInputElement;
+  private formUpdateCar!: HTMLInputElement;
 
-  public static inputUpdateCarName: HTMLInputElement;
+  private inputUpdateCarName!: HTMLInputElement;
 
-  public static inputUpdateCarColor: HTMLInputElement;
+  private inputUpdateCarColor!: HTMLInputElement;
 
-  public static inputUpdateCarSubmit: HTMLInputElement;
+  private inputUpdateCarSubmit!: HTMLInputElement;
 
-  public static cars: Car[] = [];
+  private cars: ICar[] = [];
 
   public garage!: HTMLElement;
 
-  private trackWrapper!: HTMLElement;
+  private chosenTrack!: HTMLElement;
+
+  private chosenCar!: ICar;
 
   private controlPanel!: HTMLElement;
 
@@ -54,35 +61,73 @@ export class Garage {
 
   private inputCreateCarSubmit!: HTMLInputElement;
 
-  private inputUpdateCarColor!: HTMLInputElement;
-
-  private inputUpdateCarSubmit!: HTMLInputElement;
-
   constructor() {
     this.generateGarage();
     this.generateControlPanel();
+    this.bindCallbacks();
     this.startEventListners();
-    this.generateTrack();
   }
 
-  public static isDisableUpdateForm(isDisable = true): void {
-    Garage.inputUpdateCarColor.value = '#ffe942';
-    Garage.inputUpdateCarName.value = '';
-    Garage.inputUpdateCarName.disabled = isDisable;
-    Garage.inputUpdateCarColor.disabled = isDisable;
-    Garage.inputUpdateCarSubmit.disabled = isDisable;
+  private disableUpdateForm(isDisable = true): void {
+    this.inputUpdateCarColor.value = '#ffe942';
+    this.inputUpdateCarName.value = '';
+    this.inputUpdateCarName.disabled = isDisable;
+    this.inputUpdateCarColor.disabled = isDisable;
+    this.inputUpdateCarSubmit.disabled = isDisable;
+  }
+
+  private bindCallbacks(): void {
+    this.updateCarSubmitHandler = this.updateCarSubmitHandler.bind(this);
+    this.createCarSubmitHandler = this.createCarSubmitHandler.bind(this);
+    this.formCreateCarFocusHandler = this.formCreateCarFocusHandler.bind(this);
+    this.documentClickHandler = this.documentClickHandler.bind(this);
   }
 
   private startEventListners(): void {
-    this.createCarSubmitHandler = this.createCarSubmitHandler.bind(this);
-    this.formCreateCarFocusHandler = this.formCreateCarFocusHandler.bind(this);
+    document.addEventListener('click', this.documentClickHandler);
     this.formCreateCar.addEventListener('submit', this.createCarSubmitHandler);
     this.formCreateCar.addEventListener('focus', this.formCreateCarFocusHandler, true);
-    // Garage.formUpdateCar.addEventListener('blur', this.formUpdateBlurHandler, true);
+  }
+
+  private documentClickHandler(event: Event): void {
+    const targ = event.target as HTMLElement;
+    if (targ.closest(`.${BTN_TRACK_SELECT_CAR_STYLE}`)) this.updateCarFormHandler(targ);
+  }
+
+  private updateCarFormHandler(target: HTMLElement): void {
+    const chosenTrack = target.closest(TRACK_TAG) as HTMLElement;
+    if (!chosenTrack) return;
+    const chosenCar = this.cars
+      .find((eachCar) => `${eachCar.id}` === chosenTrack.getAttribute(ATTR_CAR_ID));
+
+    if (!chosenCar) return;
+    this.disableUpdateForm(false);
+    this.inputUpdateCarName.focus();
+    this.inputUpdateCarName.value = chosenCar.name || '';
+    this.inputUpdateCarColor.value = chosenCar.color || '#ffffff';
+    this.chosenTrack = chosenTrack;
+    this.chosenCar = chosenCar;
+    this.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
+  }
+
+  private updateCarSubmitHandler(event: Event): void {
+    event.preventDefault();
+    if (!isFormValidate(this.inputUpdateCarName.value)) {
+      this.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
+      this.inputUpdateCarName.focus();
+      return;
+    }
+    const { chosenCar } = this;
+    chosenCar.name = this.inputUpdateCarName.value;
+    chosenCar.color = this.inputUpdateCarColor.value;
+
+    this.setTrackAttributes(this.chosenTrack, chosenCar.id, chosenCar.name, chosenCar.color);
+    this.disableUpdateForm(true);
+    console.log('cars', this.cars);
   }
 
   private formCreateCarFocusHandler(): void {
-    Garage.isDisableUpdateForm();
+    this.disableUpdateForm();
   }
 
   private resetCreateForm(): void {
@@ -97,25 +142,31 @@ export class Garage {
       return;
     }
     const car = new Car(
+      freeIdSearche(this.cars),
       this.inputCreateCarColor.value,
       this.inputCreateCarName.value,
       getRandomIntBetween(),
     );
     const track: Track = generateDomElement(TRACK_TAG, null, this.garage);
+    this.setTrackAttributes(track, car.id, car.name, car.color);
     track.generateCar(car);
-    Garage.cars.push(car);
+    this.cars.push(car);
     this.resetCreateForm();
-    // console.log('cars', Garage.cars);
+  }
+
+  private setTrackAttributes(
+    parent: HTMLElement,
+    id: string | number,
+    name: string,
+    color: string,
+  ): void {
+    parent.setAttribute(ATTR_CAR_ID, `${id}`);
+    parent.setAttribute(ATTR_CAR_NAME, `${name}`);
+    parent.setAttribute(ATTR_CAR_COLOR, `${color}`);
   }
 
   private generateGarage(): void {
     this.garage = generateDomElement('div', '', null, GARAGE);
-  }
-
-  private generateTrack(): void {
-    // const track = generateDomElement(TRACK_TAG, null, this.garage);
-    // track.setAttribute(ATTR_CAR_NAME, 'Toyota');
-    // track.setAttribute(ATTR_CAR_COLOR, '#000000');
   }
 
   private generateControlPanel(): void {
@@ -136,13 +187,13 @@ export class Garage {
   }
 
   private generateFormUpdateCar(): void {
-    Garage.formUpdateCar = generateDomElement('form', '', this.controlPanel);
-    Garage.inputUpdateCarName = generateDomElement('input', '', Garage.formUpdateCar, INP_UPDATE_CAR_NAME);
-    Garage.inputUpdateCarName.type = 'text';
-    Garage.inputUpdateCarColor = generateDomElement('input', '', Garage.formUpdateCar, INP_UPDATE_CAR_COLOR);
-    Garage.inputUpdateCarColor.type = 'color';
-    Garage.inputUpdateCarSubmit = generateDomElement('button', UPDATE_CAR_SUBMIT, Garage.formUpdateCar);
-    Garage.inputUpdateCarSubmit.type = 'submit';
-    Garage.isDisableUpdateForm(true);
+    this.formUpdateCar = generateDomElement('form', '', this.controlPanel);
+    this.inputUpdateCarName = generateDomElement('input', '', this.formUpdateCar, INP_UPDATE_CAR_NAME);
+    this.inputUpdateCarName.type = 'text';
+    this.inputUpdateCarColor = generateDomElement('input', '', this.formUpdateCar, INP_UPDATE_CAR_COLOR);
+    this.inputUpdateCarColor.type = 'color';
+    this.inputUpdateCarSubmit = generateDomElement('button', UPDATE_CAR_SUBMIT, this.formUpdateCar);
+    this.inputUpdateCarSubmit.type = 'submit';
+    this.disableUpdateForm(true);
   }
 }
