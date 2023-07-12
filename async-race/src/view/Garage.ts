@@ -8,7 +8,8 @@ import {
   carNames,
 } from '../constants';
 import {
-  freeIdSearche, generateDomElement, getRandomIntBetween, getTrackTags, isFormValidate, randomColor,
+  delay,
+  freeIdSearche, generateDomElement, getRandomIntBetween, isFormValidate, randomColor,
 } from '../utilites';
 import { Car } from './Car';
 import { Track } from './Track';
@@ -59,10 +60,16 @@ const {
   ATTR_CAR_ID,
   ATTR_CAR_COLOR,
   MOOVE,
+  WINNER,
 } = constantsAttributes;
 
 const { TRACK_TAG } = constantsTagName;
-const { NUMBER_RANDOM_CREATED_CAR, NUMBER_TRACKS_PER_PAGE } = constantsNumbers;
+const {
+  NUMBER_RANDOM_CREATED_CAR,
+  NUMBER_TRACKS_PER_PAGE,
+  MAX_SPEED,
+  MIN_SPEED,
+} = constantsNumbers;
 
 export class Garage {
   private formUpdateCar!: HTMLInputElement;
@@ -107,6 +114,8 @@ export class Garage {
 
   private paginWrapper!: HTMLElement;
 
+  private isRace = false;
+
   private currPageNum = 1;
 
   private maxPage = 1;
@@ -140,9 +149,11 @@ export class Garage {
     const targ = event.target as HTMLElement;
     if (targ.closest(`.${BTN_TRACK_SELECT_CAR_STYLE}`)) this.updateCarForm(targ);
     else if (targ.closest(`.${BTN_TRACK_REMOVE_CAR_STYLE}`)) this.removeCar(targ);
+
     else if (targ.closest(`.${BTN_STOP_RACE}`)) this.stopRace();
     else if (targ.closest(`.${BTN_START_RACE}`)) this.startRace();
     else if (targ.closest(`.${BTN_CREATE_CARS}`)) this.createCars();
+
     else if (targ.closest(`.${BTN_PAGIN_FIRST}`)) this.paginClickHandler('first');
     else if (targ.closest(`.${BTN_PAGIN_LAST}`)) this.paginClickHandler('last');
     else if (targ.closest(`.${BTN_PAGIN_LEFT}`)) this.paginClickHandler('previus');
@@ -206,13 +217,31 @@ export class Garage {
   }
 
   private stopRace(): void {
-    const tracks = getTrackTags();
+    this.isRace = false;
+    const tracks = this.getTrackTags();
     if (tracks.length) tracks.forEach((track) => track.removeAttribute(MOOVE));
   }
 
   private startRace(): void {
-    const tracks = getTrackTags();
-    if (tracks.length) tracks.forEach((track) => track.setAttribute(MOOVE, ''));
+    this.isRace = true;
+    const tracks = this.getTrackTags();
+    if (tracks.length) {
+      tracks.forEach((track) => {
+        track.removeAttribute(WINNER);
+        track.setAttribute(MOOVE, '');
+      });
+    }
+    this.showWinner(tracks);
+  }
+
+  private async showWinner(tracks: Track[]): Promise<void> {
+    const trackRaceTimes = tracks.map((track) => track.raceTime);
+    const minTime = Math.min(...trackRaceTimes);
+    const minTimeIndx = trackRaceTimes.indexOf(minTime);
+    const winTrack = tracks[minTimeIndx];
+    if (!winTrack) return;
+    await delay(minTime * 1000);
+    if (this.isRace) winTrack.setAttribute(WINNER, '');
   }
 
   private createCars(): void {
@@ -221,7 +250,7 @@ export class Garage {
       startID + index,
       randomColor(),
       carNames[getRandomIntBetween(0, carNames.length - 1)],
-      getRandomIntBetween(1, 100),
+      getRandomIntBetween(MIN_SPEED, MAX_SPEED),
     ));
     this.cars = [...this.cars, ...randomCars];
     this.fillTracksHtml();
@@ -244,7 +273,7 @@ export class Garage {
       freeIdSearche(this.cars),
       this.inputCreateCarColor.value,
       this.inputCreateCarName.value,
-      getRandomIntBetween(1, 100),
+      getRandomIntBetween(MIN_SPEED, MAX_SPEED),
     );
     const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
     this.setTrackAttributes(track, car.id, car.name, car.color);
@@ -316,6 +345,10 @@ export class Garage {
   private updateGarageTitle(): void {
     this.garageTitle.textContent = `${GARAGE_TITLE} (${this.cars.length})`;
     this.updatePagination();
+  }
+
+  private getTrackTags(): Track[] {
+    return [...document.querySelectorAll(TRACK_TAG)] as Track[];
   }
 
   // ============== PAGINATION ======== start ====

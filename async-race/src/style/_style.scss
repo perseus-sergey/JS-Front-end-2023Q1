@@ -213,6 +213,28 @@ main {
       }
     }
 
+    .track__car-winner {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-shadow:
+      -0.1vh -0.1vh 0.1vh #000000,
+      0.1vh 0.1vh 0 #000000,
+      0 0 0.9vh #f3ffcb,
+      0.3vh 0.3vh 0 #000000,
+      0.4vh 0.4vh 0 #000000,
+      0.5vh 0.5vh 0 #000000;
+      color: #c5f338;
+      font-weight: 900;
+      visibility: hidden;
+
+    }
+    &[winner] {
+      .track__car-winner {
+        visibility: visible;
+      }
+    }
+
     .finish-flag {
       display: inline-block;
       position: relative;

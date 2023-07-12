@@ -1,5 +1,5 @@
 import {
-  constantsAttributes, constantsClasses, constantsSVGs, constantsTexts,
+  constantsAttributes, constantsClasses, constantsNumbers, constantsSVGs, constantsTexts,
 } from '../constants';
 import { generateDomElement } from '../utilites';
 import { Car } from './Car';
@@ -7,6 +7,7 @@ import { Car } from './Car';
 const {
   TRACK_BTNS_WRAPPER,
   TRACK_CAR_NAME,
+  TRACK_CAR_WINNER_TAG,
   FINISH_FLAG,
   CAR,
   BTN_TRACK_SELECT_CAR_STYLE,
@@ -18,13 +19,25 @@ const {
 const { FINISH_FLAG_SVG } = constantsSVGs;
 
 const {
-  BTN_TRACK_SELECT_CAR, BTN_TRACK_REMOVE_CAR, BTN_TRACK_STOP_CAR, BTN_TRACK_START_CAR,
+  BTN_TRACK_SELECT_CAR,
+  BTN_TRACK_REMOVE_CAR,
+  BTN_TRACK_STOP_CAR,
+  BTN_TRACK_START_CAR,
+  TRACK_CAR_WINNER_TITLE,
 } = constantsTexts;
 
-const { ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE } = constantsAttributes;
+const {
+  ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE, WINNER,
+} = constantsAttributes;
+
+const { DISTANCE } = constantsNumbers;
 
 export class Track extends HTMLElement {
   public car!: Car;
+
+  public raceTime!: number;
+
+  private winnerTitleTag!: HTMLElement;
 
   private carElement!: HTMLElement;
 
@@ -36,6 +49,8 @@ export class Track extends HTMLElement {
 
   private carTitle: string | null | undefined;
 
+  // private winnerTitle: string | null | undefined;
+
   private start = 0;
 
   private stopId!: number;
@@ -45,12 +60,14 @@ export class Track extends HTMLElement {
   private distance!: number;
 
   public static get observedAttributes(): string[] {
-    return [ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE];
+    return [ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE, WINNER];
   }
 
   public insertCar(car: Car): void {
     this.car = car;
+    this.raceTime = this.getRaceTime();
     this.carTitleTag.innerHTML = car.name;
+    this.winnerTitleTag.innerHTML = this.getWinnerTitle();
     this.carElement = generateDomElement('div', car.getImage(), this, CAR);
     generateDomElement('div', FINISH_FLAG_SVG, this, FINISH_FLAG);
   }
@@ -62,6 +79,7 @@ export class Track extends HTMLElement {
     } else if (name === ATTR_CAR_COLOR) {
       if (this.carElement) this.carElement.innerHTML = this.car.getImage();
     } else if (name === MOOVE) this.moove();
+    // else if (name === WINNER) this.win();
   }
 
   private connectedCallback(): void {
@@ -79,6 +97,7 @@ export class Track extends HTMLElement {
     this.engineStartBtn = generateDomElement('button', BTN_TRACK_START_CAR, trackBtnsWrapper, BTN_TRACK_START_CAR_STYLE);
 
     this.carTitleTag = generateDomElement('span', this.carTitle || null, trackBtnsWrapper, TRACK_CAR_NAME);
+    this.winnerTitleTag = generateDomElement('span', null, this, TRACK_CAR_WINNER_TAG);
 
     return this;
   }
@@ -107,11 +126,18 @@ export class Track extends HTMLElement {
   private step(timestamp: number): void {
     this.distance = this.clientWidth - this.carElement.clientWidth;
     if (!this.start || this.progress > this.distance) this.start = timestamp;
-    this.progress = (timestamp - this.start) / (500 / this.car.velocity);
-    // this.progress = (timestamp - this.start) / this.car.velocity + 25;
+    this.progress = (timestamp - this.start) / this.raceTime;
     this.carElement.style.transform = `translateX(${Math.min(this.progress, this.distance)}px)`;
     if (this.progress < this.distance) {
       this.stopId = requestAnimationFrame(this.step);
     }
+  }
+
+  private getRaceTime(): number {
+    return +(DISTANCE / 1000 / this.car.velocity).toFixed(2);
+  }
+
+  private getWinnerTitle(): string {
+    return `${TRACK_CAR_WINNER_TITLE} - ${this.carTitle} - (${this.raceTime}s)`;
   }
 }
