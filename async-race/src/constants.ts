@@ -1,5 +1,159 @@
-export const constantsStorage = {
+export const API_BASE_URL = 'http://127.0.0.1:3000';
+export const apiGarage = {
+  getCars: {
+    method: 'GET',
+    getCarsUrl: '/garage',
+    optional: {
+      pageNumUrl: '_page=',
+      limit: {
+        limitUrl: '_limit=',
+        respHeader: 'X-Total-Count',
+      },
+    },
+  },
+  getCar: {
+    method: 'GET',
+    getCarUrl: '/garage/:id',
+    required: {
+      id: 'id=',
+    },
+  },
+  createCar: {
+    method: 'POST',
+    getCarsUrl: '/garage',
+    reqHeaders: '\'Content-Type\': \'application/json\'',
+    dataParams: {
+      name: 'name',
+      color: 'color',
+    },
+    successRespCode: 201,
+  },
+  deleteCar: {
+    method: 'DELETE',
+    deleteCarUrl: '/garage/:id',
+    required: {
+      id: 'id=',
+    },
+  },
+  updateCar: {
+    method: 'PUT',
+    deleteCarUrl: '/garage/:id',
+    reqHeaders: '\'Content-Type\': \'application/json\'',
+    required: {
+      id: 'id=',
+    },
+    dataParams: {
+      name: 'name',
+      color: 'color',
+    },
+  },
 };
+
+export const apiCarEngine = {
+  method: 'PATCH',
+  startStopUrl: '/engine',
+  required: {
+    id: 'id=',
+    status: {
+      statusUrl: 'status=',
+      params: {
+        started: 'started',
+        stopped: 'stopped',
+        drive: 'drive',
+      },
+    },
+  },
+  respContent: {
+    velocity: 'velocity',
+    distance: 'distance',
+    success: 'success', // true/false
+  },
+  stopCode: 500,
+};
+
+export const apiGetWinners = {
+  method: 'GET',
+  winnersUrl: '/winners',
+  optional: {
+    pageNum: '_page=',
+    limit: '_limit=',
+    sort: {
+      sortUrl: '_sort=',
+      params: {
+        id: 'id',
+        wins: 'wins',
+        time: 'time',
+      },
+    },
+    order: {
+      orderUrl: '_order=',
+      params: {
+        asc: 'ASC',
+        desc: 'DESC',
+      },
+    },
+  },
+  respContent: {
+    id: 'id',
+    wins: 'wins',
+    time: 'time',
+  },
+  respHeader: 'X-Total-Count',
+};
+
+export const apiWinner = {
+  getWinner: {
+    method: 'GET',
+    wgetUrl: '/winners/:id',
+    required: {
+      id: 'id=',
+    },
+    respContent: {
+      id: 'id',
+      wins: 'wins',
+      time: 'time',
+    },
+  },
+  createWinner: {
+    method: 'POST',
+    createUrl: '/winners',
+    reqHeaders: '\'Content-Type\': \'application/json\'',
+    required: {
+      id: 'id=',
+    },
+    respContent: {
+      id: 'id',
+      wins: 'wins',
+      time: 'time',
+    },
+  },
+  deleteWinner: {
+    method: 'DELETE',
+    deleteUrl: '/winners/:id',
+    required: {
+      id: 'id=',
+    },
+  },
+  updateWinner: {
+    method: 'PUT',
+    updateUrl: '/winners/:id',
+    reqHeaders: '\'Content-Type\': \'application/json\'',
+    required: {
+      id: 'id=',
+    },
+    dataParams: {
+      wins: 'wins',
+      time: 'time',
+    },
+    respContent: {
+      id: 'id',
+      wins: 'wins',
+      time: 'time',
+    },
+  },
+
+};
+
 export const constantsNumbers = {
   NUMBER_RANDOM_CREATED_CAR: 100,
   NUMBER_TRACKS_PER_PAGE: 7,
@@ -9,6 +163,7 @@ export const constantsNumbers = {
 };
 export const constantsTagName = {
   TRACK_TAG: 'car-track',
+  WIN_TAG: 'win-car',
 };
 export const constantsLinks = {
   SWU_IMG_PATH: './assets/images/ukraine_stand.png',
@@ -56,6 +211,7 @@ export const constantsClasses = {
   FINISH_FLAG: 'finish-flag',
   GARAGE: 'garage',
   TRACKS_TAG: 'tracks',
+  WIN_SHOW: 'show',
   WRAP_RACE_BUTTONS: 'race-btns-wrapper',
   BTN_STOP_RACE: 'btn-race-stop',
   BTN_START_RACE: 'btn-race-start',
@@ -84,6 +240,7 @@ export const constantsAttributes = {
   ATTR_CAR_COLOR: 'data-color',
   MOOVE: 'moove',
   WINNER: 'winner',
+  FINISHER: 'finisher',
 };
 export const constantsSVGs = {
   FINISH_FLAG_SVG: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 106 106"><defs><style>.cls-1{fill:#fff;}.cls-2{opacity:0.1;}.cls-3{fill:#171c1f;}</style></defs><title>checkered-flag</title><g id="Checkered-Flag"><g id="Fill"><path class="cls-1" d="M58.62,5.1C43.5,8.92,26.5,16.5,9,5.29V65.12c17.5,11.21,34.5,3.63,49.62-.19C73.75,60.48,87,59.79,97,70.1V10.27C87,0,73.75.65,58.62,5.1Z"/></g><g id="Shadows" class="cls-2"><path d="M76.63,57.86c-5.34,0-11.24,1-18.5,3.15-2.23.56-4.45,1.19-6.79,1.86C44.15,64.9,36.7,67,29.12,67A34.21,34.21,0,0,1,11,62v2a34.21,34.21,0,0,0,18.12,5c7.58,0,15-2.11,22.22-4.15,2.34-.66,4.55-1.29,6.79-1.85,7.26-2.14,13.16-3.15,18.5-3.15,7.21,0,13.26,1.91,18.37,5.8v-2C89.89,59.76,83.84,57.86,76.63,57.86Z"/></g><g id="Outline"><path class="cls-3" d="M98.44,8.87C92.66,2.9,85.52,0,76.63,0,71.29,0,65.39,1,58.13,3.14,55.9,3.71,53.58,4.36,51.35,5,44.15,7,36.7,9.15,29.12,9.15A34.21,34.21,0,0,1,11,4.13V2A2,2,0,0,0,7,2V104a2,2,0,0,0,4,0V68.58A38,38,0,0,0,29.12,73C37.26,73,45,70.81,52.44,68.7c2.31-.66,4.5-1.28,6.75-1.85a62.8,62.8,0,0,1,17.44-3c7.75,0,13.94,2.5,18.93,7.65A2,2,0,0,0,99,70.11V10.25A2,2,0,0,0,98.44,8.87ZM95,65.66c-5.11-3.9-11.16-5.8-18.37-5.8-5.34,0-11.24,1-18.5,3.15-2.23.56-4.45,1.19-6.79,1.85C44.15,66.9,36.7,69,29.12,69A34.21,34.21,0,0,1,11,64V8.74a38,38,0,0,0,18.12,4.4C37.26,13.14,45,11,52.44,8.84c2.31-.66,4.5-1.28,6.75-1.85A62.81,62.81,0,0,1,76.63,4C84.09,4,90.11,6.31,95,11.08Z"/></g><g id="Black"><path class="cls-3" d="M53,7.61c-4.67,1.32-9.33,2.65-14,3.53V26.33c4.67-.88,9.33-2.21,14-3.53Zm-42,0V22.8a34.47,34.47,0,0,0,14,4.42V12A34.47,34.47,0,0,1,11,7.61ZM95,66.38V51.19a34.47,34.47,0,0,0-14-4.42V62A34.47,34.47,0,0,1,95,66.38ZM95,37V22.8a34.47,34.47,0,0,0-14-4.42V32.58A34.47,34.47,0,0,1,95,37ZM11,37V51.19a34.47,34.47,0,0,0,14,4.42V41.41A34.47,34.47,0,0,1,11,37ZM53,65.38c4.67-1.32,9.33-2.65,14-3.53V47.66c-4.67.88-9.33,2.21-14,3.53ZM39,40.53V54.72c4.67-.88,9.33-2.21,14-3.53V37C48.33,38.32,43.67,39.65,39,40.53ZM25,55.61V70.77l1.16.11a51.34,51.34,0,0,0,12.84-1V54.72A49.86,49.86,0,0,1,25,55.61ZM81,18.39V3.19a49.86,49.86,0,0,0-14,.88V19.27A49.86,49.86,0,0,1,81,18.39ZM67,33.46V47.66a49.85,49.85,0,0,1,14-.88V32.58A49.85,49.85,0,0,0,67,33.46ZM39,40.53V26.33a49.86,49.86,0,0,1-14,.88V41.41A49.85,49.85,0,0,0,39,40.53Zm28-7.07V19.27c-4.67.88-9.33,2.21-14,3.53V37C57.67,35.67,62.33,34.35,67,33.46Z"/></g></g></svg>',

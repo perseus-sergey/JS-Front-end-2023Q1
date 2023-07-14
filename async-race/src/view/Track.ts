@@ -1,8 +1,39 @@
+import { IStartStopEngine } from '../app/tipes';
 import {
-  constantsAttributes, constantsClasses, constantsNumbers, constantsSVGs, constantsTexts,
+  API_BASE_URL,
+  constantsAttributes,
+  constantsClasses,
+  constantsNumbers,
+  constantsSVGs,
+  constantsTexts,
+  apiCarEngine,
+  constantsTagName,
 } from '../constants';
-import { generateDomElement } from '../utilites';
+import { generateDomElement, getImage } from '../utilites';
 import { Car } from './Car';
+// import { CarFull } from './CarFull';
+
+const {
+  method,
+  startStopUrl,
+  required: {
+    id,
+    status: {
+      statusUrl,
+      params: {
+        started,
+        stopped,
+        drive,
+      },
+    },
+  },
+  respContent: {
+    velocity,
+    distance,
+    success, // true/false
+  },
+  stopCode,
+} = apiCarEngine;
 
 const {
   TRACK_BTNS_WRAPPER,
@@ -27,9 +58,10 @@ const {
 } = constantsTexts;
 
 const {
-  ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE, WINNER,
+  ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE, WINNER, FINISHER,
 } = constantsAttributes;
 
+const { WIN_TAG } = constantsTagName;
 const { DISTANCE } = constantsNumbers;
 
 export class Track extends HTMLElement {
@@ -37,7 +69,9 @@ export class Track extends HTMLElement {
 
   public raceTime!: number;
 
-  private winnerTitleTag!: HTMLElement;
+  public carVelocity!: number;
+
+  // private winnerTitleTag!: HTMLElement;
 
   private carElement!: HTMLElement;
 
@@ -51,13 +85,13 @@ export class Track extends HTMLElement {
 
   // private winnerTitle: string | null | undefined;
 
+  private distance = DISTANCE;
+
   private start = 0;
 
   private stopId!: number;
 
   private progress!: number;
-
-  private distance!: number;
 
   public static get observedAttributes(): string[] {
     return [ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE, WINNER];
@@ -65,10 +99,10 @@ export class Track extends HTMLElement {
 
   public insertCar(car: Car): void {
     this.car = car;
-    this.raceTime = this.getRaceTime();
+    // this.raceTime = this.getRaceTime();
     this.carTitleTag.innerHTML = car.name;
-    this.winnerTitleTag.innerHTML = this.getWinnerTitle();
-    this.carElement = generateDomElement('div', car.getImage(), this, CAR);
+    // this.winnerTitleTag.innerHTML = this.getWinnerTitle();
+    this.carElement = generateDomElement('div', getImage(this.car.color), this, CAR);
     generateDomElement('div', FINISH_FLAG_SVG, this, FINISH_FLAG);
   }
 
@@ -77,7 +111,7 @@ export class Track extends HTMLElement {
       this.carTitle = newValue;
       if (this.carTitleTag) this.carTitleTag.innerHTML = newValue;
     } else if (name === ATTR_CAR_COLOR) {
-      if (this.carElement) this.carElement.innerHTML = this.car.getImage();
+      if (this.carElement) this.carElement.innerHTML = getImage(this.car.color);
     } else if (name === MOOVE) this.moove();
     // else if (name === WINNER) this.win();
   }
@@ -97,7 +131,7 @@ export class Track extends HTMLElement {
     this.engineStartBtn = generateDomElement('button', BTN_TRACK_START_CAR, trackBtnsWrapper, BTN_TRACK_START_CAR_STYLE);
 
     this.carTitleTag = generateDomElement('span', this.carTitle || null, trackBtnsWrapper, TRACK_CAR_NAME);
-    this.winnerTitleTag = generateDomElement('span', null, this, TRACK_CAR_WINNER_TAG);
+    // this.winnerTitleTag = generateDomElement('span', null, this, TRACK_CAR_WINNER_TAG);
 
     return this;
   }
@@ -111,20 +145,46 @@ export class Track extends HTMLElement {
     this.engineStartBtn.addEventListener('click', () => this.setAttribute(MOOVE, ''));
   }
 
-  private moove(): void {
+  private async moove(): Promise<void> {
     if (this.hasAttribute(MOOVE)) {
-      this.engineStartBtn.disabled = true;
+      // if (!isServerStartAllowed()) return;
+      // this.isServerStartAllowed();
+      // this.engineStartBtn.disabled = true;
+      await this.setAnimateParams();
       requestAnimationFrame(this.step);
+      this.sendResultToWinTag();
     } else {
-      cancelAnimationFrame(this.stopId);
-      this.start = 0;
-      this.carElement.style.transform = 'translateX(0)';
-      this.engineStartBtn.disabled = false;
+      this.stopCar();
     }
   }
 
-  private step(timestamp: number): void {
+  private stopCar(): void {
+    cancelAnimationFrame(this.stopId);
+    this.start = 0;
+    this.carElement.style.transform = 'translateX(0)';
+    this.engineStartBtn.disabled = false;
+  }
+
+  private sendResultToWinTag(): void {
+    // [carId, color, carName, time]
+    const winTag = document.body.querySelector(WIN_TAG);
+    if (winTag) {
+      winTag.setAttribute(FINISHER, [
+        this.car.id, this.car.color, this.car.name, this.raceTime,
+      ].join('|'));
+    }
+  }
+
+  private async setAnimateParams(): Promise<void> {
+    this.engineStartBtn.disabled = true;
     this.distance = this.clientWidth - this.carElement.clientWidth;
+    const carEngineParams = await this.getApiVelocity(this.car.id);
+    this.carVelocity = carEngineParams.velocity || 0;
+    this.raceTime = this.getRaceTime();
+    // this.winnerTitleTag.innerHTML = this.getWinnerTitle();
+  }
+
+  private step(timestamp: number): void {
     if (!this.start || this.progress > this.distance) this.start = timestamp;
     this.progress = (timestamp - this.start) / this.raceTime;
     this.carElement.style.transform = `translateX(${Math.min(this.progress, this.distance)}px)`;
@@ -134,10 +194,57 @@ export class Track extends HTMLElement {
   }
 
   private getRaceTime(): number {
-    return +(DISTANCE / 1000 / this.car.velocity).toFixed(2);
+    return this.carVelocity ? +(this.distance / this.carVelocity).toFixed(2) : 0;
+    // return this.carVelocity ? +(this.distance / 1000 / this.carVelocity).toFixed(2) : 0;
   }
 
-  private getWinnerTitle(): string {
-    return `${TRACK_CAR_WINNER_TITLE} - ${this.carTitle} - (${this.raceTime}s)`;
+  // private getWinnerTitle(): string {
+  //   return `${TRACK_CAR_WINNER_TITLE} - ${this.carTitle} - (${this.raceTime}s)`;
+  // }
+
+  private async getApiVelocity(carId: number):Promise<IStartStopEngine> {
+    const url = `${API_BASE_URL + startStopUrl}?${id}${carId}&${statusUrl + started}`;
+    try {
+      const response = await fetch(url, { method });
+      if (!response.ok) {
+        console.error(`HTTP response: (${response.status}) - ${response.text}`);
+        return { velocity: null, distance: null };
+      }
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+      return { velocity: null, distance: null };
+    }
+    // return toJson.map((car: ICar) => new Car(car.id, car.color, car.name));
   }
+
+  // private async isServerStartAllowed():Promise<boolean> {
+  //   const url = 'http://127.0.0.1:3000/garage';
+  //   const method = 'GET';
+  //   const response = await fetch(url, { method });
+  //   console.log('Starus ', response.status);
+  //   const toJson = await response.json();
+  //   console.log('response ', JSON.stringify(toJson));
+  //   return false;
+
+  //   // .then(this.errorHandler)
+  //   // .then((res) => res.json())
+  //   // .then((data) => callback(data))
+  //   // .catch((err) => console.error(err));
+  // }
+
+  // private errorHandler(res: Response): Response {
+  //   if (!res.ok) {
+  //     if (res.status === 401 || res.status === 404) {
+  //   console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
+  // }
+  //     const errorElement: HTMLElement = document.createElement('h2');
+  //     errorElement.textContent = 'Sorry, content is not available at the moment!';
+  //     document.querySelector('.main')?.prepend();
+
+  //     throw Error(res.statusText);
+  //   }
+
+  //   return res;
+  // }
 }

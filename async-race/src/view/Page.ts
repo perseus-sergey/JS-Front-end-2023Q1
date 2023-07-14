@@ -1,8 +1,10 @@
 import {
-  constantsClasses, constantsTexts, constantsLinks, constantsSVGs,
+  constantsClasses, constantsTexts, constantsLinks, constantsSVGs, constantsTagName,
 } from '../constants';
 import { generateDomElement } from '../utilites';
 import { Garage } from './Garage';
+
+const { WIN_TAG } = constantsTagName;
 
 const {
   HEADER,
@@ -57,6 +59,7 @@ export class Page {
 
   private generateMainTag(): void {
     this.main = generateDomElement('main', '', document.body, MAIN);
+    generateDomElement(WIN_TAG, null, this.main);
     const garage = new Garage();
     this.main.append(garage.garage);
   }

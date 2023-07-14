@@ -1,4 +1,4 @@
-import { ICar } from '../app/tipes';
+// import { Car } from '../app/tipes';
 import {
   constantsClasses,
   constantsTexts,
@@ -6,6 +6,8 @@ import {
   constantsAttributes,
   constantsNumbers,
   carNames,
+  API_BASE_URL,
+  apiGarage,
 } from '../constants';
 import {
   delay,
@@ -38,6 +40,7 @@ const {
   BTN_PAGIN_FIRST,
   PAGIN_CURRENT,
   HIDE_PAGINATION,
+  WIN_SHOW,
 } = constantsClasses;
 
 const {
@@ -63,13 +66,20 @@ const {
   WINNER,
 } = constantsAttributes;
 
-const { TRACK_TAG } = constantsTagName;
+const { TRACK_TAG, WIN_TAG } = constantsTagName;
 const {
   NUMBER_RANDOM_CREATED_CAR,
   NUMBER_TRACKS_PER_PAGE,
   MAX_SPEED,
   MIN_SPEED,
 } = constantsNumbers;
+const {
+  getCars,
+  getCar,
+  createCar,
+  deleteCar,
+  updateCar,
+} = apiGarage;
 
 export class Garage {
   private formUpdateCar!: HTMLInputElement;
@@ -80,7 +90,7 @@ export class Garage {
 
   private inputUpdateCarSubmit!: HTMLInputElement;
 
-  private cars: ICar[] = [];
+  private cars: Car[] = [];
 
   public garage!: HTMLElement;
 
@@ -90,7 +100,7 @@ export class Garage {
 
   private chosenTrack!: HTMLElement;
 
-  private chosenCar!: ICar;
+  private chosenCar!: Car;
 
   private controlPanel!: HTMLElement;
 
@@ -121,10 +131,16 @@ export class Garage {
   private maxPage = 1;
 
   constructor() {
+    this.garageBuild();
+  }
+
+  private async garageBuild(): Promise<void> {
     this.generateGarage();
     this.generateControlPanel();
     this.generateGarageTitle();
     this.generateTracksTag();
+    this.cars = await this.getCarsFromServer();
+    if (this.cars.length) this.fillTracksHtml();
     this.makePagination();
     this.bindCallbacks();
     this.startEventListners();
@@ -146,6 +162,7 @@ export class Garage {
   }
 
   private documentClickHandler(event: Event): void {
+    this.hideWinTag();
     const targ = event.target as HTMLElement;
     if (targ.closest(`.${BTN_TRACK_SELECT_CAR_STYLE}`)) this.updateCarForm(targ);
     else if (targ.closest(`.${BTN_TRACK_REMOVE_CAR_STYLE}`)) this.removeCar(targ);
@@ -158,6 +175,13 @@ export class Garage {
     else if (targ.closest(`.${BTN_PAGIN_LAST}`)) this.paginClickHandler('last');
     else if (targ.closest(`.${BTN_PAGIN_LEFT}`)) this.paginClickHandler('previus');
     else if (targ.closest(`.${BTN_PAGIN_RIGHT}`)) this.paginClickHandler('next');
+  }
+
+  private hideWinTag():void {
+    const winTag = document.body.querySelector(WIN_TAG);
+    if (!winTag) return;
+    winTag.innerHTML = '';
+    winTag.classList.remove(WIN_SHOW);
   }
 
   private startEventListners(): void {
@@ -231,27 +255,28 @@ export class Garage {
         track.setAttribute(MOOVE, '');
       });
     }
-    this.showWinner(tracks);
+    // this.showWinner(tracks);
   }
 
-  private async showWinner(tracks: Track[]): Promise<void> {
-    const trackRaceTimes = tracks.map((track) => track.raceTime);
-    const minTime = Math.min(...trackRaceTimes);
-    const minTimeIndx = trackRaceTimes.indexOf(minTime);
-    const winTrack = tracks[minTimeIndx];
-    if (!winTrack) return;
-    await delay(minTime * 1000);
-    if (this.isRace) winTrack.setAttribute(WINNER, '');
-  }
+  // private async showWinner(tracks: Track[]): Promise<void> {
+  //   const trackRaceTimes = tracks.map((track) => track.raceTime);
+  //   const minTime = Math.min(...trackRaceTimes);
+  //   const minTimeIndx = trackRaceTimes.indexOf(minTime);
+  //   const winTrack = tracks[minTimeIndx];
+  //   if (!winTrack) return;
+  //   await delay(minTime * 1000);
+  //   if (this.isRace) winTrack.setAttribute(WINNER, '');
+  // }
 
   private createCars(): void {
     const startID = freeIdSearche(this.cars);
-    const randomCars = new Array(NUMBER_RANDOM_CREATED_CAR).fill(null).map((car, index) => new Car(
-      startID + index,
-      randomColor(),
-      carNames[getRandomIntBetween(0, carNames.length - 1)],
-      getRandomIntBetween(MIN_SPEED, MAX_SPEED),
-    ));
+    const randomCars = new Array(NUMBER_RANDOM_CREATED_CAR)
+      .fill(null).map((car, index) => new Car(
+        startID + index,
+        randomColor(),
+        carNames[getRandomIntBetween(0, carNames.length - 1)],
+        // getRandomIntBetween(MIN_SPEED, MAX_SPEED),
+      ));
     this.cars = [...this.cars, ...randomCars];
     this.fillTracksHtml();
     this.updateGarageTitle();
@@ -273,10 +298,12 @@ export class Garage {
       freeIdSearche(this.cars),
       this.inputCreateCarColor.value,
       this.inputCreateCarName.value,
-      getRandomIntBetween(MIN_SPEED, MAX_SPEED),
+      // getRandomIntBetween(MIN_SPEED, MAX_SPEED),
     );
     const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
     this.setTrackAttributes(track, car.id, car.name, car.color);
+
+    // REFACTOR
     track.insertCar(car);
     this.cars.push(car);
     this.resetCreateForm();
@@ -419,5 +446,30 @@ export class Garage {
     }
   }
 
-// ______________ PAGINATION ______ end _______
+  // ______________ PAGINATION ______ end _______
+
+  // ______________ FETCH ______ start _______
+
+  private async getCarsFromServer():Promise<Car[]> {
+    const url = API_BASE_URL + getCars.getCarsUrl;
+    const response = await fetch(url);
+    // console.log('Starus ', response.status);
+    const toJson = await response.json();
+    return toJson.map((car: Car) => new Car(car.id, car.color, car.name));
+  }
+
+  private errorHandler(res: Response): Response {
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 404) { console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`); }
+      const errorElement: HTMLElement = document.createElement('h2');
+      errorElement.textContent = 'Sorry, content is not available at the moment!';
+      document.querySelector('.main')?.prepend();
+
+      throw Error(res.statusText);
+    }
+
+    return res;
+  }
+
+  // ______________ FETCH ______ end _______
 }
