@@ -3,6 +3,7 @@ import {
 } from '../constants';
 import { generateDomElement } from '../utilites';
 import { Garage } from './Garage';
+import { Winner } from './Winner';
 import { Winners } from './Winners';
 
 const { WIN_TAG } = constantsTagName;
@@ -66,6 +67,8 @@ export class Page {
 
   private winPage!: Winners;
 
+  private winTag!: Winner;
+
   public generateMainPageElements(): void {
     this.generateHeader();
     this.generateMainTag();
@@ -89,7 +92,7 @@ export class Page {
 
   private generateMainTag(): void {
     this.main = generateDomElement('main', '', document.body, MAIN);
-    generateDomElement(WIN_TAG, null, this.main);
+    this.winTag = generateDomElement(WIN_TAG, null, this.main);
     this.garage = new Garage();
     this.main.append(this.garage.garage);
     this.winPage = new Winners();
@@ -138,26 +141,20 @@ export class Page {
   }
 
   private showNextPage():void {
-    // const winTag = document.body.querySelector(WIN_TAG);
-    // if (!winTag) return;
-    // winTag.innerHTML = '';
+    this.winTag.classList.add(GARAGE_HIDE);
     this.garage.garage.classList.add(GARAGE_HIDE);
+    this.winPage.pageUpdate();
     this.winPage.winPage.classList.add(WIN_SHOW);
   }
 
   private showPreviusPage():void {
     this.garage.garage.classList.remove(GARAGE_HIDE);
     this.winPage.winPage.classList.remove(WIN_SHOW);
-    // const winTag = document.body.querySelector(WIN_TAG);
-    // if (!winTag) return;
-    // winTag.innerHTML = '';
-    // winTag.classList.remove(WIN_SHOW);
+    this.winTag.classList.remove(GARAGE_HIDE);
   }
 
   private hideWinTag():void {
-    const winTag = document.body.querySelector(WIN_TAG);
-    if (!winTag) return;
-    winTag.innerHTML = '';
-    winTag.classList.remove(WIN_SHOW);
+    this.winTag.innerHTML = '';
+    this.winTag.classList.remove(WIN_SHOW);
   }
 }

@@ -9,6 +9,7 @@ import {
   constantsClasses,
   constantsTexts,
   apiWinner,
+  constantsTagName,
 } from '../constants';
 
 const {
@@ -19,7 +20,7 @@ const {
 } = apiWinner;
 
 const {
-  WIN_SHOW,
+  WIN_SHOW, BTN_START_RACE,
 } = constantsClasses;
 
 const {
@@ -27,23 +28,36 @@ const {
 } = constantsTexts;
 
 const {
-  FINISHER,
+  FINISHER, FINISHERS,
 } = constantsAttributes;
+
+const { TRACK_TAG } = constantsTagName;
 
 export class Winner extends HTMLElement {
   private oFinisher!: IFinisher;
 
   public static get observedAttributes(): string[] {
-    return [FINISHER];
+    return [FINISHER, FINISHERS];
   }
 
   private attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-    console.log('win');
+    // console.log('win');
+    if (name === FINISHERS) {
+      if (+newValue >= document.body.querySelectorAll(TRACK_TAG).length) {
+        this.raceFinished();
+      }
+      return;
+    }
     if (name !== FINISHER || this.classList.contains(WIN_SHOW)) return;
-    this.raceFinished(newValue);
+    this.setWinner(newValue);
   }
 
-  private async raceFinished(attr: string):Promise<void> {
+  private raceFinished():void {
+    const startRaceBtn = document.body.querySelector(`.${BTN_START_RACE}`) as HTMLButtonElement;
+    startRaceBtn.disabled = false;
+  }
+
+  private async setWinner(attr: string):Promise<void> {
     const [carId, color, name, time] = attr.split('|');
     this.oFinisher = {
       id: +carId,

@@ -86,15 +86,15 @@ export class Winners {
 
   private async pageBuild(): Promise<void> {
     this.generatePage();
-    // this.generateControlPanel();
     this.generatePageTitle();
     this.generateWinTable();
-    // this.generateTracksTag();
+    await this.pageUpdate();
+  }
+
+  public async pageUpdate(): Promise<void> {
     await this.createWinnersArray();
-    // this.cars = await this.getCars();
     this.fillWinTable();
     this.makePagination();
-    // this.startEventListners();
     this.updatePageTitle();
   }
 

@@ -172,7 +172,7 @@ main {
     display: flex;
     flex-direction: column;
 
-    &.hide{
+    &.hide {
       display: none;
     }
   }
@@ -309,22 +309,22 @@ main {
     background: rgb(174, 190, 1);
     width: fit-content;
   }
+}
 
-  win-car {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%);
-    text-shadow: -0.1vh -0.1vh 0.1vh #000000, 0.1vh 0.1vh 0 #000000, 0 0 0.9vh #f3ffcb, 0.3vh 0.3vh 0 #000000,
-      0.4vh 0.4vh 0 #000000, 0.5vh 0.5vh 0 #000000;
-    color: #c5f338;
-    font-weight: 900;
-    visibility: hidden;
-    z-index: 1;
+win-car {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%);
+  text-shadow: -0.1vh -0.1vh 0.1vh #000000, 0.1vh 0.1vh 0 #000000, 0 0 0.9vh #f3ffcb, 0.3vh 0.3vh 0 #000000,
+    0.4vh 0.4vh 0 #000000, 0.5vh 0.5vh 0 #000000;
+  color: #c5f338;
+  font-weight: 900;
+  visibility: hidden;
+  z-index: 1;
 
-    &.show {
-      visibility: visible;
-    }
+  &.show:not(.hide) {
+    visibility: visible;
   }
 }
 

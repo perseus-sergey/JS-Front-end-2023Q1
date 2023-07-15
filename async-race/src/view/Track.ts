@@ -55,7 +55,7 @@ const {
 } = constantsTexts;
 
 const {
-  ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE, WINNER, FINISHER,
+  ATTR_CAR_NAME, ATTR_CAR_COLOR, MOOVE, WINNER, FINISHER, FINISHERS,
 } = constantsAttributes;
 
 const { WIN_TAG } = constantsTagName;
@@ -75,6 +75,8 @@ export class Track extends HTMLElement {
   private engineStartBtn!: HTMLButtonElement;
 
   private carTitleTag!: HTMLElement;
+
+  private winTag = document.body.querySelector(WIN_TAG);
 
   private carTitle: string | null | undefined;
 
@@ -136,25 +138,40 @@ export class Track extends HTMLElement {
 
   private async moove(): Promise<void> {
     if (this.hasAttribute(MOOVE)) {
+      this.moveCarToStart();
       await this.setAnimateParams();
       requestAnimationFrame(this.step);
-      if (await this.isCrashEngine(this.car.id)) cancelAnimationFrame(this.stopId);
+      if (await this.isCrashEngine(this.car.id)) this.carStopped();
     } else {
       this.stopCar();
     }
   }
 
-  private stopCar(): void {
+  private carStopped(): void {
     cancelAnimationFrame(this.stopId);
+    if (!this.winTag) return;
+    const stoppedTrackNum = this.winTag.getAttribute(FINISHERS) || 0;
+    console.log('car stopped');
+    this.winTag.setAttribute(FINISHERS, `${+stoppedTrackNum + 1}`);
+  }
+
+  private moveCarToStart(): void {
     this.start = 0;
     this.carElement.style.transform = 'translateX(0)';
+  }
+
+  private stopCar(): void {
+    // cancelAnimationFrame(this.stopId);
+    this.carStopped();
+    this.moveCarToStart();
     this.engineStartBtn.disabled = false;
   }
 
   private sendResultToWinTag(): void {
-    const winTag = document.body.querySelector(WIN_TAG);
-    if (winTag) {
-      winTag.setAttribute(FINISHER, [
+    this.carStopped();
+    this.winTag = document.body.querySelector(WIN_TAG);
+    if (this.winTag) {
+      this.winTag.setAttribute(FINISHER, [
         this.car.id, this.car.color, this.car.name, this.raceTime,
       ].join('|'));
     }

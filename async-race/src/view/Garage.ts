@@ -61,6 +61,7 @@ const {
   ATTR_CAR_COLOR,
   MOOVE,
   WINNER,
+  FINISHERS,
 } = constantsAttributes;
 
 const { TRACK_TAG, WIN_TAG } = constantsTagName;
@@ -108,6 +109,8 @@ export class Garage {
   private inputCreateCarColor!: HTMLInputElement;
 
   private inputCreateCarSubmit!: HTMLInputElement;
+
+  private startRaceBtn!: HTMLButtonElement;
 
   private btnPaginPrevius!: HTMLButtonElement;
 
@@ -220,6 +223,9 @@ export class Garage {
   }
 
   public startRace(): void {
+    this.startRaceBtn.disabled = true;
+    const winTag = document.body.querySelector(WIN_TAG);
+    if (winTag) winTag.setAttribute(FINISHERS, `${0}`);
     this.isRace = true;
     const tracks = this.getTrackTags();
     if (tracks.length) {
@@ -298,7 +304,7 @@ export class Garage {
   private generateFormRace(): void {
     const raceBtnsWrapper = generateDomElement('div', null, this.controlPanel, WRAP_RACE_BUTTONS);
     generateDomElement('button', BTN_STOP_RACE_TEXT, raceBtnsWrapper, BTN_STOP_RACE);
-    generateDomElement('button', BTN_START_RACE_TEXT, raceBtnsWrapper, BTN_START_RACE);
+    this.startRaceBtn = generateDomElement('button', BTN_START_RACE_TEXT, raceBtnsWrapper, BTN_START_RACE);
     generateDomElement('button', BTN_CREATE_CARS_TEXT, raceBtnsWrapper, BTN_CREATE_CARS);
   }
 
