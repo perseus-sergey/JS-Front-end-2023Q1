@@ -16,9 +16,6 @@ import {
 import { Car } from './Car';
 import { Track } from './Track';
 
-// TO_DO: Determine the winner
-// TO_DO: Implement winner page
-
 const {
   GARAGE,
   TRACKS_TAG,
@@ -144,6 +141,7 @@ export class Garage {
     this.makePagination();
     this.bindCallbacks();
     this.startEventListners();
+    this.updateGarageTitle();
   }
 
   private disableUpdateForm(isDisable = true): void {
@@ -158,39 +156,14 @@ export class Garage {
     this.updateCarSubmitHandler = this.updateCarSubmitHandler.bind(this);
     this.createCarSubmitHandler = this.createCarSubmitHandler.bind(this);
     this.formCreateCarFocusHandler = this.formCreateCarFocusHandler.bind(this);
-    this.documentClickHandler = this.documentClickHandler.bind(this);
-  }
-
-  private documentClickHandler(event: Event): void {
-    this.hideWinTag();
-    const targ = event.target as HTMLElement;
-    if (targ.closest(`.${BTN_TRACK_SELECT_CAR_STYLE}`)) this.updateCarForm(targ);
-    else if (targ.closest(`.${BTN_TRACK_REMOVE_CAR_STYLE}`)) this.removeCar(targ);
-
-    else if (targ.closest(`.${BTN_STOP_RACE}`)) this.stopRace();
-    else if (targ.closest(`.${BTN_START_RACE}`)) this.startRace();
-    else if (targ.closest(`.${BTN_CREATE_CARS}`)) this.createCars();
-
-    else if (targ.closest(`.${BTN_PAGIN_FIRST}`)) this.paginClickHandler('first');
-    else if (targ.closest(`.${BTN_PAGIN_LAST}`)) this.paginClickHandler('last');
-    else if (targ.closest(`.${BTN_PAGIN_LEFT}`)) this.paginClickHandler('previus');
-    else if (targ.closest(`.${BTN_PAGIN_RIGHT}`)) this.paginClickHandler('next');
-  }
-
-  private hideWinTag():void {
-    const winTag = document.body.querySelector(WIN_TAG);
-    if (!winTag) return;
-    winTag.innerHTML = '';
-    winTag.classList.remove(WIN_SHOW);
   }
 
   private startEventListners(): void {
-    document.addEventListener('click', this.documentClickHandler);
     this.formCreateCar.addEventListener('submit', this.createCarSubmitHandler);
     this.formCreateCar.addEventListener('focus', this.formCreateCarFocusHandler, true);
   }
 
-  private removeCar(target: HTMLElement): void {
+  public removeCar(target: HTMLElement): void {
     const chosenTrack = target.closest(TRACK_TAG) as Track;
     if (!chosenTrack) return;
     const chosenCarID = this.cars
@@ -203,7 +176,7 @@ export class Garage {
     // console.log('cars remove', this.cars);
   }
 
-  private updateCarForm(target: HTMLElement): void {
+  public updateCarForm(target: HTMLElement): void {
     const chosenTrack = target.closest(TRACK_TAG) as Track;
     if (!chosenTrack) return;
     const chosenCar = this.cars
@@ -219,7 +192,7 @@ export class Garage {
     this.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
   }
 
-  private updateCarSubmitHandler(event: Event): void {
+  public updateCarSubmitHandler(event: Event): void {
     event.preventDefault();
     if (!isFormValidate(this.inputUpdateCarName.value)) {
       this.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
@@ -236,51 +209,38 @@ export class Garage {
     // console.log('cars add', this.cars);
   }
 
-  private formCreateCarFocusHandler(): void {
+  public formCreateCarFocusHandler(): void {
     this.disableUpdateForm();
   }
 
-  private stopRace(): void {
+  public stopRace(): void {
     this.isRace = false;
     const tracks = this.getTrackTags();
     if (tracks.length) tracks.forEach((track) => track.removeAttribute(MOOVE));
   }
 
-  private startRace(): void {
+  public startRace(): void {
     this.isRace = true;
     const tracks = this.getTrackTags();
     if (tracks.length) {
       tracks.forEach((track) => {
-        track.removeAttribute(WINNER);
+        console.log('moove');
         track.setAttribute(MOOVE, '');
       });
     }
-    // this.showWinner(tracks);
   }
 
-  // private async showWinner(tracks: Track[]): Promise<void> {
-  //   const trackRaceTimes = tracks.map((track) => track.raceTime);
-  //   const minTime = Math.min(...trackRaceTimes);
-  //   const minTimeIndx = trackRaceTimes.indexOf(minTime);
-  //   const winTrack = tracks[minTimeIndx];
-  //   if (!winTrack) return;
-  //   await delay(minTime * 1000);
-  //   if (this.isRace) winTrack.setAttribute(WINNER, '');
-  // }
-
-  private createCars(): void {
+  public createCars(): void {
     const startID = freeIdSearche(this.cars);
     const randomCars = new Array(NUMBER_RANDOM_CREATED_CAR)
       .fill(null).map((car, index) => new Car(
         startID + index,
         randomColor(),
         carNames[getRandomIntBetween(0, carNames.length - 1)],
-        // getRandomIntBetween(MIN_SPEED, MAX_SPEED),
       ));
     this.cars = [...this.cars, ...randomCars];
     this.fillTracksHtml();
     this.updateGarageTitle();
-    // console.log(this.cars);
   }
 
   private resetCreateForm(): void {
@@ -298,7 +258,6 @@ export class Garage {
       freeIdSearche(this.cars),
       this.inputCreateCarColor.value,
       this.inputCreateCarName.value,
-      // getRandomIntBetween(MIN_SPEED, MAX_SPEED),
     );
     const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
     this.setTrackAttributes(track, car.id, car.name, car.color);
@@ -414,7 +373,7 @@ export class Garage {
     });
   }
 
-  private paginClickHandler(btnName: 'first' | 'previus' | 'next' | 'last'): void {
+  public paginClickHandler(btnName: 'first' | 'previus' | 'next' | 'last'): void {
     if (btnName === 'first') this.currPageNum = 1;
     else if (btnName === 'previus') this.currPageNum -= 1;
     else if (btnName === 'next') this.currPageNum += 1;
@@ -453,22 +412,19 @@ export class Garage {
   private async getCarsFromServer():Promise<Car[]> {
     const url = API_BASE_URL + getCars.getCarsUrl;
     const response = await fetch(url);
-    // console.log('Starus ', response.status);
+    await this.errorHandler(response);
     const toJson = await response.json();
     return toJson.map((car: Car) => new Car(car.id, car.color, car.name));
   }
 
-  private errorHandler(res: Response): Response {
+  private async errorHandler(res: Response): Promise<void> {
     if (!res.ok) {
-      if (res.status === 401 || res.status === 404) { console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`); }
-      const errorElement: HTMLElement = document.createElement('h2');
-      errorElement.textContent = 'Sorry, content is not available at the moment!';
-      document.querySelector('.main')?.prepend();
-
-      throw Error(res.statusText);
+      this.errorServerMessage(res);
     }
+  }
 
-    return res;
+  private errorServerMessage(res: Response): void {
+    console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
   }
 
   // ______________ FETCH ______ end _______

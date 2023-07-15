@@ -3,6 +3,7 @@ import {
 } from '../constants';
 import { generateDomElement } from '../utilites';
 import { Garage } from './Garage';
+import { Winners } from './Winners';
 
 const { WIN_TAG } = constantsTagName;
 
@@ -14,6 +15,20 @@ const {
   RSS_LINK_CLASS,
   RSS_LINK_IMG,
   COPYRIGHT,
+  BTN_TRACK_SELECT_CAR_STYLE,
+  BTN_TRACK_REMOVE_CAR_STYLE,
+  BTN_STOP_RACE,
+  BTN_START_RACE,
+  BTN_CREATE_CARS,
+  BTN_PAGIN_FIRST,
+  BTN_PAGIN_LAST,
+  BTN_PAGIN_LEFT,
+  BTN_PAGIN_RIGHT,
+  WIN_SHOW,
+  SWITCH_PAGE_BTN_WRAP,
+  NEXT_PAGE_BTN,
+  PREV_PAGE_BTN,
+  GARAGE_HIDE,
 } = constantsClasses;
 
 const {
@@ -21,6 +36,8 @@ const {
   SWU_IMG_ALT,
   RSS_IMG_ALT,
   COPYRIGHT_TEXT,
+  NEXT_PAGE,
+  PREV_PAGE,
 } = constantsTexts;
 
 const {
@@ -37,14 +54,23 @@ const {
 export class Page {
   private header!: HTMLElement;
 
+  private btnNextPage!: HTMLElement;
+
+  private btnPreviusPage!: HTMLElement;
+
   private main!: HTMLElement;
 
   private footer!: HTMLElement;
+
+  private garage!: Garage;
+
+  private winPage!: Winners;
 
   public generateMainPageElements(): void {
     this.generateHeader();
     this.generateMainTag();
     this.generateFooter();
+    this.startEventListners();
   }
 
   private generateHeader(): void {
@@ -55,13 +81,19 @@ export class Page {
     const swuImg = generateDomElement('img', '', this.header, SWU_IMG);
     swuImg.setAttribute('alt', SWU_IMG_ALT);
     swuImg.setAttribute('src', SWU_IMG_PATH);
+
+    const swithPageBtnsWrapper = generateDomElement('div', null, this.header, SWITCH_PAGE_BTN_WRAP);
+    this.btnPreviusPage = generateDomElement('button', PREV_PAGE, swithPageBtnsWrapper, PREV_PAGE_BTN);
+    this.btnNextPage = generateDomElement('button', NEXT_PAGE, swithPageBtnsWrapper, NEXT_PAGE_BTN);
   }
 
   private generateMainTag(): void {
     this.main = generateDomElement('main', '', document.body, MAIN);
     generateDomElement(WIN_TAG, null, this.main);
-    const garage = new Garage();
-    this.main.append(garage.garage);
+    this.garage = new Garage();
+    this.main.append(this.garage.garage);
+    this.winPage = new Winners();
+    this.main.append(this.winPage.winPage);
   }
 
   private generateFooter(): void {
@@ -81,5 +113,51 @@ export class Page {
 
     const copyright = generateDomElement('p', '', this.footer, COPYRIGHT);
     generateDomElement('span', COPYRIGHT_TEXT, copyright);
+  }
+
+  private startEventListners(): void {
+    document.addEventListener('click', this.documentClickHandler.bind(this));
+  }
+
+  private documentClickHandler(event: Event): void {
+    this.hideWinTag();
+    const targ = event.target as HTMLElement;
+    if (targ.closest(`.${BTN_TRACK_SELECT_CAR_STYLE}`)) this.garage.updateCarForm(targ);
+    else if (targ.closest(`.${BTN_TRACK_REMOVE_CAR_STYLE}`)) this.garage.removeCar(targ);
+
+    else if (targ.closest(`.${BTN_STOP_RACE}`)) this.garage.stopRace();
+    else if (targ.closest(`.${BTN_START_RACE}`)) this.garage.startRace();
+    else if (targ.closest(`.${BTN_CREATE_CARS}`)) this.garage.createCars();
+
+    else if (targ.closest(`.${BTN_PAGIN_FIRST}`)) this.garage.paginClickHandler('first');
+    else if (targ.closest(`.${BTN_PAGIN_LAST}`)) this.garage.paginClickHandler('last');
+    else if (targ.closest(`.${BTN_PAGIN_LEFT}`)) this.garage.paginClickHandler('previus');
+    else if (targ.closest(`.${BTN_PAGIN_RIGHT}`)) this.garage.paginClickHandler('next');
+    else if (targ.closest(`.${NEXT_PAGE_BTN}`)) this.showNextPage();
+    else if (targ.closest(`.${PREV_PAGE_BTN}`)) this.showPreviusPage();
+  }
+
+  private showNextPage():void {
+    // const winTag = document.body.querySelector(WIN_TAG);
+    // if (!winTag) return;
+    // winTag.innerHTML = '';
+    this.garage.garage.classList.add(GARAGE_HIDE);
+    this.winPage.winPage.classList.add(WIN_SHOW);
+  }
+
+  private showPreviusPage():void {
+    this.garage.garage.classList.remove(GARAGE_HIDE);
+    this.winPage.winPage.classList.remove(WIN_SHOW);
+    // const winTag = document.body.querySelector(WIN_TAG);
+    // if (!winTag) return;
+    // winTag.innerHTML = '';
+    // winTag.classList.remove(WIN_SHOW);
+  }
+
+  private hideWinTag():void {
+    const winTag = document.body.querySelector(WIN_TAG);
+    if (!winTag) return;
+    winTag.innerHTML = '';
+    winTag.classList.remove(WIN_SHOW);
   }
 }

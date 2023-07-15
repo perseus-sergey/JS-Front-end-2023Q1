@@ -13,15 +13,17 @@ export const apiGarage = {
   },
   getCar: {
     method: 'GET',
-    getCarUrl: '/garage/:id',
-    required: {
-      id: 'id=',
-    },
+    getCarUrl: '/garage/',
+    // required: {
+    //   id: 'id=',
+    // },
   },
   createCar: {
     method: 'POST',
     getCarsUrl: '/garage',
-    reqHeaders: '\'Content-Type\': \'application/json\'',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     dataParams: {
       name: 'name',
       color: 'color',
@@ -30,18 +32,20 @@ export const apiGarage = {
   },
   deleteCar: {
     method: 'DELETE',
-    deleteCarUrl: '/garage/:id',
-    required: {
-      id: 'id=',
-    },
+    deleteCarUrl: '/garage/',
+    // required: {
+    //   id: 'id=',
+    // },
   },
   updateCar: {
     method: 'PUT',
-    deleteCarUrl: '/garage/:id',
-    reqHeaders: '\'Content-Type\': \'application/json\'',
-    required: {
-      id: 'id=',
+    deleteCarUrl: '/garage/',
+    headers: {
+      'Content-Type': 'application/json',
     },
+    // required: {
+    //   id: 'id=',
+    // },
     dataParams: {
       name: 'name',
       color: 'color',
@@ -104,10 +108,10 @@ export const apiGetWinners = {
 export const apiWinner = {
   getWinner: {
     method: 'GET',
-    wgetUrl: '/winners/:id',
-    required: {
-      id: 'id=',
-    },
+    getUrl: '/winners/',
+    // required: {
+    //   id: 'id=',
+    // },
     respContent: {
       id: 'id',
       wins: 'wins',
@@ -117,9 +121,8 @@ export const apiWinner = {
   createWinner: {
     method: 'POST',
     createUrl: '/winners',
-    reqHeaders: '\'Content-Type\': \'application/json\'',
-    required: {
-      id: 'id=',
+    headers: {
+      'Content-Type': 'application/json',
     },
     respContent: {
       id: 'id',
@@ -129,18 +132,20 @@ export const apiWinner = {
   },
   deleteWinner: {
     method: 'DELETE',
-    deleteUrl: '/winners/:id',
-    required: {
-      id: 'id=',
-    },
+    deleteUrl: '/winners/',
+    // required: {
+    //   id: 'id=',
+    // },
   },
   updateWinner: {
     method: 'PUT',
-    updateUrl: '/winners/:id',
-    reqHeaders: '\'Content-Type\': \'application/json\'',
-    required: {
-      id: 'id=',
+    updateUrl: '/winners/',
+    headers: {
+      'Content-Type': 'application/json',
     },
+    // required: {
+    //   id: 'id=',
+    // },
     dataParams: {
       wins: 'wins',
       time: 'time',
@@ -157,6 +162,7 @@ export const apiWinner = {
 export const constantsNumbers = {
   NUMBER_RANDOM_CREATED_CAR: 100,
   NUMBER_TRACKS_PER_PAGE: 7,
+  NUMBER_ROWS_WIN_TABLE: 10,
   MAX_SPEED: 200,
   MIN_SPEED: 50,
   DISTANCE: 500000,
@@ -188,11 +194,19 @@ export const constantsTexts = {
   DEFAULT_UPDATE_COLOR: '#ffe942',
   DEFAULT_CREATE_COLOR: '#06a6f6',
   GARAGE_TITLE: 'Garage',
+  WIN_PAGE_TITLE: 'Winners',
   BTN_PAGIN_TEXT_LEFT: '⋖',
   BTN_PAGIN_TEXT_RIGHT: '⋗',
   BTN_PAGIN_TEXT_LAST: '⋙',
   BTN_PAGIN_TEXT_FIRST: '⋘',
+  NEXT_PAGE: 'To Winners',
+  PREV_PAGE: 'To Garage',
   TRACK_CAR_WINNER_TITLE: '!!! WINNER',
+  WIN_TBL_TITLE_ROW_1: 'Number',
+  WIN_TBL_TITLE_ROW_2: 'Car',
+  WIN_TBL_TITLE_ROW_3: 'Name',
+  WIN_TBL_TITLE_ROW_4: 'Wins',
+  WIN_TBL_TITLE_ROW_5: 'Best Time (s)',
 };
 export const constantsClasses = {
   ACTIVE: 'active',
@@ -212,6 +226,7 @@ export const constantsClasses = {
   GARAGE: 'garage',
   TRACKS_TAG: 'tracks',
   WIN_SHOW: 'show',
+  GARAGE_HIDE: 'hide',
   WRAP_RACE_BUTTONS: 'race-btns-wrapper',
   BTN_STOP_RACE: 'btn-race-stop',
   BTN_START_RACE: 'btn-race-start',
@@ -233,6 +248,14 @@ export const constantsClasses = {
   BTN_TRACK_REMOVE_CAR_STYLE: 'btn-remove-car',
   BTN_TRACK_STOP_CAR_STYLE: 'btn-stop-car',
   BTN_TRACK_START_CAR_STYLE: 'btn-start-car',
+  SWITCH_PAGE_BTN_WRAP: 'btn-swith-page-wrap',
+  NEXT_PAGE_BTN: 'btn-next-page',
+  PREV_PAGE_BTN: 'btn-prev-page',
+  WIN_PAGE: 'win-page',
+  WIN_TABLE: 'win-table',
+  WIN_TBL_BODY: 'win-table__body',
+  WIN_TBL_TITLE_ROW: 'win-table__title-row',
+  WIN_TBL_ROW: 'win-table__row',
 };
 export const constantsAttributes = {
   ATTR_CAR_NAME: 'data-name',

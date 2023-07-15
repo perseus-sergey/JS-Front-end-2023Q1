@@ -52,6 +52,21 @@ header {
       height: 5.5vw;
     }
   }
+  .btn-swith-page-wrap {
+    display: flex;
+    gap: 1.5vh;
+    position: absolute;
+    right: 5vh;
+
+    button {
+      background: rgb(71 106 56);
+      color: #ffffff;
+      font-size: 2vw;
+      padding: 0.5vw 1vw;
+      border: solid 0.3vh #a7c68c;
+      border-width: 0.1vh 0.1vh 0.5vh 0.1vh;
+    }
+  }
 }
 
 h1 {
@@ -157,16 +172,8 @@ main {
     display: flex;
     flex-direction: column;
 
-    h2 {
-      padding: 2vh 0;
-      text-align: center;
-      text-shadow:
-      -0.1vh -0.1vh 0.1vh #000000,
-      0.1vh 0.1vh 0 #000000,
-      0.3vh 0.3vh 0 #000000,
-      0.4vh 0.4vh 0 #000000,
-      0.5vh 0.5vh 0 #000000;
-      color: #c5f338;
+    &.hide{
+      display: none;
     }
   }
 
@@ -249,25 +256,75 @@ main {
   }
 }
 
-win-car {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%);
-  text-shadow:
-  -0.1vh -0.1vh 0.1vh #000000,
-  0.1vh 0.1vh 0 #000000,
-  0 0 0.9vh #f3ffcb,
-  0.3vh 0.3vh 0 #000000,
-  0.4vh 0.4vh 0 #000000,
-  0.5vh 0.5vh 0 #000000;
-  color: #c5f338;
-  font-weight: 900;
-  visibility: hidden;
-  z-index: 1;
+.garage,
+.win-page {
+  display: none;
 
   &.show {
+    display: block;
+  }
+  h2 {
+    padding: 2vh 0;
+    text-align: center;
+    text-shadow: -0.1vh -0.1vh 0.1vh #000000, 0.1vh 0.1vh 0 #000000, 0.3vh 0.3vh 0 #000000, 0.4vh 0.4vh 0 #000000,
+      0.5vh 0.5vh 0 #000000;
+    color: #c5f338;
+  }
+}
+
+.win-table__title-row,
+.win-table__row {
+  font-size: 3vh;
+  display: flex;
+  gap: 5vw;
+  align-items: center;
+  padding: 0.5vw 2vw 0.5vw 2vw;
+
+  div {
+    width: 10vw;
+    text-align: center;
+  }
+
+  div:nth-child(3) {
+    width: 15vw;
+  }
+
+  svg {
+    height: 3vh;
+  }
+}
+.win-table {
+  margin: 0 auto;
+  width: 85vw;
+
+  .win-table__row {
+    color: #ffffff;
+    text-shadow: 0.2vh 0.5vh 0.5vh rgba(0, 0, 0, 0.8);
+    padding-top: 1vh;
+  }
+
+  .win-table__title-row {
+    color: #d7ffd0;
+    text-shadow: 0.1vh 0.1vh 0.2vh rgb(0 0 0 / 83%);
+    background: rgb(174, 190, 1);
+    width: fit-content;
+  }
+
+  win-car {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%);
+    text-shadow: -0.1vh -0.1vh 0.1vh #000000, 0.1vh 0.1vh 0 #000000, 0 0 0.9vh #f3ffcb, 0.3vh 0.3vh 0 #000000,
+      0.4vh 0.4vh 0 #000000, 0.5vh 0.5vh 0 #000000;
+    color: #c5f338;
+    font-weight: 900;
+    visibility: hidden;
+    z-index: 1;
+
+    &.show {
       visibility: visible;
+    }
   }
 }
 
@@ -285,7 +342,7 @@ win-car {
     font-size: 2.5vh;
 
     &:disabled {
-      background: rgb(161 161 161);;
+      background: rgb(161 161 161);
     }
   }
 
