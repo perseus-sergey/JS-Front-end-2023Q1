@@ -112,6 +112,8 @@ export class Garage {
 
   private startRaceBtn!: HTMLButtonElement;
 
+  private createCarsBtn!: HTMLButtonElement;
+
   private btnPaginPrevius!: HTMLButtonElement;
 
   private btnPaginNext!: HTMLButtonElement;
@@ -223,9 +225,8 @@ export class Garage {
   }
 
   public startRace(): void {
-    this.startRaceBtn.disabled = true;
-    const winTag = document.body.querySelector(WIN_TAG);
-    if (winTag) winTag.setAttribute(FINISHERS, `${0}`);
+    this.disableBtns();
+    this.resetFinishersCounter();
     this.isRace = true;
     const tracks = this.getTrackTags();
     if (tracks.length) {
@@ -234,6 +235,16 @@ export class Garage {
         track.setAttribute(MOOVE, '');
       });
     }
+  }
+
+  private disableBtns(): void {
+    this.startRaceBtn.disabled = true;
+    this.createCarsBtn.disabled = true;
+  }
+
+  private resetFinishersCounter(): void {
+    const winTag = document.body.querySelector(WIN_TAG);
+    if (winTag) winTag.setAttribute(FINISHERS, `${0}`);
   }
 
   public createCars(): void {
@@ -305,7 +316,7 @@ export class Garage {
     const raceBtnsWrapper = generateDomElement('div', null, this.controlPanel, WRAP_RACE_BUTTONS);
     generateDomElement('button', BTN_STOP_RACE_TEXT, raceBtnsWrapper, BTN_STOP_RACE);
     this.startRaceBtn = generateDomElement('button', BTN_START_RACE_TEXT, raceBtnsWrapper, BTN_START_RACE);
-    generateDomElement('button', BTN_CREATE_CARS_TEXT, raceBtnsWrapper, BTN_CREATE_CARS);
+    this.createCarsBtn = generateDomElement('button', BTN_CREATE_CARS_TEXT, raceBtnsWrapper, BTN_CREATE_CARS);
   }
 
   private generateFormCreateCar(): void {

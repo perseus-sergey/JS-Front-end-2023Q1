@@ -13,6 +13,8 @@ const {
   SWU_IMG,
   MAIN,
   FOOTER,
+  GARAGE,
+  WIN_PAGE,
   RSS_LINK_CLASS,
   RSS_LINK_IMG,
   COPYRIGHT,
@@ -132,10 +134,14 @@ export class Page {
     else if (targ.closest(`.${BTN_START_RACE}`)) this.garage.startRace();
     else if (targ.closest(`.${BTN_CREATE_CARS}`)) this.garage.createCars();
 
-    else if (targ.closest(`.${BTN_PAGIN_FIRST}`)) this.garage.paginClickHandler('first');
-    else if (targ.closest(`.${BTN_PAGIN_LAST}`)) this.garage.paginClickHandler('last');
-    else if (targ.closest(`.${BTN_PAGIN_LEFT}`)) this.garage.paginClickHandler('previus');
-    else if (targ.closest(`.${BTN_PAGIN_RIGHT}`)) this.garage.paginClickHandler('next');
+    else if (targ.closest(`.${GARAGE} .${BTN_PAGIN_FIRST}`)) this.garage.paginClickHandler('first');
+    else if (targ.closest(`.${GARAGE} .${BTN_PAGIN_LAST}`)) this.garage.paginClickHandler('last');
+    else if (targ.closest(`.${GARAGE} .${BTN_PAGIN_LEFT}`)) this.garage.paginClickHandler('previus');
+    else if (targ.closest(`.${GARAGE} .${BTN_PAGIN_RIGHT}`)) this.garage.paginClickHandler('next');
+    else if (targ.closest(`.${WIN_PAGE} .${BTN_PAGIN_FIRST}`)) this.winPage.paginClickHandler('first');
+    else if (targ.closest(`.${WIN_PAGE} .${BTN_PAGIN_LAST}`)) this.winPage.paginClickHandler('last');
+    else if (targ.closest(`.${WIN_PAGE} .${BTN_PAGIN_LEFT}`)) this.winPage.paginClickHandler('previus');
+    else if (targ.closest(`.${WIN_PAGE} .${BTN_PAGIN_RIGHT}`)) this.winPage.paginClickHandler('next');
     else if (targ.closest(`.${NEXT_PAGE_BTN}`)) this.showNextPage();
     else if (targ.closest(`.${PREV_PAGE_BTN}`)) this.showPreviusPage();
   }

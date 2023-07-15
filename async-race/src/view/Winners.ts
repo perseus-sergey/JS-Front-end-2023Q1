@@ -88,14 +88,15 @@ export class Winners {
     this.generatePage();
     this.generatePageTitle();
     this.generateWinTable();
+    this.makePagination();
     await this.pageUpdate();
   }
 
   public async pageUpdate(): Promise<void> {
     await this.createWinnersArray();
     this.fillWinTable();
-    this.makePagination();
     this.updatePageTitle();
+    // this.updatePagination();
   }
 
   private generatePage(): void {

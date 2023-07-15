@@ -20,7 +20,7 @@ const {
 } = apiWinner;
 
 const {
-  WIN_SHOW, BTN_START_RACE,
+  WIN_SHOW, BTN_START_RACE, BTN_CREATE_CARS,
 } = constantsClasses;
 
 const {
@@ -54,7 +54,9 @@ export class Winner extends HTMLElement {
 
   private raceFinished():void {
     const startRaceBtn = document.body.querySelector(`.${BTN_START_RACE}`) as HTMLButtonElement;
+    const createCarsBtn = document.body.querySelector(`.${BTN_CREATE_CARS}`) as HTMLButtonElement;
     startRaceBtn.disabled = false;
+    createCarsBtn.disabled = false;
   }
 
   private async setWinner(attr: string):Promise<void> {
