@@ -192,7 +192,6 @@ export class Garage {
     if (!chosenTrack) return;
     const chosenCar = this.cars
       .find((eachCar) => eachCar.id === chosenTrack.car.id);
-
     if (!chosenCar) return;
     this.disableUpdateForm(false);
     this.inputUpdateCarName.focus();
@@ -203,21 +202,16 @@ export class Garage {
     this.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
   }
 
-  public updateCarSubmitHandler(event: Event): void {
+  private updateCarSubmitHandler(event: Event): void {
     event.preventDefault();
     if (!isFormValidate(this.inputUpdateCarName.value)) {
       this.formUpdateCar.addEventListener('submit', this.updateCarSubmitHandler, { once: true });
       this.inputUpdateCarName.focus();
       return;
     }
-    const { chosenCar } = this;
-    chosenCar.name = this.inputUpdateCarName.value;
-    chosenCar.color = this.inputUpdateCarColor.value;
-
-    this.setTrackAttributes(this.chosenTrack, chosenCar.id, chosenCar.name, chosenCar.color);
+    this.updateCar();
     this.disableUpdateForm(true);
-    this.updateGarageTitle();
-    // console.log('cars add', this.cars);
+    // this.updateGarageTitle();
   }
 
   public formCreateCarFocusHandler(): void {
@@ -265,34 +259,20 @@ export class Garage {
     this.resetCreateForm();
   }
 
-  // ============== CRUD CAR ======== start ==========
-
-  public createCarsssss(): void {
-    const startID = freeIdSearche(this.cars);
-    const randomCars = new Array(NUMBER_RANDOM_CREATED_CAR)
-      .fill(null).map((car, index) => new Car(
-        startID + index,
-        randomColor(),
-        carNames[getRandomIntBetween(0, carNames.length - 1)],
-      ));
-    this.cars = [...this.cars, ...randomCars];
-    this.fillTracksHtml();
-    this.updateGarageTitle();
+  private resetCreateForm(): void {
+    this.inputCreateCarColor.value = DEFAULT_CREATE_COLOR;
+    this.inputCreateCarName.value = '';
   }
 
+  // ============== CRUD CAR ======== start ==========
+
   public createCars(): void {
-    // const startID = freeIdSearche(this.cars);
-    // new Array(NUMBER_RANDOM_CREATED_CAR)
-    //   .fill(null).forEach(await this.createCar());
     for (let n = 0; n < NUMBER_RANDOM_CREATED_CAR; n += 1) {
       this.createCar({
         name: carNames[getRandomIntBetween(0, carNames.length - 1)],
         color: randomColor(),
       });
     }
-    // this.cars = [...this.cars, ...randomCars];
-    // this.fillTracksHtml();
-    // this.updateGarageTitle();
   }
 
   private async createCar(car: ICarCreate): Promise<void> {
@@ -308,9 +288,22 @@ export class Garage {
     this.updateGarageTitle();
   }
 
-  private resetCreateForm(): void {
-    this.inputCreateCarColor.value = DEFAULT_CREATE_COLOR;
-    this.inputCreateCarName.value = '';
+  private async updateCar(): Promise<void> {
+    const { chosenCar } = this;
+    const updatedCar: ICar = await this.carCRUD<ICar, ICarCreate>(
+      updateCar.method,
+      chosenCar.id,
+      {
+        name: this.inputUpdateCarName.value,
+        color: this.inputUpdateCarColor.value,
+      },
+    );
+    if (!updatedCar) return;
+
+    chosenCar.name = updatedCar.name;
+    chosenCar.color = updatedCar.color;
+
+    this.setTrackAttributes(this.chosenTrack, chosenCar.id, chosenCar.name, chosenCar.color);
   }
 
   private async carCRUD<P, T>(
@@ -341,7 +334,7 @@ export class Garage {
   }
 
   private makeRequestUrl(carId?: number):string {
-    const id = (carId !== undefined) ? carId : '';
+    const id = (carId !== undefined) ? `/${carId}` : '';
     return `${API_BASE_URL + getCars.getCarsUrl + id}`;
   }
   // ______________ FETCH ______ start _______
