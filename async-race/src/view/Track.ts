@@ -141,7 +141,7 @@ export class Track extends HTMLElement {
       this.moveCarToStart();
       await this.setAnimateParams();
       requestAnimationFrame(this.step);
-      if (await this.isCrashEngine(this.car.id)) this.carStopped();
+      if (await this.isCrashEngine(this.car.id, drive)) this.carStopped();
     } else {
       this.stopCar();
     }
@@ -151,7 +151,7 @@ export class Track extends HTMLElement {
     cancelAnimationFrame(this.stopId);
     if (!this.winTag) return;
     const stoppedTrackNum = this.winTag.getAttribute(FINISHERS) || 0;
-    console.log('car stopped');
+    // console.log('car stopped');
     this.winTag.setAttribute(FINISHERS, `${+stoppedTrackNum + 1}`);
   }
 
@@ -160,8 +160,9 @@ export class Track extends HTMLElement {
     this.carElement.style.transform = 'translateX(0)';
   }
 
-  private stopCar(): void {
+  private async stopCar(): Promise<void> {
     // cancelAnimationFrame(this.stopId);
+    await this.isCrashEngine(this.car.id, stopped);
     this.carStopped();
     this.moveCarToStart();
     this.engineStartBtn.disabled = false;
@@ -180,7 +181,7 @@ export class Track extends HTMLElement {
   private async setAnimateParams(): Promise<void> {
     this.engineStartBtn.disabled = true;
     this.distance = this.clientWidth - this.carElement.clientWidth;
-    const carEngineParams = await this.getApiVelocity(this.car.id);
+    const carEngineParams = await this.getApiVelocity(this.car.id, started);
     this.carVelocity = carEngineParams.velocity || 0;
     this.raceTime = this.getRaceTime();
   }
@@ -198,8 +199,8 @@ export class Track extends HTMLElement {
     return this.carVelocity ? +(this.distance / this.carVelocity).toFixed(2) : 0;
   }
 
-  private async isCrashEngine(carId: number): Promise<boolean> {
-    const url = `${API_BASE_URL + startStopUrl}?${id}${carId}&${statusUrl + drive}`;
+  private async isCrashEngine(carId: number, status:string): Promise<boolean> {
+    const url = this.makeRequestUrl(carId, status);
     try {
       return this.responseCrash(await fetch(url, { method }));
     } catch (error) {
@@ -210,15 +211,15 @@ export class Track extends HTMLElement {
 
   private responseCrash(res: Response): boolean {
     if (!res.ok) {
-      if (res.status === 500) console.log('Car has been stopped. It\'s engine was broken down.');
+      if (res.status === stopCode) console.log('Car has been stopped. It\'s engine was broken down.');
       else console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
       return true;
     }
     return false;
   }
 
-  private async getApiVelocity(carId: number):Promise<IStartStopEngine> {
-    const url = `${API_BASE_URL + startStopUrl}?${id}${carId}&${statusUrl + started}`;
+  private async getApiVelocity(carId: number, status: string):Promise<IStartStopEngine> {
+    const url = this.makeRequestUrl(carId, status);
     try {
       const response = this.errorHandler(await fetch(url, { method }));
       return await response.json();
@@ -236,5 +237,9 @@ export class Track extends HTMLElement {
       throw Error(res.statusText);
     }
     return res;
+  }
+
+  private makeRequestUrl(carId: number, status: string):string {
+    return `${API_BASE_URL + startStopUrl}?${id}${carId}&${statusUrl + status}`;
   }
 }

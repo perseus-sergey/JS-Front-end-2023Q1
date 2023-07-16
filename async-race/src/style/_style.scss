@@ -61,7 +61,7 @@ header {
     button {
       background: rgb(71 106 56);
       color: #ffffff;
-      font-size: 2vw;
+      font-size: 2.5vh;
       padding: 0.5vw 1vw;
       border: solid 0.3vh #a7c68c;
       border-width: 0.1vh 0.1vh 0.5vh 0.1vh;
@@ -259,9 +259,12 @@ main {
 .garage,
 .win-page {
   display: none;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
 
   &.show {
-    display: block;
+    display: flex;
   }
   h2 {
     padding: 2vh 0;
@@ -294,6 +297,7 @@ main {
   }
 }
 .win-table {
+  flex: 1 0 auto;
   margin: 0 auto;
   width: 85vw;
 

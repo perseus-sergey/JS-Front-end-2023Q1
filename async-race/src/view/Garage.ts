@@ -1,4 +1,5 @@
 // import { Car } from '../app/tipes';
+import { ICar, ICarCreate } from '../app/tipes';
 import {
   constantsClasses,
   constantsTexts,
@@ -141,12 +142,17 @@ export class Garage {
     this.generateControlPanel();
     this.generateGarageTitle();
     this.generateTracksTag();
-    this.cars = await this.getCarsFromServer();
+    await this.getCars();
     if (this.cars.length) this.fillTracksHtml();
     this.makePagination();
     this.bindCallbacks();
     this.startEventListners();
     this.updateGarageTitle();
+  }
+
+  private async getCars(): Promise<void> {
+    const data = await this.carCRUD<Car[], undefined>();
+    this.cars = data.map((car: Car) => new Car(car.id, car.color, car.name));
   }
 
   private disableUpdateForm(isDisable = true): void {
@@ -159,12 +165,12 @@ export class Garage {
 
   private bindCallbacks(): void {
     this.updateCarSubmitHandler = this.updateCarSubmitHandler.bind(this);
-    this.createCarSubmitHandler = this.createCarSubmitHandler.bind(this);
+    this.createCarFormSubmitHandler = this.createCarFormSubmitHandler.bind(this);
     this.formCreateCarFocusHandler = this.formCreateCarFocusHandler.bind(this);
   }
 
   private startEventListners(): void {
-    this.formCreateCar.addEventListener('submit', this.createCarSubmitHandler);
+    this.formCreateCar.addEventListener('submit', this.createCarFormSubmitHandler);
     this.formCreateCar.addEventListener('focus', this.formCreateCarFocusHandler, true);
   }
 
@@ -247,7 +253,21 @@ export class Garage {
     if (winTag) winTag.setAttribute(FINISHERS, `${0}`);
   }
 
-  public createCars(): void {
+  private createCarFormSubmitHandler(event: Event): void {
+    event.preventDefault();
+    if (!isFormValidate(this.inputCreateCarName.value)) {
+      this.inputCreateCarName.focus();
+    }
+    this.createCar({
+      name: this.inputCreateCarName.value,
+      color: this.inputCreateCarColor.value,
+    });
+    this.resetCreateForm();
+  }
+
+  // ============== CRUD CAR ======== start ==========
+
+  public createCarsssss(): void {
     const startID = freeIdSearche(this.cars);
     const randomCars = new Array(NUMBER_RANDOM_CREATED_CAR)
       .fill(null).map((car, index) => new Car(
@@ -260,31 +280,93 @@ export class Garage {
     this.updateGarageTitle();
   }
 
+  public createCars(): void {
+    // const startID = freeIdSearche(this.cars);
+    // new Array(NUMBER_RANDOM_CREATED_CAR)
+    //   .fill(null).forEach(await this.createCar());
+    for (let n = 0; n < NUMBER_RANDOM_CREATED_CAR; n += 1) {
+      this.createCar({
+        name: carNames[getRandomIntBetween(0, carNames.length - 1)],
+        color: randomColor(),
+      });
+    }
+    // this.cars = [...this.cars, ...randomCars];
+    // this.fillTracksHtml();
+    // this.updateGarageTitle();
+  }
+
+  private async createCar(car: ICarCreate): Promise<void> {
+    const createdCar: ICar = await this.carCRUD<ICar, ICarCreate>(createCar.method, undefined, car);
+    // const numTracks = this.garage.querySelectorAll(TRACKS_TAG).length;
+    // if (numTracks < NUMBER_TRACKS_PER_PAGE) {
+    //   const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
+    //   this.setTrackAttributes(track, car.id, car.name, car.color);
+    //   track.insertCar(car);
+    // }
+    this.cars.push(createdCar);
+    this.fillTracksHtml();
+    this.updateGarageTitle();
+  }
+
   private resetCreateForm(): void {
     this.inputCreateCarColor.value = DEFAULT_CREATE_COLOR;
     this.inputCreateCarName.value = '';
   }
 
-  private createCarSubmitHandler(event: Event): void {
-    event.preventDefault();
-    if (!isFormValidate(this.inputCreateCarName.value)) {
-      this.inputCreateCarName.focus();
-      return;
+  private async carCRUD<P, T>(
+    method = 'GET',
+    carId?: number,
+    body?: T,
+    headers = { 'Content-Type': 'application/json' },
+  ):Promise<P> {
+    // const { method, createUrl, headers } = createWinner;
+    try {
+      const response = await fetch(this.makeRequestUrl(carId), {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : null,
+      });
+      await this.carCRUDResponseHandler(response);
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    const car = new Car(
-      freeIdSearche(this.cars),
-      this.inputCreateCarColor.value,
-      this.inputCreateCarName.value,
-    );
-    const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
-    this.setTrackAttributes(track, car.id, car.name, car.color);
-
-    // REFACTOR
-    track.insertCar(car);
-    this.cars.push(car);
-    this.resetCreateForm();
-    this.updateGarageTitle();
   }
+
+  private async carCRUDResponseHandler(res: Response): Promise<void> {
+    if (!res.ok) {
+      console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
+    }
+  }
+
+  private makeRequestUrl(carId?: number):string {
+    const id = (carId !== undefined) ? carId : '';
+    return `${API_BASE_URL + getCars.getCarsUrl + id}`;
+  }
+  // ______________ FETCH ______ start _______
+
+  // private async getCarsFromServer():Promise<Car[]> {
+  //   const url = API_BASE_URL + getCars.getCarsUrl;
+  //   const response = await fetch(url);
+  //   await this.errorHandler(response);
+  //   const toJson = await response.json();
+  //   return toJson.map((car: Car) => new Car(car.id, car.color, car.name));
+  // }
+
+  // private async errorHandler(res: Response): Promise<void> {
+  //   if (!res.ok) {
+  //     this.errorServerMessage(res);
+  //   }
+  // }
+
+  // private errorServerMessage(res: Response): void {
+  //   console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
+  // }
+
+  // ______________ FETCH ______ end _______
+
+  // ============== CRUD CAR ======== end ==========
 
   private setTrackAttributes(
     parent: HTMLElement,
@@ -421,28 +503,5 @@ export class Garage {
       this.btnPaginFirst.disabled = true;
     }
   }
-
   // ______________ PAGINATION ______ end _______
-
-  // ______________ FETCH ______ start _______
-
-  private async getCarsFromServer():Promise<Car[]> {
-    const url = API_BASE_URL + getCars.getCarsUrl;
-    const response = await fetch(url);
-    await this.errorHandler(response);
-    const toJson = await response.json();
-    return toJson.map((car: Car) => new Car(car.id, car.color, car.name));
-  }
-
-  private async errorHandler(res: Response): Promise<void> {
-    if (!res.ok) {
-      this.errorServerMessage(res);
-    }
-  }
-
-  private errorServerMessage(res: Response): void {
-    console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
-  }
-
-  // ______________ FETCH ______ end _______
 }

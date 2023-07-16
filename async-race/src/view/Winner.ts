@@ -41,7 +41,6 @@ export class Winner extends HTMLElement {
   }
 
   private attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-    // console.log('win');
     if (name === FINISHERS) {
       if (+newValue >= document.body.querySelectorAll(TRACK_TAG).length) {
         this.raceFinished();
@@ -70,7 +69,7 @@ export class Winner extends HTMLElement {
     this.textContent = `${TRACK_CAR_WINNER_TITLE} - ${name} - (${time}s)`;
     this.classList.add(WIN_SHOW);
     await this.saveWinner();
-    await this.getWinners();
+    // await this.getWinners();
   }
 
   private async saveWinner():Promise<void> {
@@ -84,7 +83,7 @@ export class Winner extends HTMLElement {
   }
 
   private async getWinnerHendler(res: Response): Promise<void> {
-    console.log('getWinnerHendler response', res);
+    // console.log('getWinnerHendler response', res);
     if (!res.ok) {
       if (res.status === 404) this.createWinner();
       else this.errorServerMessage(res);
@@ -111,7 +110,7 @@ export class Winner extends HTMLElement {
   }
 
   private async createWinnerHendler(res: Response): Promise<void> {
-    console.log('createWinnerHendler response', res);
+    // console.log('createWinnerHendler response', res);
 
     if (!res.ok) {
       this.errorServerMessage(res);
@@ -141,7 +140,7 @@ export class Winner extends HTMLElement {
   }
 
   private async updateWinnerHendler(res: Response): Promise<void> {
-    console.log('updateWinnerHendler response', res);
+    // console.log('updateWinnerHendler response', res);
 
     if (!res.ok) {
       this.errorServerMessage(res);
@@ -150,20 +149,20 @@ export class Winner extends HTMLElement {
     console.log('Winner Updated:', await res.json());
   }
 
-  private async getWinners():Promise<void> {
-    const { method } = getWinner;
-    const url = `${API_BASE_URL + getWinner.getUrl}`;
-    try {
-      this.getWinnersHendler(await fetch(url, { method }));
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  // private async getWinners():Promise<void> {
+  //   const { method } = getWinner;
+  //   const url = `${API_BASE_URL + getWinner.getUrl}`;
+  //   try {
+  //     this.getWinnersHendler(await fetch(url, { method }));
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
 
-  private async getWinnersHendler(res: Response): Promise<void> {
-    console.log('getWinners response', await res.json());
-    if (!res.ok) this.errorServerMessage(res);
-  }
+  // private async getWinnersHendler(res: Response): Promise<void> {
+  //   // console.log('getWinners response', await res.json());
+  //   if (!res.ok) this.errorServerMessage(res);
+  // }
 
   private errorServerMessage(res: Response): void {
     console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);

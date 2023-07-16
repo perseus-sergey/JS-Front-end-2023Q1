@@ -1,7 +1,9 @@
-export interface ICar {
-  id: number,
+export interface ICarCreate {
   color: string,
   name: string,
+}
+export interface ICar extends ICarCreate {
+  id: number,
 }
 export interface IFinisher extends ICar {
   time: number,
