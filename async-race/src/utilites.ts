@@ -1,8 +1,5 @@
-/* eslint-disable max-len */
 import { ICar } from './app/tipes';
-import { constantsTagName } from './constants';
-
-// const { TRACK_TAG } = constantsTagName;
+import { carNames } from './constants';
 
 export const generateDomElement = <T extends HTMLElement>(
   tag: string,
@@ -21,27 +18,6 @@ export const generateDomElement = <T extends HTMLElement>(
   if (parent) parent.append(element);
   return element;
 };
-
-// https:// learn.javascript.ru/js-animation
-
-// export const animate = ({ timing, draw, duration }):void => {
-//   const start = performance.now();
-
-//   requestAnimationFrame(function step(time) {
-//     // timeFraction can change from 0 to 1
-//     let timeFraction = (time - start) / duration;
-//     if (timeFraction > 1) timeFraction = 1;
-
-//     // calculate the current animation state
-//     const progress = timing(timeFraction);
-
-//     draw(progress); // draw it
-
-//     if (timeFraction < 1) {
-//       requestAnimationFrame(step);
-//     }
-//   });
-// };
 
 export const getImage = (color: string): string => `
   <svg
@@ -77,6 +53,11 @@ export const freeIdSearche = (
   cars: ICar[],
 ): number => (cars.length ? Math.max(...cars.map((car) => car.id)) + 1 : 0);
 
-// export const getTrackTags = (): HTMLElement[] => [...document.querySelectorAll(TRACK_TAG)] as HTMLElement[];
+export const getRandomColor = (): string => `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')}`;
 
-export const randomColor = (): string => `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')}`;
+const getRandomModel = (): string => {
+  const arr = [...'asdfghjklqwertyuiopzxcvbnm'].map((symb, indx) => `${symb}${indx}`);
+  return arr[getRandomIntBetween(0, arr.length - 1)];
+};
+
+export const getRandomName = (): string => `${carNames[getRandomIntBetween(0, carNames.length - 1)]} - ${getRandomModel()}`;

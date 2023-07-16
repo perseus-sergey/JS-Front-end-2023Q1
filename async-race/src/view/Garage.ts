@@ -6,13 +6,12 @@ import {
   constantsTagName,
   constantsAttributes,
   constantsNumbers,
-  carNames,
   API_BASE_URL,
   apiGarage,
   apiWinner,
 } from '../constants';
 import {
-  generateDomElement, getRandomIntBetween, isFormValidate, randomColor,
+  generateDomElement, getRandomName, isFormValidate, getRandomColor,
 } from '../utilites';
 import { Car } from './Car';
 import { Track } from './Track';
@@ -268,8 +267,8 @@ export class Garage {
   public createCars(): void {
     for (let n = 0; n < NUMBER_RANDOM_CREATED_CAR; n += 1) {
       this.createCar({
-        name: carNames[getRandomIntBetween(0, carNames.length - 1)],
-        color: randomColor(),
+        name: getRandomName(),
+        color: getRandomColor(),
       });
     }
   }

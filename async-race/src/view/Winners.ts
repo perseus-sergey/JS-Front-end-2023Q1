@@ -125,29 +125,24 @@ export class Winners {
   }
 
   public tblSortTimeHandler(): void {
-    if (this.sortTimeBtn.classList.contains(ASC_SORT)) {
-      this.winners = this.winners.sort((first, sec) => (first.time > sec.time ? 1 : -1));
-      this.sortTimeBtn.classList.remove(ASC_SORT);
-    } else {
-      this.winners = this.winners.sort((first, sec) => (first.time > sec.time ? -1 : 1));
-      this.sortTimeBtn.classList.add(ASC_SORT);
-    }
-    this.sortTimeBtn.classList.add(ACTIVE);
+    this.sortTable(this.sortTimeBtn, 'time');
     this.sortWinsBtn.classList.remove(ACTIVE);
-    this.fillWinTable();
   }
 
   public tblSortWinsHandler(): void {
-    console.log('sort');
-    if (this.sortWinsBtn.classList.contains(ASC_SORT)) {
-      this.winners = this.winners.sort((first, sec) => (first.wins > sec.wins ? 1 : -1));
-      this.sortWinsBtn.classList.remove(ASC_SORT);
-    } else {
-      this.winners = this.winners.sort((first, sec) => (first.wins > sec.wins ? -1 : 1));
-      this.sortWinsBtn.classList.add(ASC_SORT);
-    }
-    this.sortWinsBtn.classList.add(ACTIVE);
+    this.sortTable(this.sortWinsBtn, 'wins');
     this.sortTimeBtn.classList.remove(ACTIVE);
+  }
+
+  private sortTable(chosenBtn: HTMLElement, field: 'time' | 'wins'): void {
+    if (chosenBtn.classList.contains(ASC_SORT)) {
+      this.winners = this.winners.sort((first, sec) => (first[field] > sec[field] ? 1 : -1));
+      chosenBtn.classList.remove(ASC_SORT);
+    } else {
+      this.winners = this.winners.sort((first, sec) => (first[field] > sec[field] ? -1 : 1));
+      chosenBtn.classList.add(ASC_SORT);
+    }
+    chosenBtn.classList.add(ACTIVE);
     this.fillWinTable();
   }
 
@@ -170,7 +165,7 @@ export class Winners {
     ).forEach((winner, idx) => {
       const row = generateDomElement('div', null, this.winTblBody, WIN_TBL_ROW);
       const { name, wins, time } = winner;
-      [idx + 1, getImage(winner.color), name, wins, time].forEach((el) => generateDomElement('div', `${el}`, row));
+      [(this.currPageNum - 1) * NUMBER_ROWS_WIN_TABLE + idx + 1, getImage(winner.color), name, wins, time].forEach((el) => generateDomElement('div', `${el}`, row));
     });
   }
 
