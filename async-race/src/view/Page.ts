@@ -128,7 +128,7 @@ export class Page {
     this.hideWinTag();
     const targ = event.target as HTMLElement;
     if (targ.closest(`.${BTN_TRACK_SELECT_CAR_STYLE}`)) this.garage.updateCarForm(targ);
-    else if (targ.closest(`.${BTN_TRACK_REMOVE_CAR_STYLE}`)) this.garage.removeCar(targ);
+    else if (targ.closest(`.${BTN_TRACK_REMOVE_CAR_STYLE}`)) this.garage.removeCarHandler(targ);
 
     else if (targ.closest(`.${BTN_STOP_RACE}`)) this.garage.stopRace();
     else if (targ.closest(`.${BTN_START_RACE}`)) this.garage.startRace();

@@ -109,9 +109,6 @@ export const apiWinner = {
   getWinner: {
     method: 'GET',
     getUrl: '/winners/',
-    // required: {
-    //   id: 'id=',
-    // },
     respContent: {
       id: 'id',
       wins: 'wins',
@@ -133,9 +130,6 @@ export const apiWinner = {
   deleteWinner: {
     method: 'DELETE',
     deleteUrl: '/winners/',
-    // required: {
-    //   id: 'id=',
-    // },
   },
   updateWinner: {
     method: 'PUT',
@@ -143,9 +137,6 @@ export const apiWinner = {
     headers: {
       'Content-Type': 'application/json',
     },
-    // required: {
-    //   id: 'id=',
-    // },
     dataParams: {
       wins: 'wins',
       time: 'time',

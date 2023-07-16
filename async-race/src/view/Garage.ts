@@ -9,10 +9,10 @@ import {
   carNames,
   API_BASE_URL,
   apiGarage,
+  apiWinner,
 } from '../constants';
 import {
-  delay,
-  freeIdSearche, generateDomElement, getRandomIntBetween, isFormValidate, randomColor,
+  generateDomElement, getRandomIntBetween, isFormValidate, randomColor,
 } from '../utilites';
 import { Car } from './Car';
 import { Track } from './Track';
@@ -79,6 +79,10 @@ const {
   deleteCar,
   updateCar,
 } = apiGarage;
+
+const {
+  deleteWinner,
+} = apiWinner;
 
 export class Garage {
   private formUpdateCar!: HTMLInputElement;
@@ -151,11 +155,11 @@ export class Garage {
   }
 
   private async getCars(): Promise<void> {
-    const data = await this.carCRUD<Car[], undefined>();
+    const data = await this.carCRUD<Car[], undefined>(this.makeRequestUrlCarEdit());
     this.cars = data.map((car: Car) => new Car(car.id, car.color, car.name));
   }
 
-  private disableUpdateForm(isDisable = true): void {
+  public disableUpdateForm(isDisable = true): void {
     this.inputUpdateCarColor.value = DEFAULT_UPDATE_COLOR;
     this.inputUpdateCarName.value = '';
     this.inputUpdateCarName.disabled = isDisable;
@@ -166,25 +170,12 @@ export class Garage {
   private bindCallbacks(): void {
     this.updateCarSubmitHandler = this.updateCarSubmitHandler.bind(this);
     this.createCarFormSubmitHandler = this.createCarFormSubmitHandler.bind(this);
-    this.formCreateCarFocusHandler = this.formCreateCarFocusHandler.bind(this);
+    // this.disableUpdateForm = this.disableUpdateForm.bind(this);
   }
 
   private startEventListners(): void {
     this.formCreateCar.addEventListener('submit', this.createCarFormSubmitHandler);
-    this.formCreateCar.addEventListener('focus', this.formCreateCarFocusHandler, true);
-  }
-
-  public removeCar(target: HTMLElement): void {
-    const chosenTrack = target.closest(TRACK_TAG) as Track;
-    if (!chosenTrack) return;
-    const chosenCarID = this.cars
-      .findIndex((eachCar) => eachCar.id === chosenTrack.car.id);
-
-    if (chosenCarID === undefined || chosenCarID === -1) return;
-    this.cars.splice(chosenCarID, 1);
-    this.fillTracksHtml();
-    this.updateGarageTitle();
-    // console.log('cars remove', this.cars);
+    this.formCreateCar.addEventListener('focus', this.disableUpdateForm.bind(this, true), true);
   }
 
   public updateCarForm(target: HTMLElement): void {
@@ -211,12 +202,11 @@ export class Garage {
     }
     this.updateCar();
     this.disableUpdateForm(true);
-    // this.updateGarageTitle();
   }
 
-  public formCreateCarFocusHandler(): void {
-    this.disableUpdateForm();
-  }
+  // public formCreateCarFocusHandler(): void {
+  //   this.disableUpdateForm();
+  // }
 
   public stopRace(): void {
     this.isRace = false;
@@ -259,6 +249,15 @@ export class Garage {
     this.resetCreateForm();
   }
 
+  public async removeCarHandler(target: HTMLElement): Promise<void> {
+    const chosenTrack = target.closest(TRACK_TAG) as Track;
+    if (!chosenTrack) return;
+
+    await this.removeCar(chosenTrack);
+    this.fillTracksHtml();
+    this.updateGarageTitle();
+  }
+
   private resetCreateForm(): void {
     this.inputCreateCarColor.value = DEFAULT_CREATE_COLOR;
     this.inputCreateCarName.value = '';
@@ -276,13 +275,11 @@ export class Garage {
   }
 
   private async createCar(car: ICarCreate): Promise<void> {
-    const createdCar: ICar = await this.carCRUD<ICar, ICarCreate>(createCar.method, undefined, car);
-    // const numTracks = this.garage.querySelectorAll(TRACKS_TAG).length;
-    // if (numTracks < NUMBER_TRACKS_PER_PAGE) {
-    //   const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
-    //   this.setTrackAttributes(track, car.id, car.name, car.color);
-    //   track.insertCar(car);
-    // }
+    const createdCar: ICar = await this.carCRUD<ICar, ICarCreate>(
+      this.makeRequestUrlCarEdit(),
+      createCar.method,
+      car,
+    );
     this.cars.push(createdCar);
     this.fillTracksHtml();
     this.updateGarageTitle();
@@ -291,8 +288,8 @@ export class Garage {
   private async updateCar(): Promise<void> {
     const { chosenCar } = this;
     const updatedCar: ICar = await this.carCRUD<ICar, ICarCreate>(
+      this.makeRequestUrlCarEdit(chosenCar.id),
       updateCar.method,
-      chosenCar.id,
       {
         name: this.inputUpdateCarName.value,
         color: this.inputUpdateCarColor.value,
@@ -306,15 +303,25 @@ export class Garage {
     this.setTrackAttributes(this.chosenTrack, chosenCar.id, chosenCar.name, chosenCar.color);
   }
 
+  private async removeCar(track: Track): Promise<void> {
+    const { id } = track.car;
+    const indxInThisCars = this.cars
+      .findIndex((eachCar) => eachCar.id === id);
+    if (indxInThisCars === undefined || indxInThisCars === -1) return;
+
+    await this.carCRUD<ICar, ICarCreate>(this.makeRequestUrlCarEdit(id), deleteCar.method);
+    await this.carCRUD<ICar, ICarCreate>(`${API_BASE_URL + deleteWinner.deleteUrl + id}`, deleteWinner.method);
+    this.cars.splice(indxInThisCars, 1);
+  }
+
   private async carCRUD<P, T>(
+    url: string,
     method = 'GET',
-    carId?: number,
     body?: T,
     headers = { 'Content-Type': 'application/json' },
   ):Promise<P> {
-    // const { method, createUrl, headers } = createWinner;
     try {
-      const response = await fetch(this.makeRequestUrl(carId), {
+      const response = await fetch(url, {
         method,
         headers,
         body: body ? JSON.stringify(body) : null,
@@ -333,32 +340,10 @@ export class Garage {
     }
   }
 
-  private makeRequestUrl(carId?: number):string {
+  private makeRequestUrlCarEdit(carId?: number):string {
     const id = (carId !== undefined) ? `/${carId}` : '';
     return `${API_BASE_URL + getCars.getCarsUrl + id}`;
   }
-  // ______________ FETCH ______ start _______
-
-  // private async getCarsFromServer():Promise<Car[]> {
-  //   const url = API_BASE_URL + getCars.getCarsUrl;
-  //   const response = await fetch(url);
-  //   await this.errorHandler(response);
-  //   const toJson = await response.json();
-  //   return toJson.map((car: Car) => new Car(car.id, car.color, car.name));
-  // }
-
-  // private async errorHandler(res: Response): Promise<void> {
-  //   if (!res.ok) {
-  //     this.errorServerMessage(res);
-  //   }
-  // }
-
-  // private errorServerMessage(res: Response): void {
-  //   console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
-  // }
-
-  // ______________ FETCH ______ end _______
-
   // ============== CRUD CAR ======== end ==========
 
   private setTrackAttributes(
