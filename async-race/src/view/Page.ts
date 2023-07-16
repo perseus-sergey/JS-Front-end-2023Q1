@@ -32,6 +32,8 @@ const {
   NEXT_PAGE_BTN,
   PREV_PAGE_BTN,
   GARAGE_HIDE,
+  WIN_TBL_WINS_SORT,
+  WIN_TBL_TIME_SORT,
 } = constantsClasses;
 
 const {
@@ -142,6 +144,8 @@ export class Page {
     else if (targ.closest(`.${WIN_PAGE} .${BTN_PAGIN_LAST}`)) this.winPage.paginClickHandler('last');
     else if (targ.closest(`.${WIN_PAGE} .${BTN_PAGIN_LEFT}`)) this.winPage.paginClickHandler('previus');
     else if (targ.closest(`.${WIN_PAGE} .${BTN_PAGIN_RIGHT}`)) this.winPage.paginClickHandler('next');
+    else if (targ.closest(`.${WIN_TBL_WINS_SORT}`)) this.winPage.tblSortWinsHandler();
+    else if (targ.closest(`.${WIN_TBL_TIME_SORT}`)) this.winPage.tblSortTimeHandler();
     else if (targ.closest(`.${NEXT_PAGE_BTN}`)) this.showNextPage();
     else if (targ.closest(`.${PREV_PAGE_BTN}`)) this.showPreviusPage();
   }

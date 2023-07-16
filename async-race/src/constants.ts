@@ -247,6 +247,9 @@ export const constantsClasses = {
   WIN_TBL_BODY: 'win-table__body',
   WIN_TBL_TITLE_ROW: 'win-table__title-row',
   WIN_TBL_ROW: 'win-table__row',
+  WIN_TBL_WINS_SORT: 'win-table__wins-sort',
+  WIN_TBL_TIME_SORT: 'win-table__time-sort',
+  ASC_SORT: 'asc',
 };
 export const constantsAttributes = {
   ATTR_CAR_NAME: 'data-name',

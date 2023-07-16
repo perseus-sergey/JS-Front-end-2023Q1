@@ -29,6 +29,10 @@ const {
   WIN_TBL_BODY,
   WIN_TBL_TITLE_ROW,
   WIN_TBL_ROW,
+  WIN_TBL_WINS_SORT,
+  WIN_TBL_TIME_SORT,
+  ASC_SORT,
+  ACTIVE,
 } = constantsClasses;
 
 const {
@@ -74,6 +78,10 @@ export class Winners {
 
   private paginWrapper!: HTMLElement;
 
+  private sortWinsBtn!: HTMLElement;
+
+  private sortTimeBtn!: HTMLElement;
+
   private isRace = false;
 
   private currPageNum = 1;
@@ -110,10 +118,37 @@ export class Winners {
       WIN_TBL_TITLE_ROW_1,
       WIN_TBL_TITLE_ROW_2,
       WIN_TBL_TITLE_ROW_3,
-      WIN_TBL_TITLE_ROW_4,
-      WIN_TBL_TITLE_ROW_5,
     ].forEach((elTitle) => generateDomElement('div', elTitle, titleRow));
     this.winTblBody = generateDomElement('div', '', winTable, WIN_TBL_BODY);
+    this.sortWinsBtn = generateDomElement('div', WIN_TBL_TITLE_ROW_4, titleRow, WIN_TBL_WINS_SORT);
+    this.sortTimeBtn = generateDomElement('div', WIN_TBL_TITLE_ROW_5, titleRow, WIN_TBL_TIME_SORT);
+  }
+
+  public tblSortTimeHandler(): void {
+    if (this.sortTimeBtn.classList.contains(ASC_SORT)) {
+      this.winners = this.winners.sort((first, sec) => (first.time > sec.time ? 1 : -1));
+      this.sortTimeBtn.classList.remove(ASC_SORT);
+    } else {
+      this.winners = this.winners.sort((first, sec) => (first.time > sec.time ? -1 : 1));
+      this.sortTimeBtn.classList.add(ASC_SORT);
+    }
+    this.sortTimeBtn.classList.add(ACTIVE);
+    this.sortWinsBtn.classList.remove(ACTIVE);
+    this.fillWinTable();
+  }
+
+  public tblSortWinsHandler(): void {
+    console.log('sort');
+    if (this.sortWinsBtn.classList.contains(ASC_SORT)) {
+      this.winners = this.winners.sort((first, sec) => (first.wins > sec.wins ? 1 : -1));
+      this.sortWinsBtn.classList.remove(ASC_SORT);
+    } else {
+      this.winners = this.winners.sort((first, sec) => (first.wins > sec.wins ? -1 : 1));
+      this.sortWinsBtn.classList.add(ASC_SORT);
+    }
+    this.sortWinsBtn.classList.add(ACTIVE);
+    this.sortTimeBtn.classList.remove(ACTIVE);
+    this.fillWinTable();
   }
 
   private generatePageTitle(): void {

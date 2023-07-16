@@ -288,6 +288,32 @@ main {
     text-align: center;
   }
 
+  .win-table__wins-sort,
+  .win-table__time-sort {
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+
+    &:before {
+      content: '';
+      position: absolute;
+      left: -1vw;
+      top: 20%;
+      transition: all 0.5s;
+    }
+
+    &.active {
+      &:before {
+        content: '⇓';
+      }
+      &.asc {
+        &:before {
+          content: '⇑';
+        }
+      }
+    }
+  }
+
   div:nth-child(3) {
     width: 15vw;
   }
