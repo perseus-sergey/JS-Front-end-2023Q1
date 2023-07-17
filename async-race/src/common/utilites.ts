@@ -1,4 +1,4 @@
-import { ICar } from './app/tipes';
+import { ICar } from './tipes';
 import { carNames } from './constants';
 
 export const generateDomElement = <T extends HTMLElement>(

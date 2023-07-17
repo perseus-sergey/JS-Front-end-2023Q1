@@ -1,4 +1,4 @@
-import { ICar } from '../app/tipes';
+import { ICar } from '../common/tipes';
 
 export class Car implements ICar {
   constructor(

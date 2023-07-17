@@ -1,6 +1,6 @@
 import {
   IFinisher, IWinner, IWinnerApi, IWinnerCreate,
-} from '../app/tipes';
+} from '../common/tipes';
 
 import {
   constantsAttributes,
@@ -8,7 +8,7 @@ import {
   constantsTexts,
   apiWinner,
   constantsTagName,
-} from '../constants';
+} from '../common/constants';
 import { Crud } from '../controller/Crud';
 
 const {

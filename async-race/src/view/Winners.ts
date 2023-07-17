@@ -1,15 +1,15 @@
-import { ICar, IWinner } from '../app/tipes';
+import { ICar, IWinner } from '../common/tipes';
 import {
   constantsClasses,
   constantsTexts,
   constantsNumbers,
   apiGarage,
   apiWinner,
-} from '../constants';
+} from '../common/constants';
 import { Crud } from '../controller/Crud';
 import {
   generateDomElement, getImage,
-} from '../utilites';
+} from '../common/utilites';
 
 const {
   getWinner,

@@ -39,6 +39,6 @@
     "dev": "webpack --mode=development",
     "watch": "webpack --watch",
     "serve": "webpack serve",
-    "deploy": "npm run build && npx gh-pages -d dist -e "
+    "deploy": "npm run build && npx gh-pages -d dist -e async-race"
   }
 }

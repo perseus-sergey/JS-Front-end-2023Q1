@@ -1,4 +1,4 @@
-import { IStartStopEngine } from '../app/tipes';
+import { IStartStopEngine } from '../common/tipes';
 import {
   constantsAttributes,
   constantsClasses,
@@ -7,10 +7,10 @@ import {
   constantsTexts,
   apiCarEngine,
   constantsTagName,
-} from '../constants';
+} from '../common/constants';
 import { Crud } from '../controller/Crud';
 import { Resp } from '../controller/Response';
-import { generateDomElement, getImage } from '../utilites';
+import { generateDomElement, getImage } from '../common/utilites';
 import { Car } from './Car';
 
 const {

@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '../constants';
+import { API_BASE_URL } from '../common/constants';
 
 // B - Body, R - Response
 export class Crud <R, B = undefined> {

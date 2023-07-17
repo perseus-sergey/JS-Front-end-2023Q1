@@ -1,4 +1,4 @@
-import { ICar, ICarCreate } from '../app/tipes';
+import { ICar, ICarCreate } from '../common/tipes';
 import {
   constantsClasses,
   constantsTexts,
@@ -7,11 +7,11 @@ import {
   constantsNumbers,
   apiGarage,
   apiWinner,
-} from '../constants';
+} from '../common/constants';
 import { Crud } from '../controller/Crud';
 import {
   generateDomElement, getRandomName, isFormValidate, getRandomColor,
-} from '../utilites';
+} from '../common/utilites';
 import { Car } from './Car';
 import { Track } from './Track';
 
@@ -230,6 +230,7 @@ export class Garage {
     event.preventDefault();
     if (!isFormValidate(this.inputCreateCarName.value)) {
       this.inputCreateCarName.focus();
+      return;
     }
     this.createCar({
       name: this.inputCreateCarName.value,

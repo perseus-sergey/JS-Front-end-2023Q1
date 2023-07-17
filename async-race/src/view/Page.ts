@@ -1,7 +1,7 @@
 import {
   constantsClasses, constantsTexts, constantsLinks, constantsSVGs, constantsTagName,
-} from '../constants';
-import { generateDomElement } from '../utilites';
+} from '../common/constants';
+import { generateDomElement } from '../common/utilites';
 import { Garage } from './Garage';
 import { Winner } from './Winner';
 import { Winners } from './Winners';
