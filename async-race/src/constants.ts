@@ -201,7 +201,6 @@ export const constantsTexts = {
 };
 export const constantsClasses = {
   ACTIVE: 'active',
-  // DISABLED: 'disabled',
   HEADER: 'header',
   SWU_IMG: 'swu-img',
   MAIN: 'main',

@@ -351,6 +351,7 @@ win-car {
   color: #c5f338;
   font-weight: 900;
   visibility: hidden;
+  font-size: 3vw;
   z-index: 1;
 
   &.show:not(.hide) {

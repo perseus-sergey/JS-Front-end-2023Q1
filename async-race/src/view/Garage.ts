@@ -1,4 +1,3 @@
-// import { Car } from '../app/tipes';
 import { ICar, ICarCreate } from '../app/tipes';
 import {
   constantsClasses,
@@ -6,10 +5,10 @@ import {
   constantsTagName,
   constantsAttributes,
   constantsNumbers,
-  API_BASE_URL,
   apiGarage,
   apiWinner,
 } from '../constants';
+import { Crud } from '../controller/Crud';
 import {
   generateDomElement, getRandomName, isFormValidate, getRandomColor,
 } from '../utilites';
@@ -24,8 +23,6 @@ const {
   INP_CREATE_CAR_COLOR,
   INP_UPDATE_CAR_NAME,
   INP_UPDATE_CAR_COLOR,
-  BTN_TRACK_SELECT_CAR_STYLE,
-  BTN_TRACK_REMOVE_CAR_STYLE,
   WRAP_RACE_BUTTONS,
   BTN_STOP_RACE,
   BTN_START_RACE,
@@ -37,7 +34,6 @@ const {
   BTN_PAGIN_FIRST,
   PAGIN_CURRENT,
   HIDE_PAGINATION,
-  WIN_SHOW,
 } = constantsClasses;
 
 const {
@@ -60,7 +56,7 @@ const {
   ATTR_CAR_ID,
   ATTR_CAR_COLOR,
   MOOVE,
-  WINNER,
+  // WINNER,
   FINISHERS,
 } = constantsAttributes;
 
@@ -68,12 +64,9 @@ const { TRACK_TAG, WIN_TAG } = constantsTagName;
 const {
   NUMBER_RANDOM_CREATED_CAR,
   NUMBER_TRACKS_PER_PAGE,
-  MAX_SPEED,
-  MIN_SPEED,
 } = constantsNumbers;
 const {
   getCars,
-  getCar,
   createCar,
   deleteCar,
   updateCar,
@@ -154,8 +147,10 @@ export class Garage {
   }
 
   private async getCars(): Promise<void> {
-    const data = await this.carCRUD<Car[], undefined>(this.makeRequestUrlCarEdit());
-    this.cars = data.map((car: Car) => new Car(car.id, car.color, car.name));
+    const crud = new Crud<Car[]>(this.makeRequestUrlCarEdit());
+
+    const data = await crud.responseJson;
+    if (data) this.cars = data.map((car: Car) => new Car(car.id, car.color, car.name));
   }
 
   public disableUpdateForm(isDisable = true): void {
@@ -169,7 +164,6 @@ export class Garage {
   private bindCallbacks(): void {
     this.updateCarSubmitHandler = this.updateCarSubmitHandler.bind(this);
     this.createCarFormSubmitHandler = this.createCarFormSubmitHandler.bind(this);
-    // this.disableUpdateForm = this.disableUpdateForm.bind(this);
   }
 
   private startEventListners(): void {
@@ -202,10 +196,6 @@ export class Garage {
     this.updateCar();
     this.disableUpdateForm(true);
   }
-
-  // public formCreateCarFocusHandler(): void {
-  //   this.disableUpdateForm();
-  // }
 
   public stopRace(): void {
     this.isRace = false;
@@ -274,11 +264,9 @@ export class Garage {
   }
 
   private async createCar(car: ICarCreate): Promise<void> {
-    const createdCar: ICar = await this.carCRUD<ICar, ICarCreate>(
-      this.makeRequestUrlCarEdit(),
-      createCar.method,
-      car,
-    );
+    const crud = new Crud<ICar, ICarCreate>(this.makeRequestUrlCarEdit(), createCar.method, car);
+    const createdCar = await crud.responseJson;
+    if (!createdCar) return;
     this.cars.push(createdCar);
     this.fillTracksHtml();
     this.updateGarageTitle();
@@ -286,7 +274,7 @@ export class Garage {
 
   private async updateCar(): Promise<void> {
     const { chosenCar } = this;
-    const updatedCar: ICar = await this.carCRUD<ICar, ICarCreate>(
+    const crud = new Crud<ICar, ICarCreate>(
       this.makeRequestUrlCarEdit(chosenCar.id),
       updateCar.method,
       {
@@ -294,6 +282,7 @@ export class Garage {
         color: this.inputUpdateCarColor.value,
       },
     );
+    const updatedCar = await crud.responseJson;
     if (!updatedCar) return;
 
     chosenCar.name = updatedCar.name;
@@ -308,40 +297,15 @@ export class Garage {
       .findIndex((eachCar) => eachCar.id === id);
     if (indxInThisCars === undefined || indxInThisCars === -1) return;
 
-    await this.carCRUD<ICar, ICarCreate>(this.makeRequestUrlCarEdit(id), deleteCar.method);
-    await this.carCRUD<ICar, ICarCreate>(`${API_BASE_URL + deleteWinner.deleteUrl + id}`, deleteWinner.method);
+    const delCar = new Crud<ICar, ICarCreate>(this.makeRequestUrlCarEdit(id), deleteCar.method);
+    const delWin = new Crud<ICar, ICarCreate>(`${deleteWinner.deleteUrl + id}`, deleteWinner.method);
     this.cars.splice(indxInThisCars, 1);
-  }
-
-  private async carCRUD<P, T>(
-    url: string,
-    method = 'GET',
-    body?: T,
-    headers = { 'Content-Type': 'application/json' },
-  ):Promise<P> {
-    try {
-      const response = await fetch(url, {
-        method,
-        headers,
-        body: body ? JSON.stringify(body) : null,
-      });
-      await this.carCRUDResponseHandler(response);
-      return await response.json();
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-
-  private async carCRUDResponseHandler(res: Response): Promise<void> {
-    if (!res.ok) {
-      console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
-    }
+    if (delCar.responseJson && await delWin.responseJson) console.log('Deleted');
   }
 
   private makeRequestUrlCarEdit(carId?: number):string {
     const id = (carId !== undefined) ? `/${carId}` : '';
-    return `${API_BASE_URL + getCars.getCarsUrl + id}`;
+    return `${getCars.getCarsUrl + id}`;
   }
   // ============== CRUD CAR ======== end ==========
 

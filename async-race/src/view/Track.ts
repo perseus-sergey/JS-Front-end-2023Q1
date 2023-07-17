@@ -1,6 +1,5 @@
 import { IStartStopEngine } from '../app/tipes';
 import {
-  API_BASE_URL,
   constantsAttributes,
   constantsClasses,
   constantsNumbers,
@@ -9,6 +8,8 @@ import {
   apiCarEngine,
   constantsTagName,
 } from '../constants';
+import { Crud } from '../controller/Crud';
+import { Resp } from '../controller/Response';
 import { generateDomElement, getImage } from '../utilites';
 import { Car } from './Car';
 
@@ -25,11 +26,6 @@ const {
         drive,
       },
     },
-  },
-  respContent: {
-    velocity,
-    distance,
-    success, // true/false
   },
   stopCode,
 } = apiCarEngine;
@@ -151,7 +147,6 @@ export class Track extends HTMLElement {
     cancelAnimationFrame(this.stopId);
     if (!this.winTag) return;
     const stoppedTrackNum = this.winTag.getAttribute(FINISHERS) || 0;
-    // console.log('car stopped');
     this.winTag.setAttribute(FINISHERS, `${+stoppedTrackNum + 1}`);
   }
 
@@ -161,7 +156,6 @@ export class Track extends HTMLElement {
   }
 
   private async stopCar(): Promise<void> {
-    // cancelAnimationFrame(this.stopId);
     await this.isCrashEngine(this.car.id, stopped);
     this.carStopped();
     this.moveCarToStart();
@@ -200,46 +194,18 @@ export class Track extends HTMLElement {
   }
 
   private async isCrashEngine(carId: number, status:string): Promise<boolean> {
-    const url = this.makeRequestUrl(carId, status);
-    try {
-      return this.responseCrash(await fetch(url, { method }));
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-  }
-
-  private responseCrash(res: Response): boolean {
-    if (!res.ok) {
-      if (res.status === stopCode) console.log('Car has been stopped. It\'s engine was broken down.');
-      else console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
-      return true;
-    }
-    return false;
+    const resp = new Resp(this.makeRequestUrl(carId, status), method);
+    const prom = await resp.response;
+    return (prom?.status === stopCode);
   }
 
   private async getApiVelocity(carId: number, status: string):Promise<IStartStopEngine> {
     const url = this.makeRequestUrl(carId, status);
-    try {
-      const response = this.errorHandler(await fetch(url, { method }));
-      return await response.json();
-    } catch (error) {
-      console.error(error);
-      return { velocity: null, distance: null };
-    }
-  }
-
-  private errorHandler(res: Response): Response {
-    if (!res.ok) {
-      if (res.status === 401 || res.status === 404) {
-        console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
-      }
-      throw Error(res.statusText);
-    }
-    return res;
+    const crud = new Crud<IStartStopEngine>(url, method);
+    return await crud.responseJson || { velocity: null, distance: null };
   }
 
   private makeRequestUrl(carId: number, status: string):string {
-    return `${API_BASE_URL + startStopUrl}?${id}${carId}&${statusUrl + status}`;
+    return `${startStopUrl}?${id}${carId}&${statusUrl + status}`;
   }
 }

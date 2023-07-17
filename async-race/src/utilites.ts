@@ -60,4 +60,4 @@ const getRandomModel = (): string => {
   return arr[getRandomIntBetween(0, arr.length - 1)];
 };
 
-export const getRandomName = (): string => `${carNames[getRandomIntBetween(0, carNames.length - 1)]} - ${getRandomModel()}`;
+export const getRandomName = (): string => `${carNames[getRandomIntBetween(0, carNames.length - 1)]} ${getRandomModel()}`;

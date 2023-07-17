@@ -1,13 +1,12 @@
-// import { Car } from '../app/tipes';
 import { ICar, IWinner } from '../app/tipes';
 import {
   constantsClasses,
   constantsTexts,
   constantsNumbers,
-  API_BASE_URL,
   apiGarage,
   apiWinner,
 } from '../constants';
+import { Crud } from '../controller/Crud';
 import {
   generateDomElement, getImage,
 } from '../utilites';
@@ -82,8 +81,6 @@ export class Winners {
 
   private sortTimeBtn!: HTMLElement;
 
-  private isRace = false;
-
   private currPageNum = 1;
 
   private maxPage = 1;
@@ -104,7 +101,6 @@ export class Winners {
     await this.createWinnersArray();
     this.fillWinTable();
     this.updatePageTitle();
-    // this.updatePagination();
   }
 
   private generatePage(): void {
@@ -143,7 +139,8 @@ export class Winners {
       chosenBtn.classList.add(ASC_SORT);
     }
     chosenBtn.classList.add(ACTIVE);
-    this.fillWinTable();
+    this.currPageNum = 1;
+    this.updatePagination();
   }
 
   private generatePageTitle(): void {
@@ -226,11 +223,14 @@ export class Winners {
 
   // ______________ PAGINATION ______ end _______
 
-  // ______________ FETCH ______ start _______
-
   private async createWinnersArray(): Promise<void> {
-    const cars: ICar[] = await this.load(API_BASE_URL + getCars.getCarsUrl, getCars.method);
-    this.winners = await this.load(API_BASE_URL + getWinner.getUrl, getWinner.method);
+    const crudCars = new Crud<ICar[]>(getCars.getCarsUrl, getCars.method);
+    const cars = await crudCars.responseJson;
+    if (!cars) return;
+    const crudWinners = new Crud<IWinner[]>(getWinner.getUrl, getWinner.method);
+    const winners = await crudWinners.responseJson;
+    if (!winners) return;
+    this.winners = winners;
     this.winners.forEach((winner) => {
       const oCar = cars.find((car) => car.id === winner.id);
       if (!oCar) return;
@@ -239,28 +239,4 @@ export class Winners {
       win.color = oCar.color;
     });
   }
-
-  private async load<T>(url:string, method:string):Promise<T> {
-    try {
-      const response = await fetch(url, { method });
-      await this.errorHandler(response);
-      return await response.json();
-      // return toJson.map((car: Car) => new Car(car.id, car.color, car.name));
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-
-  private async errorHandler(res: Response): Promise<void> {
-    if (!res.ok) {
-      this.errorServerMessage(res);
-    }
-  }
-
-  private errorServerMessage(res: Response): void {
-    console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
-  }
-
-  // ______________ FETCH ______ end _______
 }
