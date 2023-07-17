@@ -116,6 +116,7 @@ export class Track extends HTMLElement {
     generateDomElement('button', BTN_TRACK_REMOVE_CAR, trackBtnsWrapper, BTN_TRACK_REMOVE_CAR_STYLE);
 
     this.engineStopBtn = generateDomElement('button', BTN_TRACK_STOP_CAR, trackBtnsWrapper, BTN_TRACK_STOP_CAR_STYLE);
+    this.engineStopBtn.disabled = true;
     this.engineStartBtn = generateDomElement('button', BTN_TRACK_START_CAR, trackBtnsWrapper, BTN_TRACK_START_CAR_STYLE);
 
     this.carTitleTag = generateDomElement('span', this.carTitle || null, trackBtnsWrapper, TRACK_CAR_NAME);
@@ -160,6 +161,7 @@ export class Track extends HTMLElement {
     this.carStopped();
     this.moveCarToStart();
     this.engineStartBtn.disabled = false;
+    this.engineStopBtn.disabled = true;
   }
 
   private sendResultToWinTag(): void {
@@ -174,6 +176,7 @@ export class Track extends HTMLElement {
 
   private async setAnimateParams(): Promise<void> {
     this.engineStartBtn.disabled = true;
+    this.engineStopBtn.disabled = false;
     this.distance = this.clientWidth - this.carElement.clientWidth;
     const carEngineParams = await this.getApiVelocity(this.car.id, started);
     this.carVelocity = carEngineParams.velocity || 0;
