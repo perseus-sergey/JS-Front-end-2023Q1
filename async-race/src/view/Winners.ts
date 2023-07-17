@@ -140,7 +140,12 @@ export class Winners {
     }
     chosenBtn.classList.add(ACTIVE);
     this.currPageNum = 1;
-    this.updatePagination();
+    if (!this.isTableOverFull()) this.fillWinTable();
+    else this.updatePagination();
+  }
+
+  private isTableOverFull(): boolean {
+    return this.winners.length > NUMBER_ROWS_WIN_TABLE;
   }
 
   private generatePageTitle(): void {
@@ -198,7 +203,7 @@ export class Winners {
   }
 
   private isPaginationVisible(): boolean {
-    if (this.winners.length <= NUMBER_ROWS_WIN_TABLE) {
+    if (!this.isTableOverFull()) {
       this.paginWrapper.classList.add(HIDE_PAGINATION);
       return false;
     }
