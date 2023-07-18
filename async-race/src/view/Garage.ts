@@ -14,6 +14,7 @@ import {
 } from '../common/utilites';
 import { Car } from './Car';
 import { Track } from './Track';
+import { Pagination } from '../controller/Pagination';
 
 const {
   GARAGE,
@@ -27,13 +28,6 @@ const {
   BTN_STOP_RACE,
   BTN_START_RACE,
   BTN_CREATE_CARS,
-  PAGIN_WRAPPER,
-  BTN_PAGIN_LEFT,
-  BTN_PAGIN_RIGHT,
-  BTN_PAGIN_LAST,
-  BTN_PAGIN_FIRST,
-  PAGIN_CURRENT,
-  HIDE_PAGINATION,
 } = constantsClasses;
 
 const {
@@ -45,10 +39,6 @@ const {
   BTN_STOP_RACE_TEXT,
   BTN_START_RACE_TEXT,
   BTN_CREATE_CARS_TEXT,
-  BTN_PAGIN_TEXT_LEFT,
-  BTN_PAGIN_TEXT_RIGHT,
-  BTN_PAGIN_TEXT_LAST,
-  BTN_PAGIN_TEXT_FIRST,
 } = constantsTexts;
 
 const {
@@ -76,7 +66,9 @@ const {
   deleteWinner,
 } = apiWinner;
 
-export class Garage {
+export class Garage extends Pagination<Car> {
+  protected numberRowsPerPage = NUMBER_TRACKS_PER_PAGE;
+
   private formUpdateCar!: HTMLInputElement;
 
   private inputUpdateCarName!: HTMLInputElement;
@@ -85,9 +77,7 @@ export class Garage {
 
   private inputUpdateCarSubmit!: HTMLInputElement;
 
-  private cars: Car[] = [];
-
-  public garage!: HTMLElement;
+  public layout!: HTMLElement;
 
   public tracksElement!: HTMLElement;
 
@@ -111,25 +101,26 @@ export class Garage {
 
   private createCarsBtn!: HTMLButtonElement;
 
-  private btnPaginPrevius!: HTMLButtonElement;
+  // private btnPaginPrevius!: HTMLButtonElement;
 
-  private btnPaginNext!: HTMLButtonElement;
+  // private btnPaginNext!: HTMLButtonElement;
 
-  private btnPaginLast!: HTMLButtonElement;
+  // private btnPaginLast!: HTMLButtonElement;
 
-  private btnPaginFirst!: HTMLButtonElement;
+  // private btnPaginFirst!: HTMLButtonElement;
 
-  private paginCurrPage!: HTMLElement;
+  // private paginCurrPage!: HTMLElement;
 
-  private paginWrapper!: HTMLElement;
+  // private paginWrapper!: HTMLElement;
 
   private isRace = false;
 
-  private currPageNum = 1;
+  // private currPageNum = 1;
 
-  private maxPage = 1;
+  // private maxPage = 1;
 
   constructor() {
+    super();
     this.garageBuild();
   }
 
@@ -139,7 +130,7 @@ export class Garage {
     this.generateGarageTitle();
     this.generateTracksTag();
     await this.getCars();
-    if (this.cars.length) this.fillTracksHtml();
+    if (this.mainArray.length) this.fillPage();
     this.makePagination();
     this.bindCallbacks();
     this.startEventListners();
@@ -150,7 +141,7 @@ export class Garage {
     const crud = new Crud<Car[]>(this.makeRequestUrlCarEdit());
 
     const data = await crud.responseJson;
-    if (data) this.cars = data.map((car: Car) => new Car(car.id, car.color, car.name));
+    if (data) this.mainArray = data.map((car: Car) => new Car(car.id, car.color, car.name));
   }
 
   public disableUpdateForm(isDisable = true): void {
@@ -159,6 +150,19 @@ export class Garage {
     this.inputUpdateCarName.disabled = isDisable;
     this.inputUpdateCarColor.disabled = isDisable;
     this.inputUpdateCarSubmit.disabled = isDisable;
+  }
+
+  protected fillPage(pageNumber = 1): void {
+    this.tracksElement.innerHTML = '';
+
+    this.mainArray.slice(
+      (pageNumber - 1) * NUMBER_TRACKS_PER_PAGE,
+      pageNumber * NUMBER_TRACKS_PER_PAGE,
+    ).forEach((car) => {
+      const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
+      this.setTrackAttributes(track, car.id, car.name, car.color);
+      track.insertCar(car);
+    });
   }
 
   private bindCallbacks(): void {
@@ -174,7 +178,7 @@ export class Garage {
   public updateCarForm(target: HTMLElement): void {
     const chosenTrack = target.closest(TRACK_TAG) as Track;
     if (!chosenTrack) return;
-    const chosenCar = this.cars
+    const chosenCar = this.mainArray
       .find((eachCar) => eachCar.id === chosenTrack.car.id);
     if (!chosenCar) return;
     this.disableUpdateForm(false);
@@ -244,7 +248,7 @@ export class Garage {
     if (!chosenTrack) return;
 
     await this.removeCar(chosenTrack);
-    this.fillTracksHtml();
+    this.fillPage();
     this.updateGarageTitle();
   }
 
@@ -268,8 +272,8 @@ export class Garage {
     const crud = new Crud<ICar, ICarCreate>(this.makeRequestUrlCarEdit(), createCar.method, car);
     const createdCar = await crud.responseJson;
     if (!createdCar) return;
-    this.cars.push(createdCar);
-    this.fillTracksHtml();
+    this.mainArray.push(createdCar);
+    this.fillPage();
     this.updateGarageTitle();
   }
 
@@ -294,13 +298,13 @@ export class Garage {
 
   private async removeCar(track: Track): Promise<void> {
     const { id } = track.car;
-    const indxInThisCars = this.cars
+    const indxInThisCars = this.mainArray
       .findIndex((eachCar) => eachCar.id === id);
     if (indxInThisCars === undefined || indxInThisCars === -1) return;
 
     const delCar = new Crud<ICar, ICarCreate>(this.makeRequestUrlCarEdit(id), deleteCar.method);
     const delWin = new Crud<ICar, ICarCreate>(`${deleteWinner.deleteUrl + id}`, deleteWinner.method);
-    this.cars.splice(indxInThisCars, 1);
+    this.mainArray.splice(indxInThisCars, 1);
     if (delCar.responseJson && await delWin.responseJson) console.log('Deleted');
   }
 
@@ -322,18 +326,18 @@ export class Garage {
   }
 
   private generateGarage(): void {
-    this.garage = generateDomElement('div', '', null, GARAGE);
+    this.layout = generateDomElement('div', '', null, GARAGE);
   }
 
   private generateControlPanel(): void {
-    this.controlPanel = generateDomElement('div', null, this.garage, CONTROL_PANEL);
+    this.controlPanel = generateDomElement('div', null, this.layout, CONTROL_PANEL);
     this.generateFormCreateCar();
     this.generateFormUpdateCar();
     this.generateFormRace();
   }
 
   private generateTracksTag(): void {
-    this.tracksElement = generateDomElement('div', '', this.garage, TRACKS_TAG);
+    this.tracksElement = generateDomElement('div', '', this.layout, TRACKS_TAG);
   }
 
   private generateFormRace(): void {
@@ -366,84 +370,15 @@ export class Garage {
   }
 
   private generateGarageTitle(): void {
-    this.garageTitle = generateDomElement('h2', null, this.garage);
+    this.garageTitle = generateDomElement('h2', null, this.layout);
   }
 
   private updateGarageTitle(): void {
-    this.garageTitle.textContent = `${GARAGE_TITLE} (${this.cars.length})`;
+    this.garageTitle.textContent = `${GARAGE_TITLE} (${this.mainArray.length})`;
     this.updatePagination();
   }
 
   private getTrackTags(): Track[] {
     return [...document.querySelectorAll(TRACK_TAG)] as Track[];
   }
-
-  // ============== PAGINATION ======== start ====
-
-  private makePagination(): void {
-    this.paginWrapper = generateDomElement('div', null, this.garage, PAGIN_WRAPPER, HIDE_PAGINATION);
-    this.btnPaginFirst = generateDomElement('button', BTN_PAGIN_TEXT_FIRST, this.paginWrapper, BTN_PAGIN_FIRST);
-    this.btnPaginPrevius = generateDomElement('button', BTN_PAGIN_TEXT_LEFT, this.paginWrapper, BTN_PAGIN_LEFT);
-    this.paginCurrPage = generateDomElement('div', `${this.currPageNum}`, this.paginWrapper, PAGIN_CURRENT);
-    this.btnPaginNext = generateDomElement('button', BTN_PAGIN_TEXT_RIGHT, this.paginWrapper, BTN_PAGIN_RIGHT);
-    this.btnPaginLast = generateDomElement('button', BTN_PAGIN_TEXT_LAST, this.paginWrapper, BTN_PAGIN_LAST);
-  }
-
-  private updatePagination(): void {
-    if (!this.isPaginationVisible()) return;
-
-    this.maxPage = Math.ceil(this.cars.length / NUMBER_TRACKS_PER_PAGE);
-    this.currPageNum = Math.min(this.currPageNum, this.maxPage);
-    this.paginCurrPage.innerHTML = `${this.currPageNum}`;
-
-    this.setDisablingPaginBtns();
-
-    this.fillTracksHtml(this.currPageNum);
-  }
-
-  private fillTracksHtml(pageNumber = 1): void {
-    this.tracksElement.innerHTML = '';
-
-    this.cars.slice(
-      (pageNumber - 1) * NUMBER_TRACKS_PER_PAGE,
-      pageNumber * NUMBER_TRACKS_PER_PAGE,
-    ).forEach((car) => {
-      const track: Track = generateDomElement(TRACK_TAG, null, this.tracksElement);
-      this.setTrackAttributes(track, car.id, car.name, car.color);
-      track.insertCar(car);
-    });
-  }
-
-  public paginClickHandler(btnName: 'first' | 'previus' | 'next' | 'last'): void {
-    if (btnName === 'first') this.currPageNum = 1;
-    else if (btnName === 'previus') this.currPageNum -= 1;
-    else if (btnName === 'next') this.currPageNum += 1;
-    else if (btnName === 'last') this.currPageNum = this.maxPage;
-    this.updatePagination();
-  }
-
-  private isPaginationVisible(): boolean {
-    if (this.cars.length <= NUMBER_TRACKS_PER_PAGE) {
-      this.paginWrapper.classList.add(HIDE_PAGINATION);
-      return false;
-    }
-    this.paginWrapper.classList.remove(HIDE_PAGINATION);
-    return true;
-  }
-
-  private setDisablingPaginBtns(): void {
-    this.btnPaginNext.disabled = false;
-    this.btnPaginLast.disabled = false;
-    this.btnPaginPrevius.disabled = false;
-    this.btnPaginFirst.disabled = false;
-
-    if (this.currPageNum >= this.maxPage) {
-      this.btnPaginNext.disabled = true;
-      this.btnPaginLast.disabled = true;
-    } else if (this.currPageNum <= 1) {
-      this.btnPaginPrevius.disabled = true;
-      this.btnPaginFirst.disabled = true;
-    }
-  }
-  // ______________ PAGINATION ______ end _______
 }

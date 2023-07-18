@@ -79,8 +79,8 @@ export class Page extends Listners {
   private generateMainTag(): void {
     this.main = generateDomElement('main', '', document.body, MAIN);
     this.winTag = generateDomElement(WIN_TAG, null, this.main);
-    this.main.append(this.garage.garage);
-    this.main.append(this.winPage.winPage);
+    this.main.append(this.garage.layout);
+    this.main.append(this.winPage.layout);
   }
 
   private generateFooter(): void {
@@ -104,14 +104,14 @@ export class Page extends Listners {
 
   protected showNextPage():void {
     this.winTag.classList.add(GARAGE_HIDE);
-    this.garage.garage.classList.add(GARAGE_HIDE);
+    this.garage.layout.classList.add(GARAGE_HIDE);
     this.winPage.pageUpdate();
-    this.winPage.winPage.classList.add(WIN_SHOW);
+    this.winPage.layout.classList.add(WIN_SHOW);
   }
 
   protected showPreviusPage():void {
-    this.garage.garage.classList.remove(GARAGE_HIDE);
-    this.winPage.winPage.classList.remove(WIN_SHOW);
+    this.garage.layout.classList.remove(GARAGE_HIDE);
+    this.winPage.layout.classList.remove(WIN_SHOW);
     this.winTag.classList.remove(GARAGE_HIDE);
   }
 
