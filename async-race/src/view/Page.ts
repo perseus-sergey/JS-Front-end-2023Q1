@@ -86,9 +86,10 @@ export class Page extends Listners {
   private generateFooter(): void {
     this.footer = generateDomElement('footer', '', document.body, FOOTER);
 
-    const gitLink = generateDomElement('a', '', this.footer);
-    gitLink.setAttribute('target', '_blank');
-    gitLink.setAttribute('href', GIT_LINK);
+    const gitLink: HTMLAnchorElement = generateDomElement('a', '', this.footer);
+    gitLink.href = GIT_LINK;
+    gitLink.target = '_blank';
+
     gitLink.innerHTML = GIT_SVG;
     const rssLink = generateDomElement('a', '', this.footer, RSS_LINK_CLASS);
     rssLink.setAttribute('target', '_blank');

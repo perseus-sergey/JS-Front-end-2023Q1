@@ -35,7 +35,7 @@ export class Pagination<T> {
 
   protected maxPage = 1;
 
-  protected numberRowsPerPage!: number;
+  protected rowsPerPage!: number;
 
   protected currPageNum = 1;
 
@@ -51,14 +51,13 @@ export class Pagination<T> {
   }
 
   protected updatePagination(): void {
-    if (!this.isPaginationVisible()) return;
+    if (this.isPaginationVisible()) {
+      this.maxPage = Math.ceil(this.mainArray.length / this.rowsPerPage);
+      this.currPageNum = Math.min(Math.max(1, this.currPageNum), this.maxPage);
+      this.paginCurrPage.innerHTML = `${this.currPageNum}`;
 
-    this.maxPage = Math.ceil(this.mainArray.length / this.numberRowsPerPage);
-    this.currPageNum = Math.min(this.currPageNum, this.maxPage);
-    this.paginCurrPage.innerHTML = `${this.currPageNum}`;
-
-    this.setDisablingPaginBtns();
-
+      this.setDisablingPaginBtns();
+    }
     this.fillPage(this.currPageNum);
   }
 
@@ -75,7 +74,7 @@ export class Pagination<T> {
   }
 
   protected isTableOverFull(): boolean {
-    return true;
+    return this.mainArray.length > this.rowsPerPage;
   }
 
   private isPaginationVisible(): boolean {

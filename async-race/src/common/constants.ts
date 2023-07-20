@@ -166,10 +166,12 @@ export const constantsLinks = {
   SWU_IMG_PATH: './assets/images/ukraine_stand.png',
   GIT_LINK: 'https://github.com/perseus-sergey',
   RSS_LINK: 'https://rs.school/',
+  API_LINK: 'https://github.com/mikhama/async-race-api',
   RSS_IMG_PATH: './assets/images/rs-school.png',
 };
 export const constantsTexts = {
   H1: 'Async Race',
+  ATTENTION_INSTALL_SERVER: 'There are no car in the garage!<br>Click here to install the server.',
   SWU_IMG_ALT: 'Stand With Ukraine',
   RSS_IMG_ALT: 'Rss School reference',
   COPYRIGHT_TEXT: 'Created 2023',
@@ -202,10 +204,12 @@ export const constantsTexts = {
 export const constantsClasses = {
   ACTIVE: 'active',
   HEADER: 'header',
+  INSTALL_SERVER: 'message-not-server',
   SWU_IMG: 'swu-img',
   MAIN: 'main',
   FOOTER: 'footer',
   RSS_LINK_CLASS: 'rss-ref',
+  API_LINK_CLASS: 'api-ref',
   RSS_LINK_IMG: 'rss-ref__img',
   COPYRIGHT: 'copyright',
   TRACK_BTNS_WRAPPER: 'track-btns-wrapper',

@@ -51,7 +51,7 @@ export class Winners extends Pagination<IWinner> {
 
   public tracksElement!: HTMLElement;
 
-  protected numberRowsPerPage = NUMBER_ROWS_WIN_TABLE;
+  protected rowsPerPage = NUMBER_ROWS_WIN_TABLE;
 
   private winPageTitle!: HTMLElement;
 
@@ -117,10 +117,6 @@ export class Winners extends Pagination<IWinner> {
     this.currPageNum = 1;
     if (!this.isTableOverFull()) this.fillPage();
     else this.updatePagination();
-  }
-
-  protected isTableOverFull(): boolean {
-    return this.mainArray.length > NUMBER_ROWS_WIN_TABLE;
   }
 
   private generatePageTitle(): void {

@@ -7,6 +7,7 @@ import {
   constantsNumbers,
   apiGarage,
   apiWinner,
+  constantsLinks,
 } from '../common/constants';
 import { Crud } from '../controller/Crud';
 import {
@@ -17,6 +18,7 @@ import { Track } from './Track';
 import { Pagination } from '../controller/Pagination';
 
 const {
+  INSTALL_SERVER,
   GARAGE,
   TRACKS_TAG,
   CONTROL_PANEL,
@@ -31,6 +33,7 @@ const {
 } = constantsClasses;
 
 const {
+  ATTENTION_INSTALL_SERVER,
   GARAGE_TITLE,
   CREATE_CAR_SUBMIT,
   UPDATE_CAR_SUBMIT,
@@ -46,11 +49,11 @@ const {
   ATTR_CAR_ID,
   ATTR_CAR_COLOR,
   MOOVE,
-  // WINNER,
   FINISHERS,
 } = constantsAttributes;
 
 const { TRACK_TAG, WIN_TAG } = constantsTagName;
+const { API_LINK } = constantsLinks;
 const {
   NUMBER_RANDOM_CREATED_CAR,
   NUMBER_TRACKS_PER_PAGE,
@@ -67,7 +70,7 @@ const {
 } = apiWinner;
 
 export class Garage extends Pagination<Car> {
-  protected numberRowsPerPage = NUMBER_TRACKS_PER_PAGE;
+  protected rowsPerPage = NUMBER_TRACKS_PER_PAGE;
 
   private formUpdateCar!: HTMLInputElement;
 
@@ -78,6 +81,8 @@ export class Garage extends Pagination<Car> {
   private inputUpdateCarSubmit!: HTMLInputElement;
 
   public layout!: HTMLElement;
+
+  public apiLink!: HTMLAnchorElement;
 
   public tracksElement!: HTMLElement;
 
@@ -101,23 +106,7 @@ export class Garage extends Pagination<Car> {
 
   private createCarsBtn!: HTMLButtonElement;
 
-  // private btnPaginPrevius!: HTMLButtonElement;
-
-  // private btnPaginNext!: HTMLButtonElement;
-
-  // private btnPaginLast!: HTMLButtonElement;
-
-  // private btnPaginFirst!: HTMLButtonElement;
-
-  // private paginCurrPage!: HTMLElement;
-
-  // private paginWrapper!: HTMLElement;
-
   private isRace = false;
-
-  // private currPageNum = 1;
-
-  // private maxPage = 1;
 
   constructor() {
     super();
@@ -130,7 +119,7 @@ export class Garage extends Pagination<Car> {
     this.generateGarageTitle();
     this.generateTracksTag();
     await this.getCars();
-    if (this.mainArray.length) this.fillPage();
+    // if (this.mainArray.length) this.fillPage();
     this.makePagination();
     this.bindCallbacks();
     this.startEventListners();
@@ -142,6 +131,17 @@ export class Garage extends Pagination<Car> {
 
     const data = await crud.responseJson;
     if (data) this.mainArray = data.map((car: Car) => new Car(car.id, car.color, car.name));
+    if (!this.mainArray.length) this.checkEmptyGarage();
+  }
+
+  private checkEmptyGarage(): void {
+    if (!this.mainArray.length) {
+      if (this.apiLink) return;
+      this.apiLink = generateDomElement('a', ATTENTION_INSTALL_SERVER, this.layout, INSTALL_SERVER);
+      this.apiLink.href = API_LINK;
+      this.apiLink.target = '_blank';
+    } else
+    if (this.apiLink) this.apiLink.remove();
   }
 
   public disableUpdateForm(isDisable = true): void {
@@ -153,6 +153,7 @@ export class Garage extends Pagination<Car> {
   }
 
   protected fillPage(pageNumber = 1): void {
+    this.checkEmptyGarage();
     this.tracksElement.innerHTML = '';
 
     this.mainArray.slice(
@@ -248,7 +249,7 @@ export class Garage extends Pagination<Car> {
     if (!chosenTrack) return;
 
     await this.removeCar(chosenTrack);
-    this.fillPage();
+    // this.fillPage();
     this.updateGarageTitle();
   }
 
@@ -273,7 +274,7 @@ export class Garage extends Pagination<Car> {
     const createdCar = await crud.responseJson;
     if (!createdCar) return;
     this.mainArray.push(createdCar);
-    this.fillPage();
+    // this.fillPage();
     this.updateGarageTitle();
   }
 

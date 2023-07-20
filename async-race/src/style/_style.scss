@@ -178,6 +178,21 @@ main {
     &.hide {
       display: none;
     }
+
+    .message-not-server {
+      text-decoration: none;
+      white-space: nowrap;  
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translateX(-50%);
+      text-shadow: -0.1vh -0.1vh 0.1vh #000000, 0.1vh 0.1vh 0 #000000, 0 0 0.9vh #f3ffcb, 0.3vh 0.3vh 0 #000000,
+        0.4vh 0.4vh 0 #000000, 0.5vh 0.5vh 0 #000000;
+      color: #c5f338;
+      font-weight: 900;
+      z-index: 1;
+      font-size: 5vh;
+    }
   }
 
   .tracks {
@@ -368,20 +383,23 @@ main {
 }
 
 win-car {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%);
-  text-shadow: -0.1vh -0.1vh 0.1vh #000000, 0.1vh 0.1vh 0 #000000, 0 0 0.9vh #f3ffcb, 0.3vh 0.3vh 0 #000000,
-    0.4vh 0.4vh 0 #000000, 0.5vh 0.5vh 0 #000000;
-  color: #c5f338;
-  font-weight: 900;
-  visibility: hidden;
-  font-size: 3vh;
   white-space: nowrap;
-  z-index: 1;
-
+  visibility: hidden;
+  font-size: 0;
+  z-index: -1;
+  transition: all 0.5s;
+  
   &.show:not(.hide) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%);
+    text-shadow: -0.1vh -0.1vh 0.1vh #000000, 0.1vh 0.1vh 0 #000000, 0 0 0.9vh #f3ffcb, 0.3vh 0.3vh 0 #000000,
+      0.4vh 0.4vh 0 #000000, 0.5vh 0.5vh 0 #000000;
+    color: #c5f338;
+    font-weight: 900;
+    z-index: 1;
+    font-size: 3vh;
     visibility: visible;
   }
 }
