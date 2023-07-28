@@ -1,4 +1,4 @@
-import { IStartStopEngine } from '../common/tipes';
+import { IStartStopEngine } from '../common/types';
 import {
   constantsAttributes,
   constantsClasses,
@@ -130,7 +130,10 @@ export class Track extends HTMLElement {
 
   private setListners(): void {
     this.engineStopBtn.addEventListener('click', () => this.removeAttribute(MOOVE));
-    this.engineStartBtn.addEventListener('click', () => this.setAttribute(MOOVE, ''));
+    this.engineStartBtn.addEventListener('click', () => {
+      this.setAttribute(MOOVE, '');
+      this.engineStopBtn.disabled = false;
+    });
   }
 
   private async moove(): Promise<void> {
@@ -176,7 +179,7 @@ export class Track extends HTMLElement {
 
   private async setAnimateParams(): Promise<void> {
     this.engineStartBtn.disabled = true;
-    this.engineStopBtn.disabled = false;
+    // this.engineStopBtn.disabled = false;
     this.distance = this.clientWidth - this.carElement.clientWidth;
     const carEngineParams = await this.getApiVelocity(this.car.id, started);
     this.carVelocity = carEngineParams.velocity || 0;

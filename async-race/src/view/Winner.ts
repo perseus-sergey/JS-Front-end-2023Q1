@@ -1,6 +1,6 @@
 import {
   IFinisher, IWinner, IWinnerApi, IWinnerCreate,
-} from '../common/tipes';
+} from '../common/types';
 
 import {
   constantsAttributes,
@@ -18,7 +18,19 @@ const {
 } = apiWinner;
 
 const {
-  WIN_SHOW, BTN_START_RACE, BTN_CREATE_CARS,
+  BTN_STOP_RACE,
+  WIN_SHOW,
+  BTN_START_RACE,
+  BTN_CREATE_CARS,
+  INP_CREATE_CAR_NAME,
+  INP_CREATE_CAR_COLOR,
+  CREATE_CAR_SUBMIT_CLASS,
+  NEXT_PAGE_BTN,
+  PAGIN_WRAPPER,
+  IS_RACING,
+  BTN_TRACK_REMOVE_CAR_STYLE,
+  BTN_TRACK_STOP_CAR_STYLE,
+  BTN_TRACK_SELECT_CAR_STYLE,
 } = constantsClasses;
 
 const {
@@ -50,10 +62,41 @@ export class Winner extends HTMLElement {
   }
 
   private raceFinished():void {
-    const startRaceBtn = document.body.querySelector(`.${BTN_START_RACE}`) as HTMLButtonElement;
-    const createCarsBtn = document.body.querySelector(`.${BTN_CREATE_CARS}`) as HTMLButtonElement;
-    startRaceBtn.disabled = false;
-    createCarsBtn.disabled = false;
+    this.enableButtons();
+  }
+
+  private enableButtons():void {
+    let delCarBtns = [...document.body.querySelectorAll(`.${BTN_TRACK_REMOVE_CAR_STYLE}`)] as HTMLButtonElement[];
+    let stopCarBtns = [...document.body.querySelectorAll(`.${BTN_TRACK_STOP_CAR_STYLE}`)] as HTMLButtonElement[];
+    let selectCarBtns = [...document.body.querySelectorAll(`.${BTN_TRACK_SELECT_CAR_STYLE}`)] as HTMLButtonElement[];
+    delCarBtns = delCarBtns.length ? delCarBtns : [];
+    selectCarBtns = selectCarBtns.length ? selectCarBtns : [];
+    stopCarBtns = stopCarBtns.length ? stopCarBtns : [];
+    [
+      ...delCarBtns,
+      ...stopCarBtns,
+      ...selectCarBtns,
+    ].forEach(((btn) => {
+      const button = btn;
+      button.disabled = false;
+    }));
+
+    [
+      BTN_START_RACE,
+      BTN_STOP_RACE,
+      BTN_CREATE_CARS,
+      INP_CREATE_CAR_NAME,
+      INP_CREATE_CAR_COLOR,
+      CREATE_CAR_SUBMIT_CLASS,
+      NEXT_PAGE_BTN,
+    ].forEach((btnClassName) => this.enableButton(btnClassName));
+    const paginWrapper = document.body.querySelector(`.${PAGIN_WRAPPER}`) as HTMLButtonElement;
+    paginWrapper.classList.remove(IS_RACING);
+  }
+
+  private enableButton(btnClassName: string): void {
+    const startRaceBtn = document.body.querySelector(`.${btnClassName}`) as HTMLButtonElement;
+    if (startRaceBtn) startRaceBtn.disabled = false;
   }
 
   private async setWinner(attr: string):Promise<void> {

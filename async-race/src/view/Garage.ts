@@ -1,4 +1,4 @@
-import { ICar, ICarCreate } from '../common/tipes';
+import { ICar, ICarCreate } from '../common/types';
 import {
   constantsClasses,
   constantsTexts,
@@ -30,6 +30,10 @@ const {
   BTN_STOP_RACE,
   BTN_START_RACE,
   BTN_CREATE_CARS,
+  CREATE_CAR_SUBMIT_CLASS,
+  UPDATE_CAR_SUBMIT_CLASS,
+  IS_RACING,
+  PAGIN_WRAPPER,
 } = constantsClasses;
 
 const {
@@ -104,6 +108,8 @@ export class Garage extends Pagination<Car> {
 
   private startRaceBtn!: HTMLButtonElement;
 
+  private resetRaceBtn!: HTMLButtonElement;
+
   private createCarsBtn!: HTMLButtonElement;
 
   private isRace = false;
@@ -144,12 +150,20 @@ export class Garage extends Pagination<Car> {
     if (this.apiLink) this.apiLink.remove();
   }
 
-  public disableUpdateForm(isDisable = true): void {
+  private disableUpdateForm(isDisable = true): void {
     this.inputUpdateCarColor.value = DEFAULT_UPDATE_COLOR;
     this.inputUpdateCarName.value = '';
     this.inputUpdateCarName.disabled = isDisable;
     this.inputUpdateCarColor.disabled = isDisable;
     this.inputUpdateCarSubmit.disabled = isDisable;
+  }
+
+  private disableCreateForm(isDisable = true): void {
+    this.inputCreateCarColor.value = DEFAULT_CREATE_COLOR;
+    this.inputCreateCarName.value = '';
+    this.inputCreateCarName.disabled = isDisable;
+    this.inputCreateCarColor.disabled = isDisable;
+    this.inputCreateCarSubmit.disabled = isDisable;
   }
 
   protected fillPage(pageNumber = 1): void {
@@ -215,15 +229,22 @@ export class Garage extends Pagination<Car> {
     const tracks = this.getTrackTags();
     if (tracks.length) {
       tracks.forEach((track) => {
-        console.log('moove');
         track.setAttribute(MOOVE, '');
       });
     }
   }
 
   private disableBtns(): void {
-    this.startRaceBtn.disabled = true;
-    this.createCarsBtn.disabled = true;
+    const allBtns = [...document.body.querySelectorAll(`button:not(.${PAGIN_WRAPPER} button)`)] as HTMLButtonElement[];
+    if (allBtns.length) {
+      allBtns.forEach(((btn) => {
+        const button = btn;
+        button.disabled = true;
+      }));
+    }
+    this.paginWrapper.classList.add(IS_RACING);
+    this.disableCreateForm();
+    this.disableUpdateForm();
   }
 
   private resetFinishersCounter(): void {
@@ -249,6 +270,7 @@ export class Garage extends Pagination<Car> {
     if (!chosenTrack) return;
 
     await this.removeCar(chosenTrack);
+    this.disableUpdateForm();
     // this.fillPage();
     this.updateGarageTitle();
   }
@@ -305,8 +327,9 @@ export class Garage extends Pagination<Car> {
 
     const delCar = new Crud<ICar, ICarCreate>(this.makeRequestUrlCarEdit(id), deleteCar.method);
     const delWin = new Crud<ICar, ICarCreate>(`${deleteWinner.deleteUrl + id}`, deleteWinner.method);
-    this.mainArray.splice(indxInThisCars, 1);
-    if (delCar.responseJson && await delWin.responseJson) console.log('Deleted');
+    if (delCar.responseJson && await delWin.responseJson) {
+      this.mainArray.splice(indxInThisCars, 1);
+    }
   }
 
   private makeRequestUrlCarEdit(carId?: number):string {
@@ -343,7 +366,7 @@ export class Garage extends Pagination<Car> {
 
   private generateFormRace(): void {
     const raceBtnsWrapper = generateDomElement('div', null, this.controlPanel, WRAP_RACE_BUTTONS);
-    generateDomElement('button', BTN_STOP_RACE_TEXT, raceBtnsWrapper, BTN_STOP_RACE);
+    this.resetRaceBtn = generateDomElement('button', BTN_STOP_RACE_TEXT, raceBtnsWrapper, BTN_STOP_RACE);
     this.startRaceBtn = generateDomElement('button', BTN_START_RACE_TEXT, raceBtnsWrapper, BTN_START_RACE);
     this.createCarsBtn = generateDomElement('button', BTN_CREATE_CARS_TEXT, raceBtnsWrapper, BTN_CREATE_CARS);
   }
@@ -354,7 +377,7 @@ export class Garage extends Pagination<Car> {
     this.inputCreateCarName.type = 'text';
     this.inputCreateCarColor = generateDomElement('input', '', this.formCreateCar, INP_CREATE_CAR_COLOR);
     this.inputCreateCarColor.type = 'color';
-    this.inputCreateCarSubmit = generateDomElement('button', CREATE_CAR_SUBMIT, this.formCreateCar);
+    this.inputCreateCarSubmit = generateDomElement('button', CREATE_CAR_SUBMIT, this.formCreateCar, CREATE_CAR_SUBMIT_CLASS);
     this.inputCreateCarSubmit.type = 'submit';
     this.resetCreateForm();
   }
@@ -365,7 +388,7 @@ export class Garage extends Pagination<Car> {
     this.inputUpdateCarName.type = 'text';
     this.inputUpdateCarColor = generateDomElement('input', '', this.formUpdateCar, INP_UPDATE_CAR_COLOR);
     this.inputUpdateCarColor.type = 'color';
-    this.inputUpdateCarSubmit = generateDomElement('button', UPDATE_CAR_SUBMIT, this.formUpdateCar);
+    this.inputUpdateCarSubmit = generateDomElement('button', UPDATE_CAR_SUBMIT, this.formUpdateCar, UPDATE_CAR_SUBMIT_CLASS);
     this.inputUpdateCarSubmit.type = 'submit';
     this.disableUpdateForm(true);
   }

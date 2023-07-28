@@ -45,9 +45,9 @@ const {
 export class Page extends Listners {
   private header!: HTMLElement;
 
-  private btnNextPage!: HTMLElement;
+  private btnNextPage!: HTMLButtonElement;
 
-  private btnPreviusPage!: HTMLElement;
+  private btnPreviusPage!: HTMLButtonElement;
 
   private main!: HTMLElement;
 
@@ -108,12 +108,16 @@ export class Page extends Listners {
     this.garage.layout.classList.add(GARAGE_HIDE);
     this.winPage.pageUpdate();
     this.winPage.layout.classList.add(WIN_SHOW);
+    this.btnNextPage.disabled = true;
+    this.btnPreviusPage.disabled = false;
   }
 
   protected showPreviusPage():void {
     this.garage.layout.classList.remove(GARAGE_HIDE);
     this.winPage.layout.classList.remove(WIN_SHOW);
     this.winTag.classList.remove(GARAGE_HIDE);
+    this.btnNextPage.disabled = false;
+    this.btnPreviusPage.disabled = true;
   }
 
   protected hideWinTag():void {

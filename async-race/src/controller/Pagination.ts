@@ -78,7 +78,7 @@ export class Pagination<T> {
   }
 
   private isPaginationVisible(): boolean {
-    if (!this.isTableOverFull()) {
+    if (!this.isTableOverFull() && this.currPageNum <= 1) {
       this.paginWrapper.classList.add(HIDE_PAGINATION);
       return false;
     }
@@ -95,7 +95,8 @@ export class Pagination<T> {
     if (this.currPageNum >= this.maxPage) {
       this.btnPaginNext.disabled = true;
       this.btnPaginLast.disabled = true;
-    } else if (this.currPageNum <= 1) {
+    }
+    if (this.currPageNum <= 1) {
       this.btnPaginPrevius.disabled = true;
       this.btnPaginFirst.disabled = true;
     }

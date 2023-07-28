@@ -175,7 +175,7 @@ export const constantsTexts = {
   SWU_IMG_ALT: 'Stand With Ukraine',
   RSS_IMG_ALT: 'Rss School reference',
   COPYRIGHT_TEXT: 'Created 2023',
-  BTN_STOP_RACE_TEXT: 'STOP RACE',
+  BTN_STOP_RACE_TEXT: 'RESET',
   BTN_START_RACE_TEXT: 'START RACE',
   BTN_CREATE_CARS_TEXT: 'CREATE CARS',
   CREATE_CAR_SUBMIT: 'CREATE',
@@ -202,6 +202,8 @@ export const constantsTexts = {
   WIN_TBL_TITLE_ROW_5: 'Best Time (s)',
 };
 export const constantsClasses = {
+  CREATE_CAR_SUBMIT_CLASS: 'create-car-submit',
+  UPDATE_CAR_SUBMIT_CLASS: 'update-car-submit',
   ACTIVE: 'active',
   HEADER: 'header',
   INSTALL_SERVER: 'message-not-server',
@@ -238,6 +240,7 @@ export const constantsClasses = {
   BTN_PAGIN_FIRST: 'btn-pagination-first',
   PAGIN_CURRENT: 'pagination-current',
   HIDE_PAGINATION: 'pagination-hidden',
+  IS_RACING: 'is-racing',
   BTN_TRACK_SELECT_CAR_STYLE: 'btn-select-car',
   BTN_TRACK_REMOVE_CAR_STYLE: 'btn-remove-car',
   BTN_TRACK_STOP_CAR_STYLE: 'btn-stop-car',

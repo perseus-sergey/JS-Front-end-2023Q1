@@ -1,4 +1,4 @@
-import { ICar, IWinner } from '../common/tipes';
+import { ICar, IWinner } from '../common/types';
 import {
   constantsClasses,
   constantsTexts,
@@ -129,8 +129,8 @@ export class Winners extends Pagination<IWinner> {
   }
 
   protected fillPage(pageNumber = 1): void {
-    if (!this.mainArray.length) return;
     this.winTblBody.innerHTML = '';
+    if (!this.mainArray.length) return;
 
     this.mainArray.slice(
       (pageNumber - 1) * NUMBER_ROWS_WIN_TABLE,

@@ -30,7 +30,7 @@ export class Listners {
   }
 
   private documentClickHandler(event: Event): void {
-    this.hideWinTag();
+    // this.hideWinTag();
     const targ = event.target as HTMLElement;
     if (targ.closest(`.${BTN_TRACK_SELECT_CAR_STYLE}`)) this.garage.updateCarForm(targ);
     else if (targ.closest(`.${BTN_TRACK_REMOVE_CAR_STYLE}`)) this.garage.removeCarHandler(targ);
@@ -51,6 +51,29 @@ export class Listners {
     else if (targ.closest(`.${WIN_TBL_TIME_SORT}`)) this.winPage.tblSortTimeHandler();
     else if (targ.closest(`.${NEXT_PAGE_BTN}`)) this.showNextPage();
     else if (targ.closest(`.${PREV_PAGE_BTN}`)) this.showPreviusPage();
+
+    this.winTagHandler(targ);
+  }
+
+  private winTagHandler(target: HTMLElement): void {
+    [
+      `.${BTN_STOP_RACE}`,
+      `.${BTN_START_RACE}`,
+      `.${BTN_CREATE_CARS}`,
+      `.${GARAGE} .${BTN_PAGIN_FIRST}`,
+      `.${GARAGE} .${BTN_PAGIN_LAST}`,
+      `.${GARAGE} .${BTN_PAGIN_LEFT}`,
+      `.${GARAGE} .${BTN_PAGIN_RIGHT}`,
+      `.${WIN_PAGE} .${BTN_PAGIN_LAST}`,
+      `.${WIN_PAGE} .${BTN_PAGIN_LEFT}`,
+      `.${WIN_PAGE} .${BTN_PAGIN_RIGHT}`,
+      `.${WIN_TBL_WINS_SORT}`,
+      `.${WIN_TBL_TIME_SORT}`,
+      `.${NEXT_PAGE_BTN}`,
+      `.${PREV_PAGE_BTN}`,
+    ].forEach((selector) => {
+      if (target.closest(selector)) this.hideWinTag();
+    });
   }
 
   protected hideWinTag(): void {}

@@ -103,24 +103,6 @@ footer {
     }
   }
 
-  .git-ref {
-    color: #999;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    gap: 2%;
-    white-space: nowrap;
-    width: 20%;
-
-    .copyright,
-    .git-ref {
-      font-size: 2.5vh;
-
-      @media (orientation: portrait) {
-        font-size: 2.5vw;
-      }
-    }
-  }
   .copyright a {
     color: #777;
   }
@@ -411,7 +393,8 @@ win-car {
   justify-content: center;
   gap: 1vh;
 
-  &.pagination-hidden {
+  &.pagination-hidden,
+  &.is-racing {
     visibility: hidden;
   }
   button {
