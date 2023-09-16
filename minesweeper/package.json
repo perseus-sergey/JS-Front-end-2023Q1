@@ -8,7 +8,7 @@
     "dev": "webpack --mode development",
     "prod": "webpack  --node-env=production",
     "building": "webpack --config webpack.config.js",
-    "serve": "webpack serve"
+    "start": "webpack serve"
   },
   "keywords": [],
   "author": "",
